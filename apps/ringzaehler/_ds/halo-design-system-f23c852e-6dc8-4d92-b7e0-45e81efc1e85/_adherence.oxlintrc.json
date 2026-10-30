@@ -1,0 +1,249 @@
+{
+  "plugins": [
+    "react",
+    "import"
+  ],
+  "rules": {
+    "react/forbid-elements": [
+      "warn",
+      {
+        "forbid": [
+          {
+            "element": "button",
+            "message": "Use <Button> from the design system instead of <button>."
+          }
+        ]
+      }
+    ],
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [
+          {
+            "group": [
+              "components/general/BentoCard/**",
+              "components/general/Brand/**",
+              "components/general/Button/**",
+              "components/general/Card/**",
+              "components/general/CaseCard/**",
+              "components/general/Chip/**",
+              "components/general/FeatureCard/**",
+              "components/general/Footer/**",
+              "components/general/HaloRoot/**",
+              "components/general/HeroInput/**",
+              "components/general/LogoCell/**",
+              "components/general/Nav/**",
+              "components/general/NavLink/**"
+            ],
+            "message": "Import design-system components from 'index.js', not component internals."
+          }
+        ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+        "message": "Raw hex color — use a design-system color token via var()."
+      },
+      {
+        "selector": "Literal[value=/\\b\\d+px\\b/]",
+        "message": "Raw px value — use a design-system spacing token via var()."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='BentoCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:title|description|visual|className|id|style|children|key|ref|className|style|children)$/]",
+        "message": "<BentoCard> doesn't accept that prop. Declared props: title, description, visual, className, id, style, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Brand'] > JSXAttribute > JSXIdentifier[name!=/^(?:name|href|size|markOnly|className|id|style|children|key|ref|className|style|children)$/]",
+        "message": "<Brand> doesn't accept that prop. Declared props: name, href, size, markOnly, className, id, style, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Brand'] > JSXAttribute[name.name='size'] > Literal[value!=/^(?:sm|md)$/]",
+        "message": "<Brand> size must be one of 'sm' | 'md'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|size|leadingIcon|trailingIcon|href|children|className|id|style|key|ref|className|style|children)$/]",
+        "message": "<Button> doesn't accept that prop. Declared props: variant, size, leadingIcon, trailingIcon, href, children, className, id, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='variant'] > Literal[value!=/^(?:primary|secondary|ghost)$/]",
+        "message": "<Button> variant must be one of 'primary' | 'secondary' | 'ghost'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='size'] > Literal[value!=/^(?:sm|md|lg)$/]",
+        "message": "<Button> size must be one of 'sm' | 'md' | 'lg'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Card'] > JSXAttribute > JSXIdentifier[name!=/^(?:padded|flat|children|className|id|style|key|ref|className|style|children)$/]",
+        "message": "<Card> doesn't accept that prop. Declared props: padded, flat, children, className, id, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='CaseCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:name|linkLabel|linkHref|thumbBackground|thumbContent|className|id|style|children|key|ref|className|style|children)$/]",
+        "message": "<CaseCard> doesn't accept that prop. Declared props: name, linkLabel, linkHref, thumbBackground, thumbContent, className, id, style, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Chip'] > JSXAttribute > JSXIdentifier[name!=/^(?:children|className|id|style|key|ref|className|style|children)$/]",
+        "message": "<Chip> doesn't accept that prop. Declared props: children, className, id, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='FeatureCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:title|description|linkLabel|linkHref|visual|className|id|style|children|key|ref|className|style|children)$/]",
+        "message": "<FeatureCard> doesn't accept that prop. Declared props: title, description, linkLabel, linkHref, visual, className, id, style, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Footer'] > JSXAttribute > JSXIdentifier[name!=/^(?:brand|columns|bottomLeft|bottomRight|className|id|style|children|key|ref|className|style|children)$/]",
+        "message": "<Footer> doesn't accept that prop. Declared props: brand, columns, bottomLeft, bottomRight, className, id, style, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='HaloRoot'] > JSXAttribute > JSXIdentifier[name!=/^(?:children|className|id|style|key|ref|className|style|children)$/]",
+        "message": "<HaloRoot> doesn't accept that prop. Declared props: children, className, id, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='HeroInput'] > JSXAttribute > JSXIdentifier[name!=/^(?:placeholder|controls|onSend|hideSend|className|id|style|children|key|ref|className|style|children)$/]",
+        "message": "<HeroInput> doesn't accept that prop. Declared props: placeholder, controls, onSend, hideSend, className, id, style, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='LogoCell'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|variant|className|id|style|children|key|ref|className|style|children)$/]",
+        "message": "<LogoCell> doesn't accept that prop. Declared props: label, variant, className, id, style, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='LogoCell'] > JSXAttribute[name.name='variant'] > Literal[value!=/^(?:sans|serif|mono|thin)$/]",
+        "message": "<LogoCell> variant must be one of 'sans' | 'serif' | 'mono' | 'thin'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Nav'] > JSXAttribute > JSXIdentifier[name!=/^(?:brand|links|actions|className|id|style|children|key|ref|className|style|children)$/]",
+        "message": "<Nav> doesn't accept that prop. Declared props: brand, links, actions, className, id, style, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='NavLink'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|hasDropdown|className|id|style|children|key|ref|className|style|children)$/]",
+        "message": "<NavLink> doesn't accept that prop. Declared props: label, hasDropdown, className, id, style, children."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/index.js"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "x-omelette": {
+    "components": {
+      "BentoCard": {
+        "replaces": []
+      },
+      "Brand": {
+        "replaces": []
+      },
+      "Button": {
+        "replaces": [
+          "button"
+        ]
+      },
+      "Card": {
+        "replaces": []
+      },
+      "CaseCard": {
+        "replaces": []
+      },
+      "Chip": {
+        "replaces": []
+      },
+      "FeatureCard": {
+        "replaces": []
+      },
+      "Footer": {
+        "replaces": []
+      },
+      "HaloRoot": {
+        "replaces": []
+      },
+      "HeroInput": {
+        "replaces": []
+      },
+      "LogoCell": {
+        "replaces": []
+      },
+      "Nav": {
+        "replaces": []
+      },
+      "NavLink": {
+        "replaces": []
+      }
+    },
+    "tokens": [
+      "--halo-accent",
+      "--halo-accent-glow",
+      "--halo-accent-soft",
+      "--halo-bg",
+      "--halo-fg",
+      "--halo-fg-dim",
+      "--halo-fg-muted",
+      "--halo-font-body",
+      "--halo-font-display",
+      "--halo-font-mono",
+      "--halo-glow",
+      "--halo-hairline",
+      "--halo-hairline-strong",
+      "--halo-radius-lg",
+      "--halo-radius-md",
+      "--halo-radius-pill",
+      "--halo-radius-sm",
+      "--halo-radius-xl",
+      "--halo-ring",
+      "--halo-ring-strong",
+      "--halo-space-1",
+      "--halo-space-2",
+      "--halo-space-3",
+      "--halo-space-4",
+      "--halo-space-5",
+      "--halo-space-6",
+      "--halo-space-7",
+      "--halo-space-8",
+      "--halo-success",
+      "--halo-surface-1",
+      "--halo-surface-2",
+      "--halo-surface-3",
+      "--halo-surface-hover"
+    ],
+    "tokenKinds": {
+      "--halo-bg": "color",
+      "--halo-surface-1": "color",
+      "--halo-surface-2": "color",
+      "--halo-surface-3": "color",
+      "--halo-surface-hover": "color",
+      "--halo-fg": "color",
+      "--halo-fg-muted": "color",
+      "--halo-fg-dim": "color",
+      "--halo-hairline": "color",
+      "--halo-hairline-strong": "color",
+      "--halo-accent": "color",
+      "--halo-accent-soft": "color",
+      "--halo-accent-glow": "color",
+      "--halo-success": "color",
+      "--halo-font-display": "font",
+      "--halo-font-body": "font",
+      "--halo-font-mono": "font",
+      "--halo-radius-sm": "radius",
+      "--halo-radius-md": "radius",
+      "--halo-radius-lg": "radius",
+      "--halo-radius-xl": "radius",
+      "--halo-radius-pill": "radius",
+      "--halo-space-1": "spacing",
+      "--halo-space-2": "spacing",
+      "--halo-space-3": "spacing",
+      "--halo-space-4": "spacing",
+      "--halo-space-5": "spacing",
+      "--halo-space-6": "spacing",
+      "--halo-space-7": "spacing",
+      "--halo-space-8": "spacing",
+      "--halo-ring": "color",
+      "--halo-ring-strong": "color",
+      "--halo-glow": "color"
+    },
+    "fontFamilies": []
+  }
+}

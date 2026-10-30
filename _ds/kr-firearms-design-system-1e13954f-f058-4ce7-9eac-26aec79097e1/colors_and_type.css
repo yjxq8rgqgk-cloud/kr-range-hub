@@ -1,0 +1,244 @@
+/* ============================================================
+   KR — Design System :: Colors & Type
+   Brand: KR Firearms / KR Design / KR Dienstleistungen
+   Direction: earthy warm camo ("Est-Tarn"), dark-biased
+   surfaces, metallic copper/bronze/steel accents from the
+   wolf + KR monogram mark. Prints in grayscale only — the
+   palette is tuned for strong luminance separation.
+   ============================================================ */
+
+/* ---- Web body + mono (Google Fonts CDN) ---- */
+@import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Barlow+Semi+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+/* ---- Brand display fonts (self-hosted, user-provided) ---- */
+@font-face {
+  font-family: 'Gunplay';
+  src: url('fonts/gunplay_rg.otf') format('opentype');
+  font-weight: 400 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Ghost Factory';
+  src: url('fonts/Ghost_Factory.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+
+:root {
+  /* ============================================================
+     COLOR — base scale
+     Warm earth neutrals, dark-biased. Names follow luminance.
+     ============================================================ */
+
+  /* Neutral earth ramp (backgrounds → text) */
+  --ink-900: #14110B;   /* deepest — primary canvas */
+  --ink-850: #1A160E;
+  --ink-800: #211C13;   /* base surface */
+  --ink-700: #2B2418;   /* raised surface / cards */
+  --ink-600: #38301F;   /* hairlines on dark, hover fill */
+  --ink-500: #4A3F29;   /* strong border */
+  --earth-400: #6E5F44; /* muted text on dark */
+  --earth-300: #8C7B58; /* secondary text */
+  --sand-200: #BCAB86;  /* tertiary / dim labels */
+  --sand-100: #DCD0B5;  /* body text on dark */
+  --bone-050: #EFE8D6;  /* high-emphasis text / near-white */
+
+  /* Camo field accents (warm) */
+  --olive-drab: #4E4F35;
+  --olive: #6A6C43;
+  --olive-light: #878A56;
+  --coyote: #7A5E38;    /* coyote brown */
+  --field-tan: #B59A6E;
+
+  /* Metallics — sampled from the KR mark */
+  --copper: #B26A3E;
+  --copper-bright: #C9824E;
+  --copper-deep: #8C4F2C;
+  --bronze: #C39A4C;
+  --gold: #D2B05A;
+  --steel: #9A988F;
+  --steel-light: #C2C0B6;
+  --gunmetal: #33332F;
+
+  /* ============================================================
+     COLOR — semantic
+     ============================================================ */
+  --bg: var(--ink-900);
+  --bg-raised: var(--ink-700);
+  --bg-sunken: var(--ink-850);
+  --surface: var(--ink-800);
+  --surface-hover: var(--ink-600);
+
+  --fg: var(--bone-050);          /* primary text */
+  --fg-muted: var(--sand-100);    /* body text */
+  --fg-dim: var(--earth-300);     /* secondary */
+  --fg-faint: var(--earth-400);   /* disabled / captions */
+
+  --border: var(--ink-600);
+  --border-strong: var(--ink-500);
+  --border-metal: #5A4A30;
+
+  --primary: var(--copper);          /* default action */
+  --primary-hover: var(--copper-bright);
+  --primary-press: var(--copper-deep);
+  --primary-fg: #1B130C;             /* text on copper */
+
+  --accent: var(--bronze);           /* highlights, KR gold */
+  --accent-2: var(--gold);
+
+  --success: #6E8A3C;
+  --warning: #C9924A;
+  --danger: #A8402E;
+  --info: var(--steel);
+
+  --focus-ring: var(--copper-bright);
+
+  /* ============================================================
+     TYPE — families
+     Display = Gunplay (tactical block). Stamp = Ghost Factory
+     (distressed, impact only). Body/UI = Barlow. Tech labels =
+     Barlow Semi Condensed / JetBrains Mono.
+     ============================================================ */
+  --font-display: 'Gunplay', 'Arial Black', sans-serif;
+  --font-stamp: 'Ghost Factory', 'Gunplay', sans-serif;
+  --font-body: 'Barlow', system-ui, -apple-system, sans-serif;
+  --font-cond: 'Barlow Semi Condensed', 'Barlow', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* TYPE — fluid scale (1.25 major-third-ish) */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-md: 18px;
+  --text-lg: 22px;
+  --text-xl: 28px;
+  --text-2xl: 36px;
+  --text-3xl: 48px;
+  --text-4xl: 64px;
+  --text-5xl: 88px;
+
+  --leading-tight: 1.02;
+  --leading-snug: 1.18;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  --tracking-tight: -0.01em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+  --tracking-wider: 0.12em;   /* tactical labels */
+  --tracking-widest: 0.22em;  /* stamps */
+
+  /* ============================================================
+     SPACING — 4px base
+     ============================================================ */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+
+  /* RADII — small & hard-edged; tactical, not soft */
+  --radius-none: 0px;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-pill: 999px;
+
+  /* BORDERS */
+  --border-w: 1px;
+  --border-w-2: 2px;
+
+  /* SHADOWS — deep, low, warm-black. Used sparingly. */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.45);
+  --shadow-md: 0 6px 18px rgba(0,0,0,.45);
+  --shadow-lg: 0 18px 48px rgba(0,0,0,.55);
+  --shadow-inset: inset 0 1px 0 rgba(255,255,255,.04);
+  --glow-copper: 0 0 0 1px rgba(201,130,78,.35), 0 8px 28px rgba(178,106,62,.18);
+
+  /* MOTION */
+  --ease-out: cubic-bezier(.2,.7,.2,1);
+  --ease-in-out: cubic-bezier(.5,0,.2,1);
+  --dur-fast: 120ms;
+  --dur: 200ms;
+  --dur-slow: 360ms;
+}
+
+/* ============================================================
+   SEMANTIC ELEMENT STYLES — apply on a .kr-type scope or use
+   the utility classes directly.
+   ============================================================ */
+.kr-h1, h1.kr {
+  font-family: var(--font-display);
+  font-size: var(--text-4xl);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  text-transform: uppercase;
+  color: var(--fg);
+  margin: 0;
+}
+.kr-h2, h2.kr {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  line-height: var(--leading-snug);
+  text-transform: uppercase;
+  color: var(--fg);
+  margin: 0;
+}
+.kr-h3, h3.kr {
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: var(--text-xl);
+  line-height: var(--leading-snug);
+  color: var(--fg);
+  margin: 0;
+}
+.kr-stamp {
+  font-family: var(--font-stamp);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+  color: var(--accent);
+}
+.kr-eyebrow, .kr-label {
+  font-family: var(--font-cond);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--copper-bright);
+}
+.kr-body, p.kr {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  color: var(--fg-muted);
+  margin: 0;
+}
+.kr-lead {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: var(--leading-normal);
+  color: var(--fg-muted);
+}
+.kr-small {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--fg-dim);
+}
+.kr-mono, code.kr {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.02em;
+  color: var(--steel-light);
+}
+.kr-spec {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--fg-dim);
+}

@@ -1,0 +1,11 @@
+{
+  "name": "KR Range Hub",
+  "short_name": "KR Range",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#14110B",
+  "theme_color": "#14110B",
+  "lang": "de"
+}

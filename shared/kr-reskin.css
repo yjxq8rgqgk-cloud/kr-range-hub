@@ -1,0 +1,68 @@
+/* ============================================================
+   KR Hub — Re-Skin für Fremd-Apps (Halo / Wolf-Design)
+   Bringt Apps mit eigenem Farbsystem auf die KR-Firearms-Optik,
+   indem deren Variablen auf die KR-Tokens gemappt werden.
+   Dark/Light folgt automatisch: die KR-Tokens werden von
+   shared/theme.css im Light-Modus umgeschaltet.
+   Reihenfolge: NACH der App, VOR (oder egal zu) theme.css.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+/* ---- KR-Tokens (Dunkel-Basis; Hell kommt aus theme.css) ---- */
+:root {
+  --ink-900:#14110B; --ink-850:#1A160E; --ink-800:#211C13; --ink-700:#2B2418;
+  --ink-600:#38301F; --ink-500:#4A3F29; --earth-400:#6E5F44; --earth-300:#8C7B58;
+  --sand-200:#BCAB86; --sand-100:#DCD0B5; --bone-050:#EFE8D6;
+  --copper:#B26A3E; --copper-bright:#C9824E; --copper-deep:#8C4F2C;
+  --bronze:#C39A4C; --gold:#D2B05A; --steel:#9A988F; --steel-light:#C2C0B6;
+  --olive:#6A6C43; --olive-light:#878A56;
+}
+
+/* ---- Halo-Design-System → KR ---- */
+:root {
+  --halo-bg:            var(--ink-900) !important;
+  --halo-surface-1:     var(--ink-850) !important;
+  --halo-surface-2:     var(--ink-800) !important;
+  --halo-surface-3:     var(--ink-700) !important;
+  --halo-surface-hover: var(--ink-600) !important;
+  --halo-fg:            var(--sand-100) !important;
+  --halo-fg-muted:      var(--earth-300) !important;
+  --halo-fg-dim:        var(--earth-400) !important;
+  --halo-hairline:        color-mix(in srgb, var(--sand-100) 14%, transparent) !important;
+  --halo-hairline-strong: color-mix(in srgb, var(--sand-100) 22%, transparent) !important;
+  --halo-accent:        var(--copper-bright) !important;
+  --halo-accent-soft:   color-mix(in srgb, var(--copper-bright) 35%, transparent) !important;
+  --halo-accent-glow:   color-mix(in srgb, var(--copper-bright) 55%, transparent) !important;
+  --halo-success:       var(--olive-light) !important;
+  --halo-font-display:  'Barlow Semi Condensed','Barlow',system-ui,sans-serif !important;
+  --halo-font-body:     'Barlow',system-ui,sans-serif !important;
+  --halo-font-mono:     'JetBrains Mono',ui-monospace,monospace !important;
+}
+
+/* ---- Munitionsbestand "Wolf"-Design → KR ---- */
+:root {
+  --bg:         var(--ink-900) !important;
+  --surface:    var(--ink-800) !important;
+  --surface-2:  var(--ink-700) !important;
+  --surface-3:  var(--ink-600) !important;
+  --line:       var(--ink-500) !important;
+  --line-soft:  var(--ink-600) !important;
+  --fg:         var(--sand-100) !important;
+  --fg-dim:     var(--sand-200) !important;
+  --muted:      var(--earth-300) !important;
+  --brass:      var(--copper-bright) !important;
+  --brass-dim:  var(--copper-deep) !important;
+  --brass-ink:  var(--ink-900) !important;
+  --f-head:     'Barlow Semi Condensed','Barlow',system-ui,sans-serif !important;
+  --f-body:     'Barlow',system-ui,sans-serif !important;
+  --f-num:      'JetBrains Mono',ui-monospace,monospace !important;
+}
+
+/* ---- Schießrecht-Suche (grünes Design) → KR ---- */
+:root {
+  --panel:  var(--ink-800) !important;
+  --ink:    var(--sand-100) !important;
+  --accent: var(--copper-bright) !important;
+  --hl:     color-mix(in srgb, var(--gold) 55%, transparent) !important;
+  /* --bg, --muted, --line werden bereits oben (Muni-Mapping) auf KR gesetzt */
+}

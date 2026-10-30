@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="../../shared/theme.css">
+<script src="../../shared/theme.js"></script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Meine Waffen">
+<meta name="theme-color" content="#14110B">
+<link rel="apple-touch-icon" href="assets/app-icon.png">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Semi+Condensed:wght@500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+  @font-face {
+    font-family: 'Gunplay';
+    src: url('fonts/gunplay_rg.otf') format('opentype');
+    font-weight: 400 700;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Ghost Factory';
+    src: url('fonts/Ghost_Factory.ttf') format('truetype');
+    font-weight: 400;
+    font-display: swap;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  .kr-iconbtn { transition: background 160ms cubic-bezier(.2,.7,.2,1), border-color 160ms, transform 120ms; }
+  .kr-iconbtn:hover { background: #F4EEE0; border-color: #C9824E; }
+  .kr-iconbtn:active { transform: translateY(1px); }
+  .kr-row { transition: border-color 160ms, transform 120ms; }
+  .kr-row:hover { border-color: #C9824E; }
+  .kr-row:active { transform: translateY(1px); }
+  .kr-dash { transition: background 160ms, border-color 160ms; }
+  .kr-dash:hover { background: #F1E9D9; border-color: #B26A3E; }
+</style>
+<style>
+  :root{
+    --c-bg:#F3EEE1; --c-header:#D7CAAE; --c-headerline:#C2B595; --c-surface:#FCFAF4;
+    --c-input:#FFFFFF; --c-thumb:#EDE4D0; --c-border:#C7BBA1; --c-divider:#D6CCB6;
+    --c-dash:#C9A982; --c-dashbg:rgba(252,250,244,0.55); --c-track:#E4DAC2;
+    --c-text:#211C13; --c-strong:#2B2418; --c-body:#4A3F29; --c-label:#5A4A30;
+    --c-dim:#6E5F44; --c-faint:#8C7B58; --c-capbtn:#211C13; --c-capborder:#3A3122; --c-frame:#1B1812;
+  }
+  html.kr-dark{
+    --c-bg:#14110B; --c-header:#221C12; --c-headerline:#2E2616; --c-surface:#1E1810;
+    --c-input:#15100A; --c-thumb:#241D12; --c-border:#382D1C; --c-divider:#2C2415;
+    --c-dash:#4A3B23; --c-dashbg:rgba(34,28,18,0.5); --c-track:#2A2316;
+    --c-text:#ECE4D2; --c-strong:#DCD1B6; --c-body:#C6B796; --c-label:#A89569;
+    --c-dim:#B0A082; --c-faint:#94855F; --c-capbtn:#0E0A05; --c-capborder:#281F12; --c-frame:#0E0B06;
+  }
+  html.kr-dark .kr-ghost:hover{ background:#2A2316; border-color:#C9824E; }
+  html.kr-dark .kr-iconbtn:hover{ background:#2A2316; border-color:#C9824E; }
+  html.kr-dark .kr-icoedit:hover{ background:#2A2316; border-color:#C9824E; color:#C9824E; }
+  html.kr-dark .kr-icodel:hover{ background:#2E1B16; border-color:#A8402E; color:#D2705E; }
+  html.kr-dark .kr-dash:hover{ background:#241D12; border-color:#B26A3E; }
+  html.kr-dark .kr-field::placeholder{ color:#7C6E50; }
+  html.kr-dark svg[stroke="#A89A7C"]{ stroke:#6E6450; }
+  html.kr-dark svg[stroke="#211C13"]{ stroke:#ECE4D2; }
+  html.kr-dark [fill="#211C13"]{ fill:#ECE4D2; }
+  html.kr-dark img[alt="KR"]{ filter: brightness(0) invert(1) opacity(0.82) !important; }
+  html.kr-dark img[aria-hidden="true"]{ filter: brightness(0) invert(1) !important; }
+</style>
+<script>
+(function(){
+  function apply(){ try{ document.documentElement.classList.toggle('kr-dark', document.documentElement.getAttribute('data-theme') !== 'light'); }catch(e){} }
+  apply();
+  window.addEventListener('storage', function(e){ if(!e||e.key==null||e.key==='kr-hub-theme') apply(); });
+  window.__krApplyTheme = apply;
+})();
+</script>
+<script>
+(function(){
+  try {
+    if (localStorage.getItem('app:seeded') === '1') return;
+    function seedIfEmpty(key, data){
+      var cur = localStorage.getItem(key), empty = true;
+      if (cur){ try { var v = JSON.parse(cur); empty = !(Array.isArray(v) && v.length); } catch(e){ empty = true; } }
+      if (empty) localStorage.setItem(key, JSON.stringify(data));
+    }
+    seedIfEmpty('waffen:liste', [
+      { hersteller: 'Heckler & Koch', bezeichnung: 'P30', kaliber: '9 mm Luger', seriennummer: 'HK-204571', foto: '' },
+      { hersteller: 'CZ', bezeichnung: '457 Varmint', kaliber: '.22 lr', seriennummer: 'CZ-889123', foto: '' }
+    ]);
+    seedIfEmpty('munition:liste', [
+      { hersteller: 'RUAG GECO', kaliber: '9 mm Luger', gewicht: '8,0 g / 124 gr', speed: '360 m/s', foto: '' },
+      { hersteller: 'SK Standard Plus', kaliber: '.22 lr', gewicht: '2,6 g / 40 gr', speed: '331 m/s', foto: '' }
+    ]);
+    seedIfEmpty('zubehoer:liste', [
+      { hersteller: 'Aimpoint', teil: 'Rotpunktvisier Micro H-2', verbautAn: 'Heckler & Koch P30  \u00b7  SN HK-204571', notizen: 'Montage auf dem Verschluss, 2 MOA. Batterie zuletzt 03/2025 gewechselt.', foto: '' },
+      { hersteller: 'Harris', teil: 'Zweibein 6\u20139\u2033', verbautAn: 'CZ 457 Varmint  \u00b7  SN CZ-889123', notizen: 'Schnellverschluss-Adapter, bei K\u00e4lte leicht klemmig.', foto: '' }
+    ]);
+    seedIfEmpty('profil:vereine', [
+      { name: 'SV Tell Hubertus', nr: '1894-22', mitglied: '04711', eintritt: '2019-03-12' },
+      { name: 'BDS Gau Mittelrhein', nr: 'GM-7783', mitglied: '11920', eintritt: '2021-09-01' }
+    ]);
+    seedIfEmpty('profil:wbk', [
+      { farbe: 'gr\u00fcn', behoerde: 'Landratsamt Musterstadt', datum: '2022-05-17', nummer: 'WBK-2022-0815', nid: 'NID-44120', nud: 'NUD-77810' },
+      { farbe: 'gelb', behoerde: 'Ordnungsamt Beispielheim', datum: '2023-11-03', nummer: 'WBK-2023-1190', nid: 'NID-50233', nud: 'NUD-90021' }
+    ]);
+    localStorage.setItem('app:seeded','1');
+  } catch(e){}
+})();
+</script>
+<script src="./i18n.js"></script>
+</helmet>
+<div style="min-height: 100vh; background: var(--c-bg, #ECE5D6); font-family: 'Barlow', system-ui, sans-serif; color: var(--c-text, #2A2417); display: flex; flex-direction: column;">
+
+  <!-- HEADER BAR -->
+  <header style="position: sticky; top: 0; z-index: 50; background: var(--c-header, #D7CAAE); border-bottom: 3px solid #B26A3E; padding: calc(22px + env(safe-area-inset-top)) 32px 18px;">
+    <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; max-width: 1080px; margin: 0 auto; width: 100%;">
+
+      <!-- Title block + Logo: ausgeblendet, Kopf kommt aus dem einheitlichen KR-Balken -->
+      <div style="display: none;">
+        <h1 style="font-family: 'Gunplay', 'Arial Black', sans-serif; font-size: 44px; line-height: 1.02; letter-spacing: -0.01em; text-transform: uppercase; color: var(--c-text, #211C13); margin: 0;">Meine Waffen</h1>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 14px; letter-spacing: 0.04em; color: var(--c-dim, #6E5F44); margin-top: 8px; text-transform: uppercase;">WAFFEN- UND ZUBEHÖRINVENTAR</div>
+      </div>
+
+    </div>
+
+    <!-- Toolbar row -->
+    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; max-width: 1080px; margin: 16px auto 0; width: 100%;">
+      <a href="Menue.dc.html" class="kr-iconbtn" aria-label="Menü" title="Menü" style="display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; padding: 0; background: var(--c-surface, #FCFAF4); border: 1px solid var(--c-border, #E4DAC6); border-radius: 12px; color: var(--c-text, #2A2417); text-decoration: none; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,.06);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#211C13" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="9" y1="6" x2="20" y2="6"></line><line x1="9" y1="12" x2="20" y2="12"></line><line x1="9" y1="18" x2="20" y2="18"></line><rect x="3" y="4.6" width="2.8" height="2.8" rx="0.6" fill="#211C13" stroke="none"></rect><rect x="3" y="10.6" width="2.8" height="2.8" rx="0.6" fill="#211C13" stroke="none"></rect><rect x="3" y="16.6" width="2.8" height="2.8" rx="0.6" fill="#211C13" stroke="none"></rect></svg>
+      </a>
+      <sc-if value="{{ hasPerson }}" hint-placeholder-val="{{ false }}">
+        <div style="flex: 1; min-width: 0; text-align: center; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 17px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-text, #211C13); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ personName }}</div>
+      </sc-if>
+      <sc-if value="{{ noPerson }}" hint-placeholder-val="{{ true }}">
+        <div style="flex: 1;"></div>
+      </sc-if>
+      <a href="Einstellungen.dc.html" class="kr-iconbtn" aria-label="Einstellungen" title="Einstellungen" style="display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; padding: 0; background: var(--c-surface, #FCFAF4); border: 1px solid var(--c-border, #E4DAC6); border-radius: 12px; color: var(--c-text, #2A2417); text-decoration: none; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,.06);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#211C13" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN CANVAS -->
+  <main style="flex: 1; position: relative; padding: 40px 32px 56px; max-width: 1080px; margin: 0 auto; width: 100%;">
+
+    <!-- faint wolf watermark -->
+    <sc-if value="{{ showWatermark }}" hint-placeholder-val="{{ true }}">
+      <img src="assets/kr-mark-line.png" alt="" aria-hidden="true" style="position: absolute; right: 24px; bottom: 24px; width: 280px; height: auto; opacity: 0.07; filter: brightness(0.2); pointer-events: none; user-select: none;">
+    </sc-if>
+
+    <!-- WAFFEN-ÜBERSICHT -->
+    <section style="position: relative; z-index: 1;">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 0 0 18px;">
+        <div style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.16em; color: var(--c-faint, #8C7B58); white-space: nowrap;">WAFFENBESTAND · FÜR MEHR INFOS KLICKEN</div>
+      </div>
+
+      <sc-if value="{{ empty }}" hint-placeholder-val="{{ true }}">
+        <a href="MeineWaffen.dc.html" class="kr-dash" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; min-height: 260px; padding: 40px; border: 2px dashed var(--c-dash, #C9A982); border-radius: 12px; background: var(--c-dashbg, rgba(252,250,244,0.55)); text-decoration: none;">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#B26A3E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <div style="font-family: 'Gunplay', 'Arial Black', sans-serif; font-size: 24px; text-transform: uppercase; letter-spacing: -0.01em; color: var(--c-body, #4A3F29);">Noch keine Waffen angelegt</div>
+          <div style="font-family: 'Barlow', sans-serif; font-size: 15px; line-height: 1.6; color: var(--c-dim, #6E5F44); max-width: 440px;">Tippe hier, um deine erste Waffe hinzuzufügen.</div>
+        </a>
+      </sc-if>
+
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <sc-for list="{{ wView }}" as="w" hint-placeholder-count="0">
+          <button onClick="{{ w.onOpen }}" class="kr-row" style="display: flex; align-items: center; gap: 18px; width: 100%; text-align: left; padding: 14px 18px; background: var(--c-surface, #FCFAF4); border: 1px solid var(--c-border, #C7BBA1); border-left: 3px solid #B26A3E; border-radius: 10px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,.06);">
+            <sc-if value="{{ w.hasFoto }}" hint-placeholder-val="{{ false }}">
+              <img loading="lazy" src="{{ w.foto }}" alt="" style="flex-shrink: 0; width: 84px; height: 63px; object-fit: contain; border-radius: 8px; background: var(--c-frame, #1B1812); border: 1px solid var(--c-border, #C7BBA1);">
+            </sc-if>
+            <sc-if value="{{ w.noFoto }}" hint-placeholder-val="{{ true }}">
+              <div style="flex-shrink: 0; width: 84px; height: 63px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; background: var(--c-thumb, #EDE4D0); border: 1px solid var(--c-divider, #D6CCB6); color: #B0A07E;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+              </div>
+            </sc-if>
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 20px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--c-text, #211C13); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ w.title }}</div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--c-dim, #6E5F44); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ w.meta }}</div>
+            </div>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#A89A7C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- AUSWERTUNG / DASHBOARD -->
+    <section style="position: relative; z-index: 1; margin-top: 48px;">
+      <div style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.16em; color: var(--c-faint, #8C7B58); margin: 0 0 18px;"><span style="letter-spacing: 0.16em;">AUSWERTUNGEN / übersicht</span><br></div>
+
+      <sc-if value="{{ noStats }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; min-height: 180px; padding: 40px; border: 2px dashed var(--c-dash, #C9A982); border-radius: 12px; background: var(--c-dashbg, rgba(252,250,244,0.55));">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#B26A3E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          <div style="font-family: 'Barlow', sans-serif; font-size: 15px; line-height: 1.6; color: var(--c-dim, #6E5F44); max-width: 460px;">Noch keine Timeline-Einträge. Lege Trainings, Wettkämpfe und Reinigungen bei einer Waffe an — die Auswertung füllt sich automatisch.</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ hasStats }}" hint-placeholder-val="{{ true }}">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+          <sc-for list="{{ pies }}" as="p" hint-placeholder-count="3">
+            <div style="background: var(--c-surface, #FCFAF4); border: 1px solid var(--c-border, #C7BBA1); border-radius: 10px; padding: 20px; box-shadow: 0 1px 2px rgba(0,0,0,.06);">
+              <div style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--c-label, #5A4A30); margin: 0 0 14px;">{{ p.title }}</div>
+
+              <sc-if value="{{ p.empty }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; align-items: center; justify-content: center; min-height: 150px; font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--c-faint, #8C7B58); text-align: center;">Keine Daten vorhanden</div>
+              </sc-if>
+
+              <sc-if value="{{ p.has }}" hint-placeholder-val="{{ true }}">
+                <div style="display: flex; justify-content: center; margin: 0 0 16px;">
+                  <svg viewBox="0 0 100 100" style="width: 150px; height: 150px;">
+                    <g transform="rotate(-90 50 50)">
+                      <circle cx="50" cy="50" r="36" fill="none" stroke="var(--c-track, #E4DAC2)" stroke-width="15"></circle>
+                      <sc-for list="{{ p.slices }}" as="s" hint-placeholder-count="0">
+                        <circle cx="50" cy="50" r="36" fill="none" stroke="{{ s.color }}" stroke-width="15" stroke-dasharray="{{ s.dasharray }}" stroke-dashoffset="{{ s.dashoffset }}" stroke-linecap="butt"></circle>
+                      </sc-for>
+                    </g>
+                    <text x="50" y="49" text-anchor="middle" style="font-family: 'Gunplay', 'Arial Black', sans-serif; font-size: 19px; fill: var(--c-text, #211C13);">{{ p.totalLabel }}</text>
+                    <text x="50" y="62" text-anchor="middle" style="font-family: 'Barlow', sans-serif; font-size: 7px; letter-spacing: 0.12em; fill: var(--c-faint, #8C7B58);">{{ p.unit }}</text>
+                  </svg>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <sc-for list="{{ p.slices }}" as="s" hint-placeholder-count="0">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <svg width="12" height="12" style="flex-shrink: 0;"><rect width="12" height="12" rx="2" fill="{{ s.color }}"></rect></svg>
+                      <div style="flex: 1; min-width: 0; font-family: 'Barlow', sans-serif; font-size: 13.5px; color: var(--c-body, #4A3F29); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ s.label }}</div>
+                      <div style="flex-shrink: 0; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--c-dim, #6E5F44);">{{ s.pctLabel }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- BALKEN: Gesamtschüsse pro Waffe -->
+        <div style="margin-top: 16px; background: var(--c-surface, #FCFAF4); border: 1px solid var(--c-border, #C7BBA1); border-left: 3px solid #B26A3E; border-radius: 10px; padding: 22px 24px; box-shadow: 0 1px 2px rgba(0,0,0,.06);">
+          <div style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--c-label, #5A4A30); margin: 0 0 18px;">Gesamtschüsse pro Waffe</div>
+
+          <sc-if value="{{ barsEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--c-faint, #8C7B58);">Noch keine verschossene Munition erfasst.</div>
+          </sc-if>
+
+          <sc-if value="{{ barsHas }}" hint-placeholder-val="{{ true }}">
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <sc-for list="{{ bars }}" as="b" hint-placeholder-count="2">
+                <div style="display: grid; grid-template-columns: 1fr; gap: 6px;">
+                  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px;">
+                    <div style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--c-text, #211C13); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ b.label }}</div>
+                    <div style="flex-shrink: 0; font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: var(--c-body, #4A3F29);">{{ b.valueLabel }} Schuss</div>
+                  </div>
+                  <div style="position: relative; height: 16px; background: var(--c-track, #E4DAC2); border-radius: 3px; overflow: hidden;">
+                    <div style="position: absolute; inset: 0 auto 0 0; height: 100%; border-radius: 3px; background: linear-gradient(90deg, #8C4F2C, #B26A3E); width: {{ b.pct }}%;"></div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+    </section>
+
+  </main>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 1136, &quot;height&quot;: 760 },
+  &quot;showWatermark&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot; }
+}">
+class Component extends DCLogic {
+  load(key) {
+    try { const v = JSON.parse(localStorage.getItem(key)); return Array.isArray(v) ? v : []; }
+    catch (e) { return []; }
+  }
+
+  state = { waffen: this.load('waffen:liste'), timeline: this.load('timeline:liste'), munition: this.load('munition:liste') };
+
+  PALETTE() { return ['#C9824E', '#6B7345', '#B26A3E', '#A8895C', '#4F5320', '#7A6A4E', '#5E6B6E', '#2E3320']; }
+
+  shots(str) { const n = parseInt(String(str == null ? '' : str).replace(/[^\d]/g, ''), 10); return isFinite(n) ? n : 0; }
+
+  buildPie(title, unit, counts, fmt) {
+    const entries = Object.keys(counts).map((k) => ({ label: k, value: counts[k] })).filter((e) => e.value > 0).sort((a, b) => b.value - a.value);
+    const total = entries.reduce((s, e) => s + e.value, 0);
+    const pal = this.PALETTE();
+    const C = 2 * Math.PI * 36;
+    let acc = 0;
+    const slices = entries.map((e, i) => {
+      const frac = total ? e.value / total : 0;
+      const seg = frac * C;
+      const offset = -acc;
+      acc += seg;
+      const pct = total ? Math.round(frac * 100) : 0;
+      return {
+        label: e.label,
+        value: e.value,
+        pctLabel: pct + '%',
+        color: pal[i % pal.length],
+        dasharray: seg.toFixed(2) + ' ' + (C - seg).toFixed(2),
+        dashoffset: offset.toFixed(2),
+      };
+    });
+    return { title, unit, slices, total, totalLabel: fmt ? fmt(total) : String(total), empty: total === 0, has: total > 0 };
+  }
+
+  goEdit(i) {
+    try { localStorage.setItem('waffen:view', JSON.stringify(i)); } catch (e) {}
+    window.location.href = 'WaffeDetail.dc.html';
+  }
+
+  renderVals() {
+    const wView = this.state.waffen.map((w, i) => ({
+      title: [w.hersteller, w.bezeichnung].filter(Boolean).join(' ') || 'Ohne Bezeichnung',
+      meta: [
+        w.kaliber && ('Kal. ' + w.kaliber),
+        w.seriennummer && ('SN ' + w.seriennummer),
+      ].filter(Boolean).join('   ·   ') || 'Keine weiteren Angaben',
+      foto: w.foto || '',
+      hasFoto: !!w.foto,
+      noFoto: !w.foto,
+      onOpen: () => this.goEdit(i),
+    }));
+    const n = this.state.waffen.length;
+
+    // --- Auswertung aus Timeline ---
+    const wByLabel = {};
+    this.state.waffen.forEach((w) => {
+      const title = [w.hersteller, w.bezeichnung].filter(Boolean).join(' ') || 'Ohne Bezeichnung';
+      const label = title + (w.seriennummer ? ('  \u00b7  SN ' + w.seriennummer) : '');
+      wByLabel[label] = { title, kaliber: (w.kaliber || '').trim() };
+    });
+    const calToAmmo = {};
+    this.state.munition.forEach((m) => {
+      const c = (m.kaliber || '').trim();
+      if (c && !calToAmmo[c]) calToAmmo[c] = (m.hersteller || '').trim();
+    });
+    const shortName = (e) => {
+      const w = wByLabel[e.waffe];
+      if (w) return w.title;
+      return e.waffe ? String(e.waffe).split('\u00b7')[0].trim() : 'Unbekannt';
+    };
+
+    const waffeCount = {}, ortCount = {}, munCount = {}, shotsByWaffe = {};
+    const tlEntries = this.state.timeline.filter((e) => !!wByLabel[e.waffe]);
+    tlEntries.forEach((e) => {
+      const name = shortName(e);
+      waffeCount[name] = (waffeCount[name] || 0) + 1;
+      const o = (e.wo || '').trim();
+      if (o) ortCount[o] = (ortCount[o] || 0) + 1;
+      const s = this.shots(e.munition);
+      if (s > 0) {
+        shotsByWaffe[name] = (shotsByWaffe[name] || 0) + s;
+        const w = wByLabel[e.waffe];
+        const cal = w ? w.kaliber : '';
+        let key;
+        if (cal) key = calToAmmo[cal] ? (calToAmmo[cal] + ' · ' + cal) : cal;
+        else key = 'Ohne Kaliber';
+        munCount[key] = (munCount[key] || 0) + s;
+      }
+    });
+
+    const fmtNum = (v) => v.toLocaleString('de-DE');
+    const pies = [
+      this.buildPie('Lieblingswaffe', 'Einträge', waffeCount),
+      this.buildPie('Lieblingsorte', 'Einträge', ortCount),
+      this.buildPie('Lieblingsmunition', 'Schuss', munCount, fmtNum),
+    ];
+
+    const barEntries = Object.keys(shotsByWaffe).map((k) => ({ label: k, value: shotsByWaffe[k] })).filter((e) => e.value > 0).sort((a, b) => b.value - a.value);
+    const maxV = barEntries.reduce((m, e) => Math.max(m, e.value), 0);
+    const bars = barEntries.map((e) => ({
+      label: e.label,
+      value: e.value,
+      valueLabel: fmtNum(e.value),
+      pct: maxV ? Math.max(4, Math.round(e.value / maxV * 100)) : 0,
+    }));
+
+    const hasStats = tlEntries.length > 0;
+
+    let pName = '', pVorname = '';
+    try { pName = (localStorage.getItem('profil:p_name') || '').trim(); } catch (e) {}
+    try { pVorname = (localStorage.getItem('profil:p_vorname') || '').trim(); } catch (e) {}
+    const personName = [pVorname, pName].filter(Boolean).join(' ');
+
+    return {
+      showWatermark: this.props.showWatermark ?? true,
+      wView,
+      empty: n === 0,
+      countLabel: n === 1 ? '1 Eintrag' : (n + ' Einträge'),
+      personName,
+      hasPerson: !!personName,
+      noPerson: !personName,
+      pies,
+      bars,
+      barsEmpty: bars.length === 0,
+      barsHas: bars.length > 0,
+      hasStats,
+      noStats: !hasStats,
+    };
+  }
+}
+</script>
+</body>
+</html>

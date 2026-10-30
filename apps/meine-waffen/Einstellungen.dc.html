@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="../../shared/theme.css">
+<script src="../../shared/theme.js"></script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Meine Waffen">
+<meta name="theme-color" content="#14110B">
+<link rel="apple-touch-icon" href="assets/app-icon.png">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  @font-face {
+    font-family: 'Gunplay';
+    src: url('fonts/gunplay_rg.otf') format('opentype');
+    font-weight: 400 700;
+    font-display: swap;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  .kr-ghost { transition: background 160ms cubic-bezier(.2,.7,.2,1), border-color 160ms, transform 120ms; }
+  .kr-ghost:hover { background: #F4EEE0; border-color: #C9824E; }
+  .kr-ghost:active { transform: translateY(1px); }
+  .kr-cu { transition: background 160ms cubic-bezier(.2,.7,.2,1), transform 120ms; }
+  .kr-cu:hover { background: #C9824E; }
+  .kr-cu:active { background: #8C4F2C; transform: translateY(1px); }
+  /* selection (live state) — base look is set inline so it paints instantly */
+  .seg.active { background: #B26A3E !important; color: #FCFAF4 !important; border-color: #B26A3E !important; }
+  .kr-row { transition: border-color 160ms, transform 120ms; }
+  .kr-row:hover { border-color: #C9824E; }
+  .kr-row:active { transform: translateY(1px); }
+  .kr-pbtn { transition: background 160ms, border-color 160ms, transform 120ms; }
+  .kr-pbtn:active { transform: translateY(1px); }
+  .kr-sheet { filter: grayscale(1); }
+  @media print {
+    @page { size: A4; margin: 12mm; }
+    html, body { background: #fff !important; }
+    .kr-app-root { display: none !important; }
+    .kr-print-toolbar { display: none !important; }
+    .kr-print-overlay { position: static !important; inset: auto !important; background: #fff !important; padding: 0 !important; overflow: visible !important; }
+    .kr-print-sheetwrap { padding: 0 !important; }
+    .kr-sheet { box-shadow: none !important; margin: 0 !important; width: 100% !important; min-height: 0 !important; }
+  }
+</style>
+<style>
+  :root{
+    --c-bg:#F3EEE1; --c-header:#D7CAAE; --c-headerline:#C2B595; --c-surface:#FCFAF4;
+    --c-input:#FFFFFF; --c-thumb:#EDE4D0; --c-border:#C7BBA1; --c-divider:#D6CCB6;
+    --c-dash:#C9A982; --c-dashbg:rgba(252,250,244,0.55);
+    --c-text:#211C13; --c-strong:#2B2418; --c-body:#4A3F29; --c-label:#5A4A30;
+    --c-dim:#6E5F44; --c-faint:#8C7B58; --c-capbtn:#211C13; --c-capborder:#3A3122; --c-frame:#1B1812;
+  }
+  html.kr-dark{
+    --c-bg:#14110B; --c-header:#221C12; --c-headerline:#2E2616; --c-surface:#1E1810;
+    --c-input:#15100A; --c-thumb:#241D12; --c-border:#382D1C; --c-divider:#2C2415;
+    --c-dash:#4A3B23; --c-dashbg:rgba(34,28,18,0.5);
+    --c-text:#ECE4D2; --c-strong:#DCD1B6; --c-body:#C6B796; --c-label:#A89569;
+    --c-dim:#B0A082; --c-faint:#94855F; --c-capbtn:#0E0A05; --c-capborder:#281F12; --c-frame:#0E0B06;
+  }
+  html.kr-dark .kr-ghost:hover{ background:#2A2316; border-color:#C9824E; }
+  html.kr-dark .kr-iconbtn:hover{ background:#2A2316; border-color:#C9824E; }
+  html.kr-dark .kr-icoedit:hover{ background:#2A2316; border-color:#C9824E; color:#C9824E; }
+  html.kr-dark .kr-icodel:hover{ background:#2E1B16; border-color:#A8402E; color:#D2705E; }
+  html.kr-dark .kr-dash:hover{ background:#241D12; border-color:#B26A3E; }
+  html.kr-dark .kr-field::placeholder{ color:#7C6E50; }
+  html.kr-dark svg[stroke="#A89A7C"]{ stroke:#6E6450; }
+  html.kr-dark svg[stroke="#211C13"]{ stroke:#ECE4D2; }
+  html.kr-dark [fill="#211C13"]{ fill:#ECE4D2; }
+  html.kr-dark img[alt="KR"]{ filter: brightness(0) invert(1) opacity(0.82) !important; }
+  html.kr-dark img[aria-hidden="true"]{ filter: brightness(0) invert(1) !important; }
+</style>
+<script>
+(function(){
+  function apply(){ try{ document.documentElement.classList.toggle('kr-dark', document.documentElement.getAttribute('data-theme') !== 'light'); }catch(e){} }
+  apply();
+  window.addEventListener('storage', function(e){ if(!e||e.key==null||e.key==='kr-hub-theme') apply(); });
+  window.__krApplyTheme = apply;
+})();
+</script>
+<script>
+(function(){
+  try {
+    if (localStorage.getItem('app:seeded') === '1') return;
+    function seedIfEmpty(key, data){
+      var cur = localStorage.getItem(key), empty = true;
+      if (cur){ try { var v = JSON.parse(cur); empty = !(Array.isArray(v) && v.length); } catch(e){ empty = true; } }
+      if (empty) localStorage.setItem(key, JSON.stringify(data));
+    }
+    seedIfEmpty('waffen:liste', [
+      { hersteller: 'Heckler & Koch', bezeichnung: 'P30', kaliber: '9 mm Luger', seriennummer: 'HK-204571', foto: '' },
+      { hersteller: 'CZ', bezeichnung: '457 Varmint', kaliber: '.22 lr', seriennummer: 'CZ-889123', foto: '' }
+    ]);
+    seedIfEmpty('munition:liste', [
+      { hersteller: 'RUAG GECO', kaliber: '9 mm Luger', gewicht: '8,0 g / 124 gr', speed: '360 m/s', foto: '' },
+      { hersteller: 'SK Standard Plus', kaliber: '.22 lr', gewicht: '2,6 g / 40 gr', speed: '331 m/s', foto: '' }
+    ]);
+    seedIfEmpty('zubehoer:liste', [
+      { hersteller: 'Aimpoint', teil: 'Rotpunktvisier Micro H-2', verbautAn: 'Heckler & Koch P30  \u00b7  SN HK-204571', notizen: 'Montage auf dem Verschluss, 2 MOA. Batterie zuletzt 03/2025 gewechselt.', foto: '' },
+      { hersteller: 'Harris', teil: 'Zweibein 6\u20139\u2033', verbautAn: 'CZ 457 Varmint  \u00b7  SN CZ-889123', notizen: 'Schnellverschluss-Adapter, bei K\u00e4lte leicht klemmig.', foto: '' }
+    ]);
+    seedIfEmpty('profil:vereine', [
+      { name: 'SV Tell Hubertus', nr: '1894-22', mitglied: '04711', eintritt: '2019-03-12' },
+      { name: 'BDS Gau Mittelrhein', nr: 'GM-7783', mitglied: '11920', eintritt: '2021-09-01' }
+    ]);
+    seedIfEmpty('profil:wbk', [
+      { farbe: 'gr\u00fcn', behoerde: 'Landratsamt Musterstadt', datum: '2022-05-17', nummer: 'WBK-2022-0815', nid: 'NID-44120', nud: 'NUD-77810' },
+      { farbe: 'gelb', behoerde: 'Ordnungsamt Beispielheim', datum: '2023-11-03', nummer: 'WBK-2023-1190', nid: 'NID-50233', nud: 'NUD-90021' }
+    ]);
+    localStorage.setItem('app:seeded','1');
+  } catch(e){}
+})();
+</script>
+<script src="./i18n.js"></script>
+</helmet>
+<div class="kr-app-root" style="min-height: 100vh; background: var(--c-bg, #F3EEE1); font-family: 'Barlow', system-ui, sans-serif; color: var(--c-text, #211C13); display: flex; flex-direction: column;">
+
+  <!-- HEADER -->
+  <header style="position: sticky; top: 0; z-index: 50; padding-top: env(safe-area-inset-top); background: var(--c-header, #D7CAAE); border-bottom: 1px solid var(--c-headerline, #C2B595);">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 1080px; margin: 0 auto; width: 100%; padding: 20px 32px;">
+      <div style="display: flex; align-items: center; gap: 20px; min-width: 0;">
+        <a href="Startseite.dc.html" class="kr-ghost" aria-label="Zurück" title="Zurück" style="display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; flex-shrink: 0; background: var(--c-surface, #FCFAF4); border: 1px solid var(--c-border, #C7BBA1); border-radius: 12px; color: var(--c-text, #211C13); text-decoration: none; box-shadow: 0 1px 2px rgba(0,0,0,.06);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        </a>
+        <h1 style="font-family: 'Gunplay', 'Arial Black', sans-serif; font-size: 40px; line-height: 1.02; letter-spacing: -0.01em; text-transform: uppercase; color: var(--c-text, #211C13); margin: 0;">Haupteinstellungen</h1>
+      </div>
+      <img src="assets/kr-mark-line.png" alt="KR" style="height: 56px; width: auto; flex-shrink: 0; filter: brightness(0.22) saturate(1.1);">
+    </div>
+  </header>
+
+  <!-- BODY -->
+  <main style="flex: 1; max-width: 1080px; margin: 0 auto; width: 100%; padding: 8px 32px 0;">
+
+    <!-- GESAMTÜBERSICHT -->
+    <section style="padding: 28px 0;">
+      <div style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: 0.16em; color: var(--c-strong, #2B2418); margin: 0 0 16px;">Gesamtübersicht</div>
+      <p style="font-family: 'Barlow', sans-serif; font-size: 17px; line-height: 1.5; color: var(--c-body, #4A3F29); margin: 0 0 20px;">Druckfertiges Datenblatt (PDF) mit allen Werten des aktiven Profils.</p>
+      <button class="kr-cu" onClick="{{ openPreview }}" style="width: 100%; height: 72px; display: inline-flex; align-items: center; justify-content: center; gap: 14px; background: #B26A3E; border: none; border-radius: 10px; color: #FCFAF4; cursor: pointer; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 18px; text-transform: uppercase; letter-spacing: 0.06em;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        Gesamtübersicht drucken
+      </button>
+    </section>
+  </main>
+
+  <!-- FERTIG -->
+  <div style="max-width: 1080px; margin: 0 auto; width: 100%; padding: 0 32px 32px;">
+    <a href="Startseite.dc.html" class="kr-cu" style="width: 100%; height: 76px; display: inline-flex; align-items: center; justify-content: center; background: #B26A3E; border-radius: 10px; color: #FCFAF4; text-decoration: none; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 19px; text-transform: uppercase; letter-spacing: 0.1em;">Fertig</a>
+  </div>
+
+</div>
+
+  <!-- DRUCKVORSCHAU (A4, Graustufen) -->
+  <sc-if value="{{ showPreview }}" hint-placeholder-val="{{ false }}">
+    <div class="kr-print-overlay" style="position: fixed; inset: 0; z-index: 200; background: rgba(20,17,11,0.80); overflow: auto;">
+
+      <div class="kr-print-toolbar" style="position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 24px; background: #14110B; border-bottom: 1px solid #2E2616;">
+        <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C9824E" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          <div style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: 0.12em; color: #ECE4D2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Druckvorschau · A4 · Graustufen</div>
+        </div>
+        <div style="display: flex; gap: 12px; flex-shrink: 0;">
+          <button onClick="{{ closePreview }}" class="kr-pbtn" style="height: 46px; padding: 0 22px; background: transparent; border: 1px solid #4A3B23; border-radius: 8px; color: #ECE4D2; cursor: pointer; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em;">Abbrechen</button>
+          <button onClick="{{ savePdf }}" class="kr-pbtn" style="height: 46px; padding: 0 24px; display: inline-flex; align-items: center; gap: 10px; background: #B26A3E; border: none; border-radius: 8px; color: #FCFAF4; cursor: pointer; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Als PDF speichern
+          </button>
+        </div>
+      </div>
+
+      <div class="kr-print-sheetwrap" style="display: flex; justify-content: center; padding: 32px 24px 48px;">
+        <div class="kr-sheet" style="width: 794px; max-width: 100%; min-height: 1123px; background: #FFFFFF; color: #1A1A1A; padding: 46px 50px; box-shadow: 0 18px 48px rgba(0,0,0,0.55); font-family: 'Barlow', sans-serif;">
+
+          <!-- Sheet-Header -->
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; border-bottom: 2px solid #1A1A1A; padding-bottom: 16px;">
+            <div style="min-width: 0;">
+              <div style="font-family: 'Gunplay', 'Arial Black', sans-serif; font-size: 30px; line-height: 1.02; text-transform: uppercase; letter-spacing: -0.01em; color: #111111;">Gesamtübersicht</div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: #555555; margin-top: 7px; text-transform: uppercase;">Waffen- und Zubehörinventar · Stand {{ printDate }}</div>
+            </div>
+            <img src="assets/kr-mark-line.png" alt="" aria-hidden="true" style="height: 44px; width: auto; flex-shrink: 0; filter: grayscale(1) brightness(0.2);">
+          </div>
+
+          <!-- WAFFEN -->
+          <div style="margin-top: 26px;">
+            <div style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.14em; color: #222222;">Waffen · {{ waffenCountLabel }}</div>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+              <thead>
+                <tr style="border-bottom: 1.5px solid #1A1A1A;">
+                  <th style="text-align: left; padding: 6px 8px; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #555555;">Waffe</th>
+                  <th style="text-align: left; padding: 6px 8px; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #555555;">Kaliber</th>
+                  <th style="text-align: left; padding: 6px 8px; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #555555;">Seriennummer</th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ waffenRows }}" as="w" hint-placeholder-count="0">
+                  <tr style="border-bottom: 1px solid #DADADA;">
+                    <td style="padding: 8px; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 14px; text-transform: uppercase; color: #1A1A1A;">{{ w.title }}</td>
+                    <td style="padding: 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #333333;">{{ w.kaliber }}</td>
+                    <td style="padding: 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #333333;">{{ w.sn }}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- ZUBEHÖR -->
+          <div style="margin-top: 24px;">
+            <div style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.14em; color: #222222;">Zubehör · {{ zubehoerCountLabel }}</div>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+              <thead>
+                <tr style="border-bottom: 1.5px solid #1A1A1A;">
+                  <th style="text-align: left; padding: 6px 8px; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #555555;">Teil</th>
+                  <th style="text-align: left; padding: 6px 8px; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #555555;">Hersteller</th>
+                  <th style="text-align: left; padding: 6px 8px; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #555555;">Verbaut an</th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ zubehoerRows }}" as="z" hint-placeholder-count="0">
+                  <tr style="border-bottom: 1px solid #DADADA;">
+                    <td style="padding: 8px; font-family: 'Barlow', sans-serif; font-weight: 600; font-size: 13px; color: #1A1A1A;">{{ z.teil }}</td>
+                    <td style="padding: 8px; font-family: 'Barlow', sans-serif; font-size: 13px; color: #333333;">{{ z.hersteller }}</td>
+                    <td style="padding: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #444444;">{{ z.verbautAn }}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- AUSWERTUNG -->
+          <div style="margin-top: 26px;">
+            <div style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.14em; color: #222222; margin-bottom: 12px;">Auswertung · Timeline</div>
+
+            <sc-if value="{{ noStats }}" hint-placeholder-val="{{ false }}">
+              <div style="font-family: 'Barlow', sans-serif; font-size: 13px; color: #777777;">Noch keine Timeline-Einträge erfasst.</div>
+            </sc-if>
+
+            <sc-if value="{{ hasStats }}" hint-placeholder-val="{{ true }}">
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;">
+                <sc-for list="{{ pies }}" as="p" hint-placeholder-count="3">
+                  <div style="border: 1px solid #DADADA; border-radius: 6px; padding: 12px;">
+                    <div style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #444444; margin-bottom: 8px;">{{ p.title }}</div>
+                    <sc-if value="{{ p.empty }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-family: 'Barlow', sans-serif; font-size: 11px; color: #999999; text-align: center; padding: 24px 0;">Keine Daten</div>
+                    </sc-if>
+                    <sc-if value="{{ p.has }}" hint-placeholder-val="{{ true }}">
+                      <div style="display: flex; justify-content: center; margin-bottom: 8px;">
+                        <svg viewBox="0 0 100 100" style="width: 96px; height: 96px;">
+                          <g transform="rotate(-90 50 50)">
+                            <circle cx="50" cy="50" r="36" fill="none" stroke="#E2E2E2" stroke-width="15"></circle>
+                            <sc-for list="{{ p.slices }}" as="s" hint-placeholder-count="0">
+                              <circle cx="50" cy="50" r="36" fill="none" stroke="{{ s.color }}" stroke-width="15" stroke-dasharray="{{ s.dasharray }}" stroke-dashoffset="{{ s.dashoffset }}"></circle>
+                            </sc-for>
+                          </g>
+                          <text x="50" y="49" text-anchor="middle" style="font-family: 'Gunplay', 'Arial Black', sans-serif; font-size: 17px; fill: #1A1A1A;">{{ p.totalLabel }}</text>
+                          <text x="50" y="61" text-anchor="middle" style="font-family: 'Barlow', sans-serif; font-size: 6.5px; letter-spacing: 0.1em; fill: #888888;">{{ p.unit }}</text>
+                        </svg>
+                      </div>
+                      <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <sc-for list="{{ p.slices }}" as="s" hint-placeholder-count="0">
+                          <div style="display: flex; align-items: center; gap: 7px;">
+                            <svg width="9" height="9" style="flex-shrink: 0;"><rect width="9" height="9" rx="1.5" fill="{{ s.color }}"></rect></svg>
+                            <div style="flex: 1; min-width: 0; font-family: 'Barlow', sans-serif; font-size: 11px; color: #333333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ s.label }}</div>
+                            <div style="flex-shrink: 0; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #666666;">{{ s.pctLabel }}</div>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="margin-top: 14px; border: 1px solid #DADADA; border-left: 3px solid #1A1A1A; border-radius: 6px; padding: 14px 16px;">
+                <div style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #444444; margin-bottom: 12px;">Gesamtschüsse pro Waffe</div>
+                <sc-if value="{{ barsEmpty }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-family: 'Barlow', sans-serif; font-size: 12px; color: #999999;">Noch keine verschossene Munition erfasst.</div>
+                </sc-if>
+                <sc-if value="{{ barsHas }}" hint-placeholder-val="{{ true }}">
+                  <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <sc-for list="{{ bars }}" as="b" hint-placeholder-count="2">
+                      <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px;">
+                          <div style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; color: #1A1A1A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ b.label }}</div>
+                          <div style="flex-shrink: 0; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: #333333;">{{ b.valueLabel }} Schuss</div>
+                        </div>
+                        <div style="position: relative; height: 13px; background: #E2E2E2; border-radius: 2px; overflow: hidden;">
+                          <div style="position: absolute; inset: 0 auto 0 0; height: 100%; background: #3A3A3A; border-radius: 2px; width: {{ b.pct }}%;"></div>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+          </div>
+
+          <!-- Fußzeile: Inhaber -->
+          <div style="margin-top: 30px; padding-top: 12px; border-top: 1px solid #BBBBBB; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;">
+            <div style="min-width: 0;">
+              <div style="font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #777777;">Inhaber</div>
+              <div style="font-family: 'Barlow', sans-serif; font-size: 12.5px; color: #333333; margin-top: 2px;">{{ footerLine }}</div>
+            </div>
+            <img src="assets/kr-mark-line.png" alt="" aria-hidden="true" style="height: 22px; width: auto; flex-shrink: 0; filter: grayscale(1) brightness(0.35); opacity: 0.7;">
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- IMPORT BESTÄTIGEN -->
+  <sc-if value="{{ importOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 210; background: rgba(20,17,11,0.72); display: flex; align-items: center; justify-content: center; padding: 24px;">
+      <div style="width: 100%; max-width: 460px; background: var(--c-bg, #F3EEE1); border: 1px solid var(--c-border, #C7BBA1); border-radius: 12px; box-shadow: 0 18px 48px rgba(0,0,0,0.5); overflow: hidden;">
+        <div style="padding: 24px 24px 18px;">
+          <div style="font-family: 'Gunplay', 'Arial Black', sans-serif; font-size: 21px; text-transform: uppercase; color: var(--c-text, #211C13); margin-bottom: 10px;">Sicherung einspielen</div>
+
+          <sc-if value="{{ importError }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px; background: #FBEDE9; border: 1px solid #E2B7AC; border-radius: 8px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A8402E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              <div style="font-family: 'Barlow', sans-serif; font-size: 14.5px; line-height: 1.5; color: #7A2E20;">{{ importErrorMsg }}</div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ importValid }}" hint-placeholder-val="{{ true }}">
+            <p style="font-family: 'Barlow', sans-serif; font-size: 15px; line-height: 1.55; color: var(--c-body, #4A3F29); margin: 0 0 14px;">Aus <strong style="word-break: break-all;">{{ importName }}</strong> einlesen:</p>
+            <div style="display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; background: var(--c-surface, #FCFAF4); border: 1px solid var(--c-border, #C7BBA1); border-radius: 8px;">
+              <sc-for list="{{ importSummary }}" as="row" hint-placeholder-count="4">
+                <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px;">
+                  <div style="font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--c-body, #4A3F29);">{{ row.label }}</div>
+                  <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: var(--c-text, #211C13);">{{ row.count }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <p style="font-family: 'Barlow', sans-serif; font-size: 13.5px; line-height: 1.5; color: var(--c-dim, #6E5F44); margin: 14px 0 0;">Der aktuelle Bestand wird dabei vollständig ersetzt. Dieser Schritt lässt sich nicht rückgängig machen.</p>
+          </sc-if>
+        </div>
+        <div style="padding: 14px 24px 18px; display: flex; gap: 12px; justify-content: flex-end; border-top: 1px solid var(--c-divider, #D6CCB6);">
+          <button onClick="{{ cancelImport }}" class="kr-ghost" style="height: 46px; padding: 0 22px; background: var(--c-surface, #FCFAF4); border: 1px solid var(--c-border, #C7BBA1); border-radius: 8px; color: var(--c-text, #211C13); cursor: pointer; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em;">Abbrechen</button>
+          <sc-if value="{{ importValid }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ confirmImport }}" style="height: 46px; padding: 0 26px; background: #B26A3E; border: none; border-radius: 8px; color: #FCFAF4; cursor: pointer; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em;">Wiederherstellen</button>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 1136, &quot;height&quot;: 1000 }
+}">
+class Component extends DCLogic {
+  load(key) {
+    try { const v = JSON.parse(localStorage.getItem(key)); return Array.isArray(v) ? v : []; }
+    catch (e) { return []; }
+  }
+
+  state = { showPreview: false, importOpen: false, toastShow: false };
+
+  DATA_KEYS() { return ['waffen:liste', 'zubehoer:liste', 'munition:liste', 'timeline:liste', 'profil:vereine', 'profil:wbk']; }
+
+  countOf(key) {
+    try { const v = JSON.parse(localStorage.getItem(key)); return Array.isArray(v) ? v.length : 0; }
+    catch (e) { return 0; }
+  }
+
+  doExport() {
+    const data = {};
+    this.DATA_KEYS().forEach((k) => { const raw = localStorage.getItem(k); if (raw != null) data[k] = raw; });
+    const payload = { app: 'Meine Waffen', type: 'kr-backup', version: 1, exportedAt: new Date().toISOString(), data };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const stamp = new Date().toISOString().slice(0, 10);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'Meine-Waffen-Sicherung-' + stamp + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    this.flashToast('Datensicherung erstellt \u2014 Datei wurde heruntergeladen.');
+  }
+
+  flashToast(msg) {
+    if (this._toastT) clearTimeout(this._toastT);
+    this.setState({ toastShow: true, toastMsg: msg });
+    this._toastT = setTimeout(() => this.setState({ toastShow: false }), 4500);
+  }
+
+  openImport() { const el = document.getElementById('kr_import_file'); if (el) el.click(); }
+
+  onImportFile(e) {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      let parsed = null, ok = true, errMsg = '';
+      try { parsed = JSON.parse(ev.target.result); } catch (err) { ok = false; errMsg = 'Die Datei ist keine g\u00fcltige Sicherungsdatei (kein lesbares JSON).'; }
+      let data = null;
+      if (ok) {
+        data = (parsed && parsed.data && typeof parsed.data === 'object') ? parsed.data : (parsed && typeof parsed === 'object' ? parsed : null);
+        const known = this.DATA_KEYS();
+        const hasKnown = data && Object.keys(data).some((k) => known.indexOf(k) !== -1);
+        if (!hasKnown) { ok = false; errMsg = 'In der Datei wurden keine bekannten Daten gefunden. Bitte eine mit dieser App erstellte Sicherung w\u00e4hlen.'; }
+      }
+      if (!ok) { this.setState({ importOpen: true, importValid: false, importError: true, importErrorMsg: errMsg, importData: null, importName: f.name }); return; }
+      const cnt = (key) => { try { const v = JSON.parse(data[key]); return Array.isArray(v) ? v.length : (v ? 1 : 0); } catch (e2) { return 0; } };
+      const summary = [
+        { label: 'Waffen', count: cnt('waffen:liste') },
+        { label: 'Zubeh\u00f6r', count: cnt('zubehoer:liste') },
+        { label: 'Munition', count: cnt('munition:liste') },
+        { label: 'Timeline-Eintr\u00e4ge', count: cnt('timeline:liste') },
+      ];
+      this.setState({ importOpen: true, importValid: true, importError: false, importErrorMsg: '', importData: data, importName: f.name, importSummary: summary });
+    };
+    reader.onerror = () => { this.setState({ importOpen: true, importValid: false, importError: true, importErrorMsg: 'Die Datei konnte nicht gelesen werden.', importData: null, importName: f.name }); };
+    reader.readAsText(f);
+  }
+
+  confirmImport() {
+    const data = this.state.importData;
+    if (!data) { this.setState({ importOpen: false }); return; }
+    const known = this.DATA_KEYS();
+    try {
+      known.forEach((k) => {
+        if (Object.prototype.hasOwnProperty.call(data, k)) {
+          const val = data[k];
+          localStorage.setItem(k, typeof val === 'string' ? val : JSON.stringify(val));
+        }
+      });
+    } catch (e) {
+      this.setState({ importValid: false, importError: true, importErrorMsg: 'Speichern fehlgeschlagen \u2014 evtl. ist der Speicher voll (zu gro\u00dfe Fotos).' });
+      return;
+    }
+    if (window.__krApplyTheme) window.__krApplyTheme();
+    this.setState({ importOpen: false, importData: null });
+    this.flashToast('Sicherung wiederhergestellt \u2014 alle Daten wurden \u00fcbernommen.');
+  }
+
+  cancelImport() { this.setState({ importOpen: false, importData: null }); }
+
+  GRAYPAL() { return ['#2E2E2E', '#6E6E6E', '#A6A6A6', '#4C4C4C', '#8A8A8A', '#C0C0C0', '#5E5E5E', '#9A9A9A']; }
+
+  shots(str) { const n = parseInt(String(str == null ? '' : str).replace(/[^\d]/g, ''), 10); return isFinite(n) ? n : 0; }
+
+  buildPie(title, unit, counts, fmt) {
+    const entries = Object.keys(counts).map((k) => ({ label: k, value: counts[k] })).filter((e) => e.value > 0).sort((a, b) => b.value - a.value);
+    const total = entries.reduce((s, e) => s + e.value, 0);
+    const pal = this.GRAYPAL();
+    const C = 2 * Math.PI * 36;
+    let acc = 0;
+    const slices = entries.map((e, i) => {
+      const frac = total ? e.value / total : 0;
+      const seg = frac * C;
+      const offset = -acc;
+      acc += seg;
+      const pct = total ? Math.round(frac * 100) : 0;
+      return {
+        label: e.label,
+        value: e.value,
+        pctLabel: pct + '%',
+        color: pal[i % pal.length],
+        dasharray: seg.toFixed(2) + ' ' + (C - seg).toFixed(2),
+        dashoffset: offset.toFixed(2),
+      };
+    });
+    return { title, unit, slices, total, totalLabel: fmt ? fmt(total) : String(total), empty: total === 0, has: total > 0 };
+  }
+
+  renderVals() {
+    const waffen = this.load('waffen:liste');
+    const zubehoer = this.load('zubehoer:liste');
+    const munition = this.load('munition:liste');
+    const timeline = this.load('timeline:liste');
+
+    const waffenRows = waffen.map((w) => ({
+      title: [w.hersteller, w.bezeichnung].filter(Boolean).join(' ') || 'Ohne Bezeichnung',
+      kaliber: w.kaliber || '—',
+      sn: w.seriennummer || '—',
+    }));
+    const zubehoerRows = zubehoer.map((z) => ({
+      teil: z.teil || 'Ohne Bezeichnung',
+      hersteller: z.hersteller || '—',
+      verbautAn: z.verbautAn || '—',
+    }));
+
+    const wByLabel = {};
+    waffen.forEach((w) => {
+      const title = [w.hersteller, w.bezeichnung].filter(Boolean).join(' ') || 'Ohne Bezeichnung';
+      const label = title + (w.seriennummer ? ('  \u00b7  SN ' + w.seriennummer) : '');
+      wByLabel[label] = { title, kaliber: (w.kaliber || '').trim() };
+    });
+    const calToAmmo = {};
+    munition.forEach((m) => { const c = (m.kaliber || '').trim(); if (c && !calToAmmo[c]) calToAmmo[c] = (m.hersteller || '').trim(); });
+    const shortName = (e) => { const w = wByLabel[e.waffe]; if (w) return w.title; return e.waffe ? String(e.waffe).split('\u00b7')[0].trim() : 'Unbekannt'; };
+
+    const waffeCount = {}, ortCount = {}, munCount = {}, shotsByWaffe = {};
+    const tlEntries = timeline.filter((e) => !!wByLabel[e.waffe]);
+    tlEntries.forEach((e) => {
+      const name = shortName(e);
+      waffeCount[name] = (waffeCount[name] || 0) + 1;
+      const o = (e.wo || '').trim();
+      if (o) ortCount[o] = (ortCount[o] || 0) + 1;
+      const s = this.shots(e.munition);
+      if (s > 0) {
+        shotsByWaffe[name] = (shotsByWaffe[name] || 0) + s;
+        const w = wByLabel[e.waffe];
+        const cal = w ? w.kaliber : '';
+        let key;
+        if (cal) key = calToAmmo[cal] ? (calToAmmo[cal] + ' \u00b7 ' + cal) : cal;
+        else key = 'Ohne Kaliber';
+        munCount[key] = (munCount[key] || 0) + s;
+      }
+    });
+
+    const fmtNum = (v) => v.toLocaleString('de-DE');
+    const pies = [
+      this.buildPie('Lieblingswaffe', 'Eintr\u00e4ge', waffeCount),
+      this.buildPie('Lieblingsorte', 'Eintr\u00e4ge', ortCount),
+      this.buildPie('Lieblingsmunition', 'Schuss', munCount, fmtNum),
+    ];
+    const barEntries = Object.keys(shotsByWaffe).map((k) => ({ label: k, value: shotsByWaffe[k] })).filter((e) => e.value > 0).sort((a, b) => b.value - a.value);
+    const maxV = barEntries.reduce((m, e) => Math.max(m, e.value), 0);
+    const bars = barEntries.map((e) => ({ label: e.label, value: e.value, valueLabel: fmtNum(e.value), pct: maxV ? Math.max(4, Math.round(e.value / maxV * 100)) : 0 }));
+    const hasStats = tlEntries.length > 0;
+
+    const nw = waffen.length, nz = zubehoer.length;
+    let printDate = '';
+    try { printDate = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }); } catch (e) { printDate = ''; }
+
+    return {
+      showPreview: this.state.showPreview,
+      openPreview: () => this.setState({ showPreview: true }),
+      closePreview: () => this.setState({ showPreview: false }),
+      savePdf: () => { window.print(); },
+      footerLine: (function(){
+        var nm = '', vn = '';
+        try { nm = (localStorage.getItem('profil:p_name') || '').trim(); } catch (e) {}
+        try { vn = (localStorage.getItem('profil:p_vorname') || '').trim(); } catch (e) {}
+        var person = [nm, vn].filter(Boolean).join(', ');
+        var vereine = [];
+        try { var arr = JSON.parse(localStorage.getItem('profil:vereine')); if (Array.isArray(arr)) vereine = arr.map(function(v){ return (v && v.name) ? String(v.name).trim() : ''; }).filter(Boolean); } catch (e) {}
+        var parts = [];
+        if (person) parts.push(person);
+        if (vereine.length) parts.push('Vereine: ' + vereine.join(', '));
+        return parts.join('   \u00b7   ') || 'Keine Inhaberdaten hinterlegt';
+      })(),
+      doExport: () => this.doExport(),
+      openImport: () => this.openImport(),
+      onImportFile: (e) => this.onImportFile(e),
+      confirmImport: () => this.confirmImport(),
+      cancelImport: () => this.cancelImport(),
+      importOpen: this.state.importOpen,
+      importValid: !!this.state.importValid,
+      importError: !!this.state.importError,
+      importErrorMsg: this.state.importErrorMsg || '',
+      importName: this.state.importName || '',
+      importSummary: this.state.importSummary || [],
+      toastShow: this.state.toastShow,
+      toastMsg: this.state.toastMsg || '',
+      printDate,
+      waffenRows,
+      zubehoerRows,
+      waffenCountLabel: nw === 1 ? '1 Eintrag' : (nw + ' Eintr\u00e4ge'),
+      zubehoerCountLabel: nz === 1 ? '1 Eintrag' : (nz + ' Eintr\u00e4ge'),
+      pies,
+      bars,
+      barsEmpty: bars.length === 0,
+      barsHas: bars.length > 0,
+      hasStats,
+      noStats: !hasStats,
+      pickSeg: (e) => {
+        const btn = e.currentTarget;
+        const group = btn.parentElement;
+        group.querySelectorAll('.seg').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>

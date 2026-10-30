@@ -1,0 +1,417 @@
+{
+  "meta": {
+    "titel": "Datenbank Schießfehler – Kurzwaffe & Langwaffe",
+    "stand": "2026-07-05",
+    "beschreibung": "Strukturierte Sammlung häufiger Schießfehler aus europäischen (DSB, ÖSB, all4shooters, UF PRO, Meisterschützen-Forum, Pulverdampf) und amerikanischen Quellen (NRA, USPSA, Lucky Gunner, KR Training, Tract Optics u.a.). Gliederung: Kategorie > Fehler > Trefferbild/Symptom > Ursache > Abstellung > Übung > Trainertipp (eigene Ergänzung).",
+    "kategorien_liste": [
+      "kurzwaffe_grundlagen",
+      "kurzwaffe_ipsc_wettkampf",
+      "langwaffe_grundlagen",
+      "langwaffe_praezision_wettkampf"
+    ]
+  },
+  "kurzwaffe_grundlagen": [
+    {
+      "id": "KW-G-01",
+      "fehler": "Thumbing (Daumendruck)",
+      "trefferbild": "Schuss wandert zur starken Hand (Rechtsschütze: nach rechts)",
+      "ursache": "Zu starker Druck des Daumens der Schusshand gegen den Rahmen während des Abziehens",
+      "abstellung": "Daumen der Schusshand entspannt an Rahmen/Schlitten anlegen, keinen aktiven Druck ausüben",
+      "uebung": "Trockentraining vor Spiegel; Daumenposition bewusst kontrollieren, 20 Wiederholungen ohne Munition",
+      "trainertipp": "Handyvideo von hinten/seitlich während Trockentraining hilft, den Effekt sichtbar zu machen."
+    },
+    {
+      "id": "KW-G-02",
+      "fehler": "Heeling",
+      "trefferbild": "Schuss zu hoch",
+      "ursache": "Handballen der Schusshand drückt im Moment des Auslösens nach vorn/oben in den Griff",
+      "abstellung": "Gleichmäßigen, konstanten Druck über die gesamte Grifffläche halten, nicht erst beim Abzug verstärken",
+      "uebung": "Ball-and-Dummy-Drill (Platzpatrone zufällig im Magazin), Bewegung der Waffe beim Klick beobachten",
+      "trainertipp": "Oft mit Rückstoßangst gekoppelt – beide Ursachen gemeinsam behandeln."
+    },
+    {
+      "id": "KW-G-03",
+      "fehler": "Breaking the Wrist / Dipping",
+      "trefferbild": "Schuss zu tief",
+      "ursache": "Handgelenk knickt im Moment des Schusses nach unten ab, oft unbewusste Rückstoßkontrolle",
+      "abstellung": "Handgelenk während des gesamten Abzugsvorgangs starr und in Verlängerung des Unterarms halten",
+      "uebung": "Penny-Drill: Münze auf Frontvisier legen, trocken abziehen ohne dass sie herunterfällt",
+      "trainertipp": "Sehr verbreitet bei Anfängern mit Großkaliber – Einstieg über Kleinkaliber/CO2 kann helfen."
+    },
+    {
+      "id": "KW-G-04",
+      "fehler": "Vorwegnehmen des Schusses / Recoil Anticipation",
+      "trefferbild": "Schuss tief-links (Rechtsschütze), stark streuendes Trefferbild",
+      "ursache": "Erwartung von Knall und Rückstoß führt zu Abwärts-/Seitwärtsbewegung vor dem eigentlichen Schussbruch",
+      "abstellung": "Mentale Trennung von Zielvorgang und Schussauslösung; Vertrauen in überraschenden Schussbruch aufbauen",
+      "uebung": "Ball-and-Dummy / Live-Dummy-Drill: Schütze weiß nicht, ob scharfe oder Exerzierpatrone folgt",
+      "trainertipp": "Klassischer Fehler, der mit steigendem Kaliber/Rückstoß wieder auftaucht, auch bei erfahrenen Schützen."
+    },
+    {
+      "id": "KW-G-05",
+      "fehler": "Falsche Abzugsfingerposition",
+      "trefferbild": "Schuss seitlich (zu viel Finger: zur schwachen Hand; zu wenig Finger: zur starken Hand)",
+      "ursache": "Zu viel oder zu wenig Kontaktfläche des Zeigefingers am Abzugszüngel",
+      "abstellung": "Kontaktpunkt systematisch variieren und Trefferlage beobachten, bis konstante Mittellage gefunden ist",
+      "uebung": "Trockentraining mit Fokus ausschließlich auf Fingerkontaktpunkt, andere Finger bewusst ruhig halten",
+      "trainertipp": "Fingerlänge und Griffgröße sind individuell – kein Standardwert, sondern austesten."
+    },
+    {
+      "id": "KW-G-06",
+      "fehler": "Jerking / ruckartiges Abziehen",
+      "trefferbild": "Schuss unten-links (Rechtsschütze), inkonsistente Streuung",
+      "ursache": "Plötzliches, bewusstes Durchreißen des Abzugs statt gleichmäßig steigendem Druck",
+      "abstellung": "Abzug als kontinuierlich steigenden Druck bis zum unbewussten Auslösen begreifen (\"Auslösen\" statt \"Abziehen\")",
+      "uebung": "Langsames Drucksteigerungstraining am Druckpunkt, Trockentraining mit Fokus auf Korn-Stillstand",
+      "trainertipp": "Sprachlich hilfreich: Begriff \"Abziehen\" im Training durch \"Auslösen\" ersetzen – ändert die mentale Herangehensweise."
+    },
+    {
+      "id": "KW-G-07",
+      "fehler": "Inkonsistenter Griffdruck",
+      "trefferbild": "Schuss driftet im Laufe einer Serie zunehmend ab",
+      "ursache": "Ermüdung führt zum Lockern des Griffs zwischen den Schüssen und erneutem Anspannen vor dem nächsten Schuss",
+      "abstellung": "Konstante, submaximale Grifffestigkeit über die gesamte Serie beibehalten",
+      "uebung": "Schnelles Trockenabziehen mit SIRT-Pistole/Dummy, um Regriff-Pausen zu eliminieren",
+      "trainertipp": "5 Schuss / 5 Sekunden / 5 Zoll auf 5 Meter als Kontrollstandard für konstanten Griff."
+    },
+    {
+      "id": "KW-G-08",
+      "fehler": "Fehlendes Nachhalten (Follow-Through)",
+      "trefferbild": "Guter Einzeltreffer, aber unregelmäßige Serie",
+      "ursache": "Arme/Visier werden direkt nach dem Schuss entspannt oder fallen gelassen",
+      "abstellung": "Visierbild und Griff nach dem Schuss 1–2 Sekunden aktiv beibehalten",
+      "uebung": "Nach jedem Trockenschuss bewusst 2 Sekunden in Position verharren und Kornbewegung beobachten",
+      "trainertipp": "Zweitwichtigster Fehler nach Abzugsfehlern laut NRA-Statistik."
+    },
+    {
+      "id": "KW-G-09",
+      "fehler": "Blinzeln/Augenschließen im Schussmoment",
+      "trefferbild": "Kein Zielbild zum Schusszeitpunkt bekannt, Streuung ohne erkennbares Muster",
+      "ursache": "Reflexartiges Schließen der Augen bei Knall/Rückstoß",
+      "abstellung": "Bewusstes Training mit Gehörschutz zur Reduktion der Schreckreaktion, Fokus auf Korn beibehalten",
+      "uebung": "Trockentraining mit lautem Knallgeräusch aus Lautsprecher zur Desensibilisierung",
+      "trainertipp": "Guter Gehörschutz reduziert diesen Reflex spürbar – oft unterschätzter Faktor."
+    },
+    {
+      "id": "KW-G-10",
+      "fehler": "Fehlerhafte Visierausrichtung / Fokusverschiebung",
+      "trefferbild": "Diffuses, nicht reproduzierbares Trefferbild",
+      "ursache": "Fokus wandert vom Korn zum Ziel statt konstant auf dem Korn zu bleiben",
+      "abstellung": "Visuellen Fokus die gesamte Zielphase über auf dem Frontvisier halten, Ziel bewusst leicht unscharf lassen",
+      "uebung": "Übung mit Zusatzmagazin über der Kimme, um Blick oberhalb des Korns zu versperren",
+      "trainertipp": "Viele Schützen glauben ein gutes Visierbild zu haben – Video-Check deckt das oft auf."
+    },
+    {
+      "id": "KW-G-11",
+      "fehler": "Falsche Atemtechnik",
+      "trefferbild": "Vertikale Streuung während der Schussabgabe",
+      "ursache": "Schuss wird während aktiver Ein-/Ausatmung statt in der natürlichen Atempause gelöst",
+      "abstellung": "Kurze Atempause nach dem Ausatmen (ca. 1/3 Restluft) für die Schussauslösung nutzen",
+      "uebung": "Trockentraining mit bewusster Atemzählung, Schuss immer an derselben Stelle im Atemzyklus platzieren",
+      "trainertipp": "Bei Kurzwaffe auf kurze Distanz weniger kritisch als bei Langwaffe, aber bei Präzisionsdisziplinen relevant."
+    },
+    {
+      "id": "KW-G-12",
+      "fehler": "Unausgeglichene Stand-/Körperhaltung",
+      "trefferbild": "Waffe pendelt seitlich, unruhiges Zielbild",
+      "ursache": "Fußstellung und Gewichtsverteilung erzeugen kein stabiles Gleichgewicht (z. B. zu schmaler Stand, Rücklage)",
+      "abstellung": "Isosceles- oder Weaver-Stand mit paralleler Fußstellung, leichte Vorlage des Oberkörpers",
+      "uebung": "Balance-Test: Augen schließen, Waffe anheben, Position halten und prüfen ob sie sich verändert",
+      "trainertipp": "Standposition mit Kreide markieren, um sie nach Unterbrechungen konsistent wiederzufinden."
+    },
+    {
+      "id": "KW-G-13",
+      "fehler": "Abzugsangst / Übervorsicht",
+      "trefferbild": "Schuss löst gar nicht oder sehr spät und unkontrolliert aus",
+      "ursache": "Übermäßige Vorsicht beim Drucksteigern aus Angst vor einem schlechten Treffer",
+      "abstellung": "Vom Anschlagsbeginn an bewusst zügiger bis zum Druckpunkt ziehen, Griff fester fassen",
+      "uebung": "Wiederholtes An- und Absetzen bis zum Druckpunkt ohne auszulösen, dann kontrolliertes Durchziehen",
+      "trainertipp": "Gegenteil von Jerking – beide Extreme brauchen unterschiedliche Übungsansätze, daher zuerst korrekt diagnostizieren."
+    },
+    {
+      "id": "KW-G-14",
+      "fehler": "Loses/instabiles Handgelenk der Stützhand",
+      "trefferbild": "Starke Streuung besonders bei Großkaliber",
+      "ursache": "Stützhand überträgt nicht genug Stabilität, Waffe kippt im Rückstoß seitlich weg",
+      "abstellung": "Stützhand mit voller, konstanter Kraft um die Schusshand schließen, Daumen der Stützhand vorwärts zeigen lassen",
+      "uebung": "Griffkraft-Drill: Stützhand-Position vor Spiegel unter Rückstoßsimulation (Trockentraining mit Federwiderstand) prüfen",
+      "trainertipp": "Häufig bei Umstieg von Kleinkaliber auf Großkaliber zu beobachten."
+    },
+    {
+      "id": "KW-G-15",
+      "fehler": "Uneinheitliche Fehlerkombination (Inconsistency)",
+      "trefferbild": "Kein klares Streubild, jeder Schuss anders",
+      "ursache": "Mehrere Technikfehler gleichzeitig, die sich gegenseitig überlagern",
+      "abstellung": "Rückkehr zu den Grundlagen: Stand, Griff, Visierbild, Atmung, Abzug einzeln isoliert trainieren",
+      "uebung": "Systematisches Einzeltraining jeder Komponente nacheinander, erst danach wieder kombinieren",
+      "trainertipp": "Korrekturtafeln sind hier mit Vorsicht zu genießen – ohne Beobachtung durch einen Trainer bleibt die Diagnose Vermutung."
+    }
+  ],
+  "kurzwaffe_ipsc_wettkampf": [
+    {
+      "id": "KW-W-01",
+      "fehler": "Unsauberer/zu langsamer Ziehvorgang (Draw)",
+      "trefferbild": "Verlust wertvoller Zeit vor dem ersten Schuss, oft schlechter erster Treffer",
+      "ursache": "Kein standardisierter Bewegungsablauf beim Greifen und Ziehen aus dem Holster",
+      "abstellung": "Festen, immer gleichen Greifpunkt am Griff etablieren, Nichtschusshand synchron zur Waffe führen",
+      "uebung": "Isoliertes Ziehtraining trocken, Video-Analyse der einzelnen Phasen (Greifen, Ziehen, Anschlag)",
+      "trainertipp": "Rob Leathams Grundsatz: erst sauber, dann schnell – Geschwindigkeit kommt aus der Wiederholung, nicht aus Hetzen."
+    },
+    {
+      "id": "KW-W-02",
+      "fehler": "Ineffizienter Magazinwechsel",
+      "trefferbild": "Zeitverlust, teils Waffenstörung durch schlechtes Einführen",
+      "ursache": "Schlechte Handkoordination, ungünstige Ausrüstungsposition, fehlende Übung",
+      "abstellung": "Bewegungsabläufe in Körperbewegung, Gear-Anordnung und Griffwechsel isoliert optimieren",
+      "uebung": "Trockentraining mit Kamera, ggf. Reload-Training mit verbundenen Augen zur Schärfung des Raumgefühls",
+      "trainertipp": "Ausrüstung (Magazintaschen-Position) an die eigene, natürliche Handbewegung anpassen, nicht umgekehrt."
+    },
+    {
+      "id": "KW-W-03",
+      "fehler": "Langsame Zielübergänge (Transitions)",
+      "trefferbild": "Zeitverlust zwischen Zielen, Auge \"hängt\" am alten Ziel",
+      "ursache": "Augen folgen der Waffe statt ihr vorauszueilen zum nächsten Ziel",
+      "abstellung": "Augen bewusst zuerst zum neuen Ziel bewegen, Waffe folgt dem Blick",
+      "uebung": "Dot-Drill mit mehreren Zielen: definierte Trefferzahl pro Ziel, Fokus auf Blickführung",
+      "trainertipp": "Kopf/Augen führen, Oberkörper folgt, Waffe folgt zuletzt – diese Reihenfolge bewusst einüben."
+    },
+    {
+      "id": "KW-W-04",
+      "fehler": "Übermäßiges Zielen auf einfachen/nahen Zielen (Over-aiming)",
+      "trefferbild": "Gute Treffer, aber deutlich zu langsame Zeit",
+      "ursache": "Visuelle Bestätigung wird auch dann gesucht, wenn die Zielgröße/Distanz sie nicht erfordert",
+      "abstellung": "Visuellen Aufwand an Zielgröße und Distanz anpassen (\"so wenig wie nötig, so viel wie nötig\")",
+      "uebung": "Bill Drill (6 Schuss A-Zone auf 7 Meter) zur Kalibrierung von nötigem Visieraufwand",
+      "trainertipp": "Klassischer Fehler ambitionierter Einsteiger, die von Präzisionsschießen umsteigen."
+    },
+    {
+      "id": "KW-W-05",
+      "fehler": "Fehlende Stage-Planung",
+      "trefferbild": "Umwege, doppelte Standortwechsel, verpasste Ziele",
+      "ursache": "Parcours wird nicht vorab mental durchgegangen bzw. visualisiert",
+      "abstellung": "Systematisches Walkthrough vor jedem Stage: Zielreihenfolge, Reload-Punkte, Bewegungspfad festlegen",
+      "uebung": "Trockenes Durchgehen der Stage mit lautem Kommentieren jedes Schritts",
+      "trainertipp": "Notiz-App oder Sprachmemo direkt nach dem Walkthrough hilft, den Plan nicht zu vergessen."
+    },
+    {
+      "id": "KW-W-06",
+      "fehler": "Ineffiziente Bewegung / schlechte Fußarbeit",
+      "trefferbild": "Zeitverlust bei Positionswechseln, unruhiger erster Schuss nach Bewegung",
+      "ursache": "Kein bewusstes Bremsen/Stabilisieren vor dem erneuten Schießen",
+      "abstellung": "Bewegungsrichtung und Bremspunkt vorab festlegen, Oberkörper stabil halten während der Beine arbeiten",
+      "uebung": "Shooting-on-the-move-Drills mit schrittweiser Geschwindigkeitssteigerung",
+      "trainertipp": "Kamera von der Seite zeigt Oberkörperschwankungen während Bewegung sehr deutlich."
+    },
+    {
+      "id": "KW-W-07",
+      "fehler": "Fehlendes Scannen/Nachbereitung nach der Stage",
+      "trefferbild": "Kein technischer Fehler, aber Sicherheits-/Regelverstoß möglich",
+      "ursache": "Gewohnheit des kontrollierten Abschlusses (Scan, Sichern, Ansage) fehlt",
+      "abstellung": "Festen Abschlussablauf nach jedem Stage-Ende trainieren, auch im Training konsequent anwenden",
+      "uebung": "Jede Trainingsserie bewusst mit Scan-Ritual beenden, auch beim Trockentraining",
+      "trainertipp": "Wird unter Wettkampfstress am ehesten vergessen – deshalb im entspannten Training fest verankern."
+    },
+    {
+      "id": "KW-W-08",
+      "fehler": "Zu aggressive Geschwindigkeit auf Kosten der Genauigkeit",
+      "trefferbild": "Viele C/D-Treffer oder Mikes (Fehlschüsse)",
+      "ursache": "Persönliches Tempo überschreitet die eigene visuelle/technische Kontrollfähigkeit",
+      "abstellung": "Geschwindigkeit reduzieren bis Trefferbild wieder saubere A-Zone-Treffer zeigt, dann schrittweise steigern",
+      "uebung": "Hit-Factor-Training: gleiche Stage mehrfach mit unterschiedlichem Tempo schießen und Ergebnis vergleichen",
+      "trainertipp": "USPSA-Grundsatz: kontrollierte Aggression – nicht die maximale, sondern die nachhaltige Geschwindigkeit zählt."
+    },
+    {
+      "id": "KW-W-09",
+      "fehler": "Fehlende visuelle Geduld (Visual Patience)",
+      "trefferbild": "Schuss löst vor vollständigem Visierbild aus, v. a. bei schwierigeren Zielen",
+      "ursache": "Abzug wird schneller betätigt als das Auge das nötige Visierbild bestätigen kann",
+      "abstellung": "Bewusste Verzögerung zwischen Zielaufnahme und Abzug bei schwierigen/weiten Zielen einbauen",
+      "uebung": "Abgestufte Zielgrößen-Drills: von großen auf kleine Ziele, Trefferbild als Rückmeldung nutzen",
+      "trainertipp": "Der Kopf weiß oft schon, dass das Visierbild nicht ausreichend war – dieses Gefühl bewusst ernst nehmen."
+    },
+    {
+      "id": "KW-W-10",
+      "fehler": "Unzureichendes Rückstoßmanagement",
+      "trefferbild": "Langsame Wiederaufnahme des Ziels nach jedem Schuss, Streuung nach oben",
+      "ursache": "Grip-Struktur und Armhaltung fangen den Rückstoß nicht ausreichend ab",
+      "abstellung": "Hohe, konstante Grifffestigkeit beider Hände, Ellbogen leicht angewinkelt, Oberkörper leicht vorgelagert",
+      "uebung": "Doppel-/Triple-Bill-Drill zur Schulung von Rückstoßkontrolle über mehrere Schüsse",
+      "trainertipp": "Grip-Kraft lässt sich isoliert per Handtrainer/Grip-Strengthener außerhalb des Schießstands verbessern."
+    }
+  ],
+  "langwaffe_grundlagen": [
+    {
+      "id": "LW-G-01",
+      "fehler": "Verkanten der Waffe (Canting)",
+      "trefferbild": "Seitliche Abweichung, die mit der Distanz zunimmt",
+      "ursache": "Waffe wird nicht senkrecht zur Ziellinie gehalten, Visierlinie/Absehen ist gekippt",
+      "abstellung": "Senkrechte Ausrichtung der Waffe mit Wasserwaage/Cant-Indikator kontrollieren, konsistente Schulterauflage",
+      "uebung": "Trockentraining vor Ziellinie mit Libelle am Gewehr, Kantung bewusst spüren und korrigieren",
+      "trainertipp": "Zielrahmen/Hintergrund als optische Referenz für die Senkrechte nutzen."
+    },
+    {
+      "id": "LW-G-02",
+      "fehler": "Inkonsistenter Anschlag / Wangenanlage (Cheek Weld)",
+      "trefferbild": "Trefferbild verschiebt sich von Schuss zu Schuss ohne erkennbares Muster",
+      "ursache": "Kopfposition am Schaft variiert zwischen den Schüssen",
+      "abstellung": "Feste, reproduzierbare Wangenauflage am Schaft etablieren, ggf. Schaftbacke anpassen",
+      "uebung": "Anschlagsroutine mit geschlossenen Augen aufbauen: Anschlag, Augen öffnen, prüfen ob Korn/Absehen zentriert ist",
+      "trainertipp": "Bei Luftgewehr/KK-Disziplinen: Korntunnel muss nach längerem Zielvorgang exakt im Diopter zentriert bleiben – driftet er, Schaftbacke korrigieren."
+    },
+    {
+      "id": "LW-G-03",
+      "fehler": "Schuss während aktiver Atembewegung",
+      "trefferbild": "Vertikale Streuung, verstärkt bei größerer Distanz",
+      "ursache": "Schussauslösung erfolgt während Ein- oder Ausatmen statt in der natürlichen Atempause",
+      "abstellung": "Nach vollständigem Ausatmen kurze, natürliche Atempause (bis zu ca. 8 Sekunden) für den Schuss nutzen",
+      "uebung": "Trockentraining mit bewusstem Atemrhythmus, Schussauslösung immer an derselben Stelle im Zyklus",
+      "trainertipp": "Bei sehr langen Zielvorgängen (>8–10 Sek.) Zielvorgang abbrechen, kurz wegschauen, neu ansetzen statt zu erzwingen."
+    },
+    {
+      "id": "LW-G-04",
+      "fehler": "Nicht korrigierte Parallaxe",
+      "trefferbild": "Trefferlage verschiebt sich abhängig von der Kopfposition hinter dem Zielfernrohr",
+      "ursache": "Absehen und Zielbild liegen nicht auf derselben Fokusebene",
+      "abstellung": "Parallaxe-Einstellring justieren, bis Kopfbewegung keine Verschiebung des Absehens mehr zeigt",
+      "uebung": "Kopf-Bewegungstest: Kopf leicht seitlich bewegen, prüfen ob Absehen wandert, Ring nachjustieren",
+      "trainertipp": "Test bei der tatsächlich genutzten Vergrößerung durchführen, da sich die Parallaxe mit dem Zoom verändert."
+    },
+    {
+      "id": "LW-G-05",
+      "fehler": "Fehlendes Nachhalten (Follow-Through)",
+      "trefferbild": "Guter Einzeltreffer, Serie streut",
+      "ursache": "Position, Atmung und Zielbild werden direkt nach dem Schuss aufgegeben",
+      "abstellung": "Nach dem Schussbruch mindestens zwei Sekunden regungslos in Position verbleiben",
+      "uebung": "Bewusstes Beobachten der Kornbewegung/Absehen-Rückkehr nach jedem Trockenschuss",
+      "trainertipp": "Wichtig für Nachfolgeschuss-Fähigkeit bei der Jagd und für die Selbstkontrolle beim Sportschießen."
+    },
+    {
+      "id": "LW-G-06",
+      "fehler": "Natural Point of Aim nicht eingestellt",
+      "trefferbild": "Ermüdungsbedingte Streuung im Laufe der Serie, Waffe muss aktiv gehalten werden",
+      "ursache": "Körperposition zwingt die Muskulatur, die Waffe auf das Ziel zu drücken statt entspannt dort zu ruhen",
+      "abstellung": "Ziel aufnehmen, Augen schließen, entspannen, Augen öffnen – bei Abweichung gesamten Körper (nicht die Arme) neu ausrichten",
+      "uebung": "Natural-Point-of-Aim-Check vor jeder Serie als festes Ritual etablieren",
+      "trainertipp": "Gilt für alle Anschlagsarten (liegend, kniend, stehend) und ist eine der wirkungsvollsten, am meisten unterschätzten Korrekturen."
+    },
+    {
+      "id": "LW-G-07",
+      "fehler": "Flinching / Bucking / Jerking",
+      "trefferbild": "Streuung meist Richtung 7 bis 10 Uhr (Rechtsschütze) oder unvorhersehbar",
+      "ursache": "Antizipation von Knall und Rückstoß führt zu Muskelreaktionen vor dem eigentlichen Schuss",
+      "abstellung": "Ball-and-Dummy-Training zur Bewusstmachung, gezielte Desensibilisierung gegenüber Knall/Rückstoß",
+      "uebung": "Live-Dummy-Drill: zufällige Exerzierpatrone im Ladevorgang, Bewegung der Waffe beim Klick beobachten",
+      "trainertipp": "Guter, gut sitzender Gehörschutz reduziert Schreckreaktion und damit diesen Fehler spürbar."
+    },
+    {
+      "id": "LW-G-08",
+      "fehler": "Falsche Riemen-/Ausrüstungsnutzung",
+      "trefferbild": "Unruhiges Zielbild, Waffe \"lebt\" im Anschlag",
+      "ursache": "Riemen falsch eingestellt oder gegen Reglement/Bedürfnis falsch genutzt, kein stabiler äußerer Anschlag",
+      "abstellung": "Riemenlänge und -spannung passend zur Disziplin und Körperbau einstellen, ggf. Trainer konsultieren",
+      "uebung": "Systematisches Ausprobieren verschiedener Riemeneinstellungen mit Trefferbild-Dokumentation",
+      "trainertipp": "Regelwerk der jeweiligen Disziplin (DSB/ISSF) beachten – nicht jede Unterstützung ist erlaubt."
+    },
+    {
+      "id": "LW-G-09",
+      "fehler": "Schräger Blick durchs Diopter/Kimme",
+      "trefferbild": "Trefferlage seitlich versetzt trotz vermeintlich korrektem Zielbild",
+      "ursache": "Blickrichtung verläuft nicht parallel zur Laufachse, Ringkorn erscheint zentriert, ist es aber nicht",
+      "abstellung": "Kopfposition so einstellen, dass der Blick exakt zentrisch und parallel durch die Visierung fällt",
+      "uebung": "Trainerkontrolle von außen oder Foto/Video der Kopfhaltung im Anschlag",
+      "trainertipp": "Dieser Fehler ist für den Schützen selbst kaum spürbar – externe Kontrolle ist hier besonders wertvoll."
+    },
+    {
+      "id": "LW-G-10",
+      "fehler": "Wind/Umweltfaktoren nicht berücksichtigt",
+      "trefferbild": "Seitliche Abweichung, die mit Distanz und Windstärke korreliert",
+      "ursache": "Windfahnen/Windzeichen werden nicht abgelesen oder falsch interpretiert",
+      "abstellung": "Windfahnen systematisch vor und während des Schießens beobachten, Korrekturwerte für die genutzte Munition kennen",
+      "uebung": "Distanz- und Windschätzungs-Drills mit anschließendem Soll-Ist-Vergleich am Trefferbild",
+      "trainertipp": "Eine einfache Wind-Tabelle für die eigene Munition (z. B. .308 Win., .223 Rem.) spart am Stand viel Zeit."
+    }
+  ],
+  "langwaffe_praezision_wettkampf": [
+    {
+      "id": "LW-W-01",
+      "fehler": "Falsch eingestellte Schaftbacke",
+      "trefferbild": "Korntunnel bzw. Absehen driftet im Laufe des Zielvorgangs aus der Mitte",
+      "ursache": "Schaftbacke nicht exakt auf Kopfform und Anschlagshöhe des Schützen abgestimmt",
+      "abstellung": "Schaftbacke so justieren, dass bei entspannter Kopfhaltung die Zentrierung auch nach längerem Zielvorgang stabil bleibt",
+      "uebung": "Probeschüsse gezielt zur Kontrolle der Schaftbacken-Einstellung nutzen, nicht nur zum Einschießen",
+      "trainertipp": "Gilt besonders für Auflage- und Präzisionsdisziplinen (DSB-Regelwerk beachten)."
+    },
+    {
+      "id": "LW-W-02",
+      "fehler": "Zu langer Zielvorgang",
+      "trefferbild": "Trefferwert sinkt gegen Ende des Zielvorgangs merklich ab",
+      "ursache": "Auge ermüdet und Sauerstoffmangel durch angehaltene Atmung nach ca. 8–10 Sekunden",
+      "abstellung": "Zielvorgang bei Überschreitung konsequent abbrechen, kurz wegsehen, neu atmen, neu ansetzen",
+      "uebung": "Zeitlich begrenztes Zielvorgangstraining mit Stoppuhr, bewusstes Abbrechen nach Limit trainieren",
+      "trainertipp": "Ehrlich mit sich selbst sein: ein Schusswert unter dem eigenen Standard sollte zur sofortigen Diopter-/Technikkontrolle führen, nicht ignoriert werden."
+    },
+    {
+      "id": "LW-W-03",
+      "fehler": "Ruckartiger statt gleichmäßiger Abzug (Präzisionsdisziplin)",
+      "trefferbild": "Seitliche Komponente im Trefferbild trotz gutem Zielbild",
+      "ursache": "Druck auf die Abzugszunge erfolgt nicht exakt nach hinten, sondern mit seitlicher Kraftkomponente",
+      "abstellung": "Druck exakt in Laufachsen-Richtung nach hinten steigern, bis der Schuss unbewusst bricht",
+      "uebung": "Trockentraining mit Fokus ausschließlich auf Abzugsrichtung, ggf. mit Trainerbeobachtung von hinten",
+      "trainertipp": "Nach dem Schuss 1–2 Sekunden ruhig in Anschlag bleiben und die Kornbewegung beobachten, um Rückschlüsse zu ziehen."
+    },
+    {
+      "id": "LW-W-04",
+      "fehler": "Fehler beim Anschlagwechsel / Positionswechsel im Wettkampf",
+      "trefferbild": "Erste Schüsse nach Stellungswechsel deutlich schlechter als Serienmitte",
+      "ursache": "Neuer Anschlag wird nicht mit derselben Sorgfalt aufgebaut wie zu Beginn des Trainings",
+      "abstellung": "Für jeden Stellungswechsel den vollständigen Ablauf (äußerer/innerer Anschlag, Natural Point of Aim) neu durchlaufen",
+      "uebung": "Dreistellungskampf-Training mit Zeitlimit pro Wechsel, Fokus auf identische Routine in jeder Stellung",
+      "trainertipp": "Kleine Veränderungen während des Wettkampfs sofort korrigieren, nicht bis zum Serienende aufschieben."
+    },
+    {
+      "id": "LW-W-05",
+      "fehler": "Scope Shadow / falscher Eye Relief",
+      "trefferbild": "Teilweise abgeschattetes Bild, unvollständiges Zielbild, seitlich abweichende Treffer",
+      "ursache": "Augenabstand zum Okular nicht konstant oder außerhalb des optimalen Bereichs des Zielfernrohrs",
+      "abstellung": "Konstante Kopf-/Schulterposition zur Optik einnehmen, Optik ggf. neu positionieren",
+      "uebung": "Anschlagsroutine so gestalten, dass die Kopfposition zur Optik jedes Mal identisch ist, Kontrolle per Foto",
+      "trainertipp": "Häufig bei wechselnden Schießjacken/Polsterungen zu beobachten – Ausrüstung möglichst konstant halten."
+    },
+    {
+      "id": "LW-W-06",
+      "fehler": "Puls-/Herzschlag nicht berücksichtigt (Langdistanz)",
+      "trefferbild": "Feine vertikale Absehen-Bewegung im Rhythmus des Pulses",
+      "ursache": "Herzschlag erzeugt spürbare Vibration, besonders freihändig oder bei hoher Vergrößerung",
+      "abstellung": "Schuss auf die kardiopulmonale Pause zwischen zwei Herzschlägen timen",
+      "uebung": "Bewusstes Beobachten des Absehens im Rhythmus des eigenen Pulses, Schusszeitpunkt gezielt darauf abstimmen",
+      "trainertipp": "Fitness und Stressreduktion verlängern die nutzbare Ruhephase spürbar."
+    },
+    {
+      "id": "LW-W-07",
+      "fehler": "Parallaxe beim Vergrößerungswechsel nicht neu geprüft",
+      "trefferbild": "Trefferlage verschiebt sich nach Zoom-Änderung",
+      "ursache": "Parallaxe wurde bei einer anderen Vergrößerungsstufe eingestellt und danach nicht erneut kontrolliert",
+      "abstellung": "Nach jeder Vergrößerungsänderung Parallaxe erneut per Kopf-Bewegungstest prüfen",
+      "uebung": "Drill: Bei fester Distanz Vergrößerung stufenweise ändern und Parallaxe jeweils neu justieren",
+      "trainertipp": "Besonders bei Distanzschätzung über die Parallaxe-Skala relevant – Realwert immer gegen Dial-Angabe prüfen."
+    },
+    {
+      "id": "LW-W-08",
+      "fehler": "Fehlende Trockentrainingsroutine",
+      "trefferbild": "Stagnation trotz regelmäßigem Live-Training",
+      "ursache": "Grundtechnik (Anschlag, Atmung, Abzug) wird nur im Livefeuer, nie isoliert trainiert",
+      "abstellung": "Feste, kurze Trockentrainingseinheiten mehrmals wöchentlich einplanen, unabhängig vom Standtraining",
+      "uebung": "10–15 Minuten Trockentraining mit Fokus auf je einer Einzelkomponente (Anschlag, Abzug, Atmung) pro Einheit",
+      "trainertipp": "Kombination aus Video-Feedback und Trockentraining bringt laut Wettkampfschützen den größten Fortschritt pro investierter Zeit."
+    }
+  ],
+  "allgemeine_trainerideen": [
+    "Video-/Kameraanalyse von der Seite und von hinten deckt viele Fehler auf, die dem Schützen selbst verborgen bleiben.",
+    "Ball-and-Dummy- bzw. Live-Dummy-Drills (zufällige Exerzierpatrone) sind das wirksamste einzelne Werkzeug zur Aufdeckung von Antizipationsfehlern bei Kurz- und Langwaffe.",
+    "Korrekturtafeln/Diagnostic Targets sind ein guter Einstieg, ersetzen aber keine Beobachtung durch einen erfahrenen Trainer – US-Quellen warnen ausdrücklich vor blindem Vertrauen in solche Tafeln.",
+    "Trockentraining sollte nicht nur ergänzend, sondern als eigenständiger, regelmäßiger Trainingsblock behandelt werden.",
+    "Für jede Disziplin (Präzision vs. IPSC/dynamisch) unterscheiden sich die Prioritäten: Präzision = Ruhe, Atmung, Nachhalten; IPSC = Trefferbild trotz Tempo, Übergänge, Bewegungseffizienz.",
+    "Ein einfaches, selbst geführtes Trainingslogbuch (Schießbuch) mit Fehler-Notizen pro Serie macht individuelle Muster über Zeit sichtbar – wirksamer als jede allgemeine Tafel.",
+    "Gehörschutz-Qualität beeinflusst nachweislich die Stärke von Flinch-/Blinzelreaktionen – oft unterschätzter, leicht behebbarer Faktor."
+  ]
+}

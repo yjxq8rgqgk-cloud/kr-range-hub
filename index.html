@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="de" data-kr-hub-root>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KR Range Hub</title>
+<meta name="theme-color" content="#14110B">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="KR Range Hub">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared/theme.css">
+<script src="shared/theme.js"></script>
+<style>
+@font-face {
+  font-family: 'Gunplay';
+  src: url('apps/ballistikrechner/fonts/gunplay_rg.otf') format('opentype');
+  font-weight: 400 700;
+  font-display: swap;
+}
+:root {
+  --ink-900:#14110B; --ink-850:#1A160E; --ink-800:#211C13; --ink-700:#2B2418;
+  --ink-600:#38301F; --ink-500:#4A3F29; --earth-400:#6E5F44; --earth-300:#8C7B58;
+  --sand-200:#BCAB86; --sand-100:#DCD0B5; --bone-050:#EFE8D6;
+  --copper:#B26A3E; --copper-bright:#C9824E; --copper-deep:#8C4F2C;
+  --bronze:#C39A4C; --gold:#D2B05A; --steel:#9A988F; --steel-light:#C2C0B6;
+  --olive:#6A6C43; --olive-light:#878A56;
+  --font-display:'Gunplay','Arial Black',sans-serif;
+  --font-head:'Barlow Semi Condensed',sans-serif;
+  --font-body:'Barlow',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+* { box-sizing: border-box; margin: 0; }
+html, body { min-height: 100%; }
+body {
+  background: var(--ink-900);
+  color: var(--sand-100);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+html[data-theme="light"] body { background: var(--ink-900); color: var(--sand-100); }
+
+.wrap { max-width: 1060px; margin: 0 auto; padding: 28px 20px 64px; }
+
+/* Kopf */
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding-bottom: 22px; margin-bottom: 30px;
+  border-bottom: 1px solid var(--ink-600);
+}
+.brand { display: flex; align-items: baseline; gap: 14px; }
+.brand h1 {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 5vw, 38px);
+  letter-spacing: 0.04em;
+  color: var(--bone-050);
+  font-weight: 400;
+}
+.brand h1 em { font-style: normal; color: var(--copper-bright); }
+.brand .sub {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--earth-300);
+}
+a.gear {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 15px; border-radius: 8px;
+  border: 1px solid var(--ink-500);
+  background: var(--ink-800);
+  color: var(--sand-100); text-decoration: none;
+  font-family: var(--font-head); font-weight: 600; font-size: 13px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  transition: border-color .15s, transform .15s;
+}
+a.gear:hover { border-color: var(--copper); transform: translateY(-1px); }
+a.gear svg { width: 15px; height: 15px; stroke: var(--copper-bright); fill: none; stroke-width: 1.8; }
+
+/* Stationsraster */
+.lede {
+  font-size: 15px; color: var(--sand-200); max-width: 56ch; margin-bottom: 26px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 14px;
+}
+a.tile {
+  position: relative;
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 20px 20px 18px;
+  border: 1px solid var(--ink-500);
+  border-radius: 10px;
+  background: linear-gradient(160deg, var(--ink-800), var(--ink-850));
+  color: inherit; text-decoration: none;
+  overflow: hidden;
+  transition: border-color .15s, transform .15s, box-shadow .15s;
+}
+a.tile::before {
+  content: attr(data-station);
+  position: absolute; top: 14px; right: 16px;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em;
+  color: var(--earth-400);
+}
+a.tile:hover {
+  border-color: var(--copper);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(0,0,0,.4);
+}
+a.tile:focus-visible {
+  outline: 2px solid var(--copper-bright); outline-offset: 2px;
+}
+.tile .icon {
+  width: 44px; height: 44px; flex: none;
+  display: grid; place-items: center;
+  border: 1px solid var(--ink-500); border-radius: 8px;
+  background: var(--ink-700);
+}
+.tile .icon svg { width: 24px; height: 24px; stroke: var(--copper-bright); fill: none; stroke-width: 1.7; }
+.tile h2 {
+  font-family: var(--font-head); font-weight: 700;
+  font-size: 19px; letter-spacing: 0.02em; color: var(--bone-050);
+}
+.tile p { font-size: 13.5px; line-height: 1.5; color: var(--sand-200); }
+.tile .go {
+  margin-top: auto; padding-top: 6px;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--copper-bright);
+}
+
+footer {
+  margin-top: 40px; padding-top: 18px;
+  border-top: 1px solid var(--ink-600);
+  display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em;
+  color: var(--earth-400);
+}
+@media (prefers-reduced-motion: reduce) {
+  a.tile, a.gear { transition: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <h1>KR <em>Range Hub</em></h1>
+      <span class="sub">9 Stationen · eine App</span>
+    </div>
+    <a class="gear" href="einstellungen.html">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.6M12 18.6v2.6M2.8 12h2.6M18.6 12h2.6M5.2 5.2l1.9 1.9M16.9 16.9l1.9 1.9M18.8 5.2l-1.9 1.9M7.1 16.9l-1.9 1.9"/></svg>
+      Einstellungen
+    </a>
+  </header>
+
+  <p class="lede">Alle Werkzeuge für Training, Verwaltung und Auswertung an einem Ort. Station wählen und loslegen!</p>
+
+  <nav class="grid" aria-label="Apps">
+    <a class="tile" data-station="ST 01" href="apps/meine-waffen/Startseite.dc.html">
+      <span class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v16M8 13h4M8 16.5h6"/></svg></span>
+      <h2>Meine Waffen</h2>
+      <p>Waffen, Munition und Zubehör verwalten — mit Timeline und Detailakten.</p>
+      <span class="go">Öffnen →</span>
+    </a>
+
+    <a class="tile" data-station="ST 02" href="apps/munitionsbestand/index.html">
+      <span class="icon"><svg viewBox="0 0 24 24"><rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M4 13h16"/><path d="M8.5 9V5.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1V9M13.5 9V6.5a1 1 0 0 1 1-1h0a1 1 0 0 1 1 1V9"/></svg></span>
+      <h2>Munitionsbestand</h2>
+      <p>Bestand, Buchungen und Sperrbestand verwalten — mit Logbuch, Auswertung und Export.</p>
+      <span class="go">Öffnen →</span>
+    </a>
+
+    <a class="tile" data-station="ST 03" href="apps/trefferaufnahme/index.html">
+      <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.5"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none" style="fill:var(--copper-bright)"/></svg></span>
+      <h2>Trefferaufnahme</h2>
+      <p>Treffer auf der Scheibe erfassen, Gruppen auswerten und Serien dokumentieren.</p>
+      <span class="go">Öffnen →</span>
+    </a>
+
+    <a class="tile" data-station="ST 04" href="apps/ringzaehler/index.html">
+      <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></span>
+      <h2>Ringzähler</h2>
+      <p>Ringzahl und Schusszahl live mitzählen — Serien summieren und Schnitt im Blick behalten.</p>
+      <span class="go">Öffnen →</span>
+    </a>
+
+    <a class="tile" data-station="ST 05" href="apps/schuss-timer/Schuss-Timer.dc.html">
+      <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><circle cx="12" cy="12" r="2.4" fill="currentColor" stroke="none" style="fill:var(--copper-bright)"/></svg></span>
+      <h2>Schuss-Timer</h2>
+      <p>Startsignal, Splits und Drills am Stand — mit Sequenzen und Verlauf.</p>
+      <span class="go">Öffnen →</span>
+    </a>
+
+    <a class="tile" data-station="ST 06" href="apps/ballistikrechner/index.html">
+      <span class="icon"><svg viewBox="0 0 24 24"><path d="M3 19c5-1 9-4 12-9 1.4-2.3 2.3-4.4 3-6"/><path d="M15.5 3.5 18 4l.5 2.5M3 21h18"/></svg></span>
+      <h2>Ballistikrechner</h2>
+      <p>Flugbahn, Ablagen und Klicks berechnen — mit Munitionsdatenbank und Absehen.</p>
+      <span class="go">Öffnen →</span>
+    </a>
+
+    <a class="tile" data-station="ST 07" href="apps/kompendium/app.html">
+      <span class="icon"><svg viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17.5H6.5A2.5 2.5 0 0 0 4 22z"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M9 7h7M9 10.5h7"/></svg></span>
+      <h2>DSB Sportordnung</h2>
+      <p>Schießkompendium: Disziplinen, Distanzen, Scheiben und Regelwerk zum Nachschlagen.</p>
+      <span class="go">Öffnen →</span>
+    </a>
+
+    <a class="tile" data-station="ST 08" href="apps/schiessrecht/index.html">
+      <span class="icon"><svg viewBox="0 0 24 24"><path d="M12 3v16M6 21h12"/><path d="M12 5 5 7.5M12 5l7 2.5"/><path d="M5 7.5 2.8 13a2.2 2.2 0 0 0 4.4 0zM19 7.5 16.8 13a2.2 2.2 0 0 0 4.4 0z"/></svg></span>
+      <h2>Schießrecht</h2>
+      <p>Gesetze, Verordnungen und Verbandsordnungen durchsuchen — mit Merkblättern und PDF-Quellen.</p>
+      <span class="go">Öffnen →</span>
+    </a>
+
+    <a class="tile" data-station="ST 09" href="apps/schiessfehler/index.html">
+      <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5V7M12 17v3.5M3.5 12H7M17 12h3.5"/><circle cx="14.6" cy="9.4" r="1.3" style="fill:var(--copper-bright)" stroke="none"/></svg></span>
+      <h2>Schießfehler-Diagnose</h2>
+      <p>Trefferbild analysieren, Fehlerursachen eingrenzen und Korrekturen nachschlagen.</p>
+      <span class="go">Öffnen →</span>
+    </a>
+  </nav>
+
+  <footer>
+    <span>KR Firearms · Range Hub</span>
+    <span id="theme-state"></span>
+  </footer>
+</div>
+<script>
+(function () {
+  // Aktuelle Theme-Wahl an die App-Links anhängen (Fallback, falls
+  // localStorage zwischen Seiten nicht greift, z. B. bei file://)
+  var t = (window.KRHubTheme && KRHubTheme.get()) || 'dark';
+  document.querySelectorAll('a.tile').forEach(function (a) {
+    a.setAttribute('href', a.getAttribute('href') + '?theme=' + t);
+  });
+  var label = { dark: 'Modus: Dunkel', light: 'Modus: Hell', system: 'Modus: System' };
+  var el = document.getElementById('theme-state');
+  if (el) el.textContent = label[t] || '';
+})();
+</script>
+</body>
+</html>

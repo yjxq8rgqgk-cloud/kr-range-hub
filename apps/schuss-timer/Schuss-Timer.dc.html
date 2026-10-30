@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="stylesheet" href="../../shared/theme.css">
+  <script src="../../shared/theme.js"></script>
+  <link rel="stylesheet" href="../../_ds/kr-firearms-design-system-1e13954f-f058-4ce7-9eac-26aec79097e1/colors_and_type.css">
+  <script src="../../_ds/kr-firearms-design-system-1e13954f-f058-4ce7-9eac-26aec79097e1/_ds_bundle.js"></script>
+  <meta name="theme-color" content="#14110B">
+  <style>
+    @keyframes kr-pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+    html, body { margin:0; padding:0; }
+    body { background:var(--ink-900); font-family:var(--font-body); -webkit-tap-highlight-color:transparent; }
+    * { box-sizing:border-box; }
+    ::selection { background:var(--copper); color:#fff; }
+    .kr-scroll::-webkit-scrollbar { width:5px; }
+    .kr-scroll::-webkit-scrollbar-thumb { background:var(--ink-500); border-radius:4px; }
+    input[type=range].kr-slider { -webkit-appearance:none; appearance:none; height:4px; border-radius:2px; background:var(--ink-600); outline:none; }
+    input[type=range].kr-slider::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; border-radius:50%; background:var(--copper); border:2px solid var(--bone-050); cursor:pointer; }
+  </style>
+</helmet>
+
+<div style="position:relative; min-height:100vh; width:100%; background:var(--ink-900); overflow-x:hidden;">
+  <img src="assets/kr-mark-line.png" style="position:fixed; right:-40px; bottom:-40px; width:340px; opacity:.06; pointer-events:none; z-index:0;" />
+
+  <header style="position:relative; z-index:1; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:28px 32px 18px; max-width:900px; margin:0 auto;">
+    <div>
+      <div style="font-family:var(--font-display); font-size:30px; letter-spacing:-0.01em; color:var(--fg); text-transform:uppercase; margin-top:2px;">{{ s.appTitle }}</div>
+    </div>
+    <img src="assets/kr-mark-line.png" alt="KR" style="height:34px; width:auto; opacity:.85;" />
+  </header>
+
+  <nav class="kr-scroll" style="position:relative; z-index:1; display:flex; gap:8px; overflow-x:auto; padding:0 32px 18px; max-width:900px; margin:0 auto;">
+    <sc-for list="{{ mainTabs }}" as="mt" hint-placeholder-count="4">
+      <button onClick="{{ mt.onClick }}" style="{{ mt.style }}">
+        <span style="{{ mt.iconWrapStyle }}" dangerouslySetInnerHTML="{{ mt.iconHtml }}"></span>
+        {{ mt.label }}
+      </button>
+    </sc-for>
+  </nav>
+
+  <main style="position:relative; z-index:1; max-width:640px; margin:0 auto; padding:4px 20px 60px;">
+
+    <!-- ================= TIMER TAB ================= -->
+    <sc-if value="{{ isTabTimer }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div class="kr-scroll" style="display:flex; gap:8px; overflow-x:auto; padding-bottom:6px; margin-bottom:16px;">
+          <sc-for list="{{ seqChips }}" as="chip" hint-placeholder-count="2">
+            <button onClick="{{ chip.onClick }}" style="{{ chip.style }}">
+              {{ chip.label }}
+              <span style="{{ chip.recordStyle }}">{{ chip.recordText }}</span>
+            </button>
+          </sc-for>
+        </div>
+
+        <div style="background:var(--ink-800); border:1px solid var(--border); border-radius:8px; padding:22px 20px 18px; position:relative;">
+          <button onClick="{{ resetRun }}" style="position:absolute; top:14px; right:14px; width:30px; height:30px; border-radius:6px; background:transparent; border:1px solid var(--border); color:var(--fg-dim); display:flex; align-items:center; justify-content:center; cursor:pointer;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 .49-9.36L1 10"></path></svg>
+          </button>
+
+          <div style="{{ phaseLabelStyle }}">{{ phaseLabelText }}</div>
+          <div style="font-family:var(--font-mono); font-weight:700; font-variant-numeric:tabular-nums; font-size:64px; color:var(--fg); line-height:1; margin:10px 0 18px;">{{ elapsedDisplay }}</div>
+
+          <div style="display:flex; align-items:flex-end; gap:2px; height:56px; margin-bottom:16px;">
+            <sc-for list="{{ barsView }}" as="bar" hint-placeholder-count="6">
+              <div style="{{ bar.style }}"></div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:14px;">
+            <button onClick="{{ startStopHandler }}" style="{{ startStopStyle }}">
+              <sc-if value="{{ showStopIcon }}" hint-placeholder-val="{{ false }}">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>
+              </sc-if>
+              <sc-if value="{{ showPlayIcon }}" hint-placeholder-val="{{ true }}">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+              </sc-if>
+            </button>
+            <div>
+              <div style="font-family:var(--font-cond); font-weight:700; font-size:13px; color:var(--fg); text-transform:uppercase; letter-spacing:.06em;">{{ startStopLabel }}</div>
+              <div style="font-size:12px; color:var(--fg-dim);">{{ startHintText }}</div>
+            </div>
+            <sc-if value="{{ showLogShot }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ recordShot }}" style="margin-left:auto; background:var(--copper); color:var(--primary-fg); border:none; border-radius:6px; font-family:var(--font-cond); font-weight:700; font-size:12px; letter-spacing:.08em; text-transform:uppercase; padding:12px 16px; cursor:pointer;">{{ s.logShot }}</button>
+            </sc-if>
+          </div>
+        </div>
+
+        <div style="margin-top:16px; background:var(--ink-800); border:1px solid var(--border); border-radius:8px; overflow:hidden;">
+          <sc-for list="{{ splitsView }}" as="row" hint-placeholder-count="3">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 16px; border-bottom:1px solid var(--border);">
+              <div style="display:flex; align-items:center; gap:9px;">
+                <div style="{{ row.dotStyle }}"></div>
+                <span style="font-family:var(--font-cond); font-size:13px; color:var(--fg-muted); text-transform:uppercase; letter-spacing:.04em;">{{ row.label }}</span>
+              </div>
+              <span style="font-family:var(--font-mono); font-size:15px; color:{{ row.valColor }}; font-variant-numeric:tabular-nums;">{{ row.valueText }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:12px; font-family:var(--font-cond); font-size:12px; color:var(--fg-dim); text-align:center;">{{ toast }}</div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- ================= SEQUENCES TAB ================= -->
+    <sc-if value="{{ isTabSequences }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="font-family:var(--font-display); font-size:19px; color:var(--fg); text-transform:uppercase; margin-bottom:12px;">{{ s.tabSequences }}</div>
+
+        <sc-for list="{{ sequencesListView }}" as="sq" hint-placeholder-count="2">
+          <div style="background:var(--ink-800); border:1px solid var(--border); border-left:3px solid var(--copper); border-radius:6px; padding:14px 16px; margin-bottom:12px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+              <span style="font-family:var(--font-cond); font-weight:700; font-size:15px; color:var(--fg);">{{ sq.name }}</span>
+              <div style="display:flex; gap:8px;">
+                <button onClick="{{ sq.onSelect }}" style="{{ sq.selectBtnStyle }}">{{ sq.selectLabel }}</button>
+                <button onClick="{{ sq.onDelete }}" style="{{ sq.delBtnStyle }}">{{ sq.delLabel }}</button>
+              </div>
+            </div>
+            <div style="display:flex; gap:6px; margin-bottom:10px;">
+              <sc-for list="{{ sq.steps }}" as="st" hint-placeholder-count="3">
+                <div style="{{ st.chipStyle }}">{{ st.short }}</div>
+              </sc-for>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; font-family:var(--font-mono); font-size:12px;">
+              <div><div style="color:var(--fg-dim); text-transform:uppercase; letter-spacing:.06em; font-size:10px;">{{ s.record }}</div><div style="color:var(--copper-bright); font-size:15px;">{{ sq.recordText }}</div></div>
+              <div><div style="color:var(--fg-dim); text-transform:uppercase; letter-spacing:.06em; font-size:10px;">{{ s.last }}</div><div style="color:var(--fg);font-size:15px;">{{ sq.lastText }}</div></div>
+              <div><div style="color:var(--fg-dim); text-transform:uppercase; letter-spacing:.06em; font-size:10px;">{{ s.attempts }}</div><div style="color:var(--fg);font-size:15px;">{{ sq.attemptsText }}</div></div>
+            </div>
+          </div>
+        </sc-for>
+
+        <div style="background:var(--ink-800); border:1px solid var(--border); border-radius:6px; padding:16px; margin-top:18px;">
+          <div style="font-family:var(--font-cond); font-weight:600; font-size:11px; color:var(--copper-bright); text-transform:uppercase; letter-spacing:.1em; margin-bottom:10px;">{{ s.newSequence }}</div>
+          <input value="{{ newSeqName }}" onInput="{{ onNewSeqNameInput }}" placeholder="{{ s.sequenceName }}" style="width:100%; background:var(--ink-900); border:1px solid var(--border); border-radius:6px; color:var(--fg); font-family:var(--font-body); font-size:14px; padding:10px 12px; margin-bottom:12px;" />
+          <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px;">
+            <button onClick="{{ addStepShot }}" title="{{ s.stepShotInfo }}" style="{{ addStepBtnStyle }}">
+              <span style="{{ infoIconStyle }}">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9.5"></circle><line x1="12" y1="11" x2="12" y2="17"></line><circle cx="12" cy="7.3" r="1" fill="currentColor" stroke="none"></circle></svg>
+              </span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="2.4"></circle></svg>
+              {{ s.stepShot }}
+            </button>
+            <button onClick="{{ addStepReload }}" title="{{ s.stepReloadInfo }}" style="{{ addStepBtnStyle }}">
+              <span style="{{ infoIconStyle }}">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9.5"></circle><line x1="12" y1="11" x2="12" y2="17"></line><circle cx="12" cy="7.3" r="1" fill="currentColor" stroke="none"></circle></svg>
+              </span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 .49-9.36L1 10"></path></svg>
+              {{ s.stepReload }}
+            </button>
+            <button onClick="{{ addStepMove }}" title="{{ s.stepMoveInfo }}" style="{{ addStepBtnStyle }}">
+              <span style="{{ infoIconStyle }}">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9.5"></circle><line x1="12" y1="11" x2="12" y2="17"></line><circle cx="12" cy="7.3" r="1" fill="currentColor" stroke="none"></circle></svg>
+              </span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="13 6 19 12 13 18"></polyline></svg>
+              {{ s.stepMove }}
+            </button>
+            <button onClick="{{ addStepSwap }}" title="{{ s.stepSwapInfo }}" style="{{ addStepBtnStyle }}">
+              <span style="{{ infoIconStyle }}">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9.5"></circle><line x1="12" y1="11" x2="12" y2="17"></line><circle cx="12" cy="7.3" r="1" fill="currentColor" stroke="none"></circle></svg>
+              </span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+              {{ s.stepSwap }}
+            </button>
+          </div>
+
+          <div style="margin-bottom:12px;">
+            <sc-for list="{{ newSeqStepsView }}" as="ns" hint-placeholder-count="0">
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 10px; background:var(--ink-900); border:1px solid var(--border); border-radius:6px; margin-bottom:6px;">
+                <span style="font-family:var(--font-cond); font-size:13px; color:var(--fg-muted); text-transform:uppercase;">{{ ns.label }}</span>
+                <button onClick="{{ ns.onRemove }}" style="background:transparent; border:none; color:var(--fg-dim); cursor:pointer; font-size:16px;">&times;</button>
+              </div>
+            </sc-for>
+          </div>
+
+          <button onClick="{{ createSequence }}" style="width:100%; background:var(--copper); color:var(--primary-fg); border:none; border-radius:6px; font-family:var(--font-cond); font-weight:700; font-size:13px; letter-spacing:.08em; text-transform:uppercase; padding:12px; cursor:pointer;">{{ s.createSequence }}</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ================= HISTORY TAB ================= -->
+    <sc-if value="{{ isTabHistory }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="font-family:var(--font-display); font-size:19px; color:var(--fg); text-transform:uppercase; margin-bottom:12px;">{{ s.tabHistory }}</div>
+
+        <sc-for list="{{ historyView }}" as="h" hint-placeholder-count="2">
+          <div style="background:var(--ink-800); border:1px solid var(--border); border-radius:6px; padding:16px; margin-bottom:16px;">
+            <div style="font-family:var(--font-cond); font-weight:700; font-size:15px; color:var(--fg); margin-bottom:10px;">{{ h.name }}</div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:10px; margin-bottom:14px;">
+              <div style="background:var(--ink-900); border:1px solid var(--border); border-radius:6px; padding:10px 12px;">
+                <div style="font-family:var(--font-mono); font-size:10px; color:var(--fg-dim); text-transform:uppercase; letter-spacing:.06em;">{{ s.drawFirst }}</div>
+                <div style="font-family:var(--font-mono); font-size:18px; color:var(--copper-bright);">{{ h.drawFirstText }}</div>
+              </div>
+              <div style="background:var(--ink-900); border:1px solid var(--border); border-radius:6px; padding:10px 12px;">
+                <div style="font-family:var(--font-mono); font-size:10px; color:var(--fg-dim); text-transform:uppercase; letter-spacing:.06em;">{{ s.avgSplit }}</div>
+                <div style="font-family:var(--font-mono); font-size:18px; color:var(--fg);">{{ h.avgSplitText }}</div>
+              </div>
+              <div style="background:var(--ink-900); border:1px solid var(--border); border-radius:6px; padding:10px 12px;">
+                <div style="font-family:var(--font-mono); font-size:10px; color:var(--fg-dim); text-transform:uppercase; letter-spacing:.06em;">{{ s.bestSplit }}</div>
+                <div style="font-family:var(--font-mono); font-size:18px; color:var(--fg);">{{ h.bestSplitText }}</div>
+              </div>
+            </div>
+
+            <sc-if value="{{ h.hasRuns }}" hint-placeholder-val="{{ false }}">
+              <div>
+                <div style="font-family:var(--font-cond); font-weight:600; font-size:10px; color:var(--fg-dim); text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px;">{{ s.splitTrend }}</div>
+                <div style="display:flex; align-items:flex-end; gap:4px; height:44px; margin-bottom:14px;">
+                  <sc-for list="{{ h.trend }}" as="tb" hint-placeholder-count="6">
+                    <div style="{{ tb.style }}"></div>
+                  </sc-for>
+                </div>
+                <sc-for list="{{ h.runs }}" as="run" hint-placeholder-count="2">
+                  <div style="display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-top:1px solid var(--border); font-family:var(--font-mono); font-size:12.5px;">
+                    <span style="color:var(--fg-dim);">{{ run.label }}</span>
+                    <span style="color:var(--fg);">{{ run.totalText }}</span>
+                    <span style="color:var(--steel-light);">{{ run.splitsText }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ h.noRuns }}" hint-placeholder-val="{{ true }}">
+              <div style="color:var(--fg-dim); font-size:13px;">{{ s.noRuns }}</div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- ================= SETTINGS TAB ================= -->
+    <sc-if value="{{ isTabSettings }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="font-family:var(--font-display); font-size:19px; color:var(--fg); text-transform:uppercase; margin-bottom:16px;">{{ s.tabSettings }}</div>
+
+        <div style="background:var(--ink-800); border:1px solid var(--border); border-radius:6px; padding:16px; margin-bottom:14px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+            <span style="font-family:var(--font-cond); font-weight:600; font-size:11px; color:var(--copper-bright); text-transform:uppercase; letter-spacing:.1em;">{{ s.micSection }}</span>
+            <span style="{{ micStatusStyle }}">{{ micStatusText }}</span>
+          </div>
+          <button onClick="{{ requestMic }}" style="width:100%; background:transparent; border:1px solid var(--border-strong); color:var(--fg); border-radius:6px; font-family:var(--font-cond); font-weight:600; font-size:12.5px; letter-spacing:.04em; text-transform:uppercase; padding:10px; cursor:pointer;">{{ s.enableMic }}</button>
+        </div>
+
+        <div style="background:var(--ink-800); border:1px solid var(--border); border-radius:6px; padding:16px; margin-bottom:14px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+            <span style="font-family:var(--font-cond); font-weight:600; font-size:11px; color:var(--copper-bright); text-transform:uppercase; letter-spacing:.1em;">{{ s.sensitivity }}</span>
+            <span style="font-family:var(--font-mono); font-size:13px; color:var(--fg);">{{ sensitivity }}%</span>
+          </div>
+          <input type="range" class="kr-slider" min="0" max="100" value="{{ sensitivity }}" onInput="{{ onSensitivityInput }}" style="width:100%;" />
+        </div>
+
+        <div style="background:var(--ink-800); border:1px solid var(--border); border-radius:6px; padding:16px; margin-bottom:14px;">
+          <div style="font-family:var(--font-cond); font-weight:600; font-size:11px; color:var(--copper-bright); text-transform:uppercase; letter-spacing:.1em; margin-bottom:10px;">{{ s.startSignal }}</div>
+          <div style="display:flex; gap:8px; margin-bottom:{{ delayRangeGap }};">
+            <button onClick="{{ setDelayRandom }}" style="{{ delayModeRandomStyle }}">{{ s.delayRandom }}</button>
+            <button onClick="{{ setDelayInstant }}" style="{{ delayModeInstantStyle }}">{{ s.delayInstant }}</button>
+          </div>
+          <sc-if value="{{ isDelayRandom }}" hint-placeholder-val="{{ true }}">
+            <div>
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+                <span style="font-family:var(--font-mono); font-size:11px; color:var(--fg-dim); text-transform:uppercase; letter-spacing:.06em;">{{ s.delayMin }}</span>
+                <span style="font-family:var(--font-mono); font-size:13px; color:var(--fg);">{{ delayMinText }}</span>
+              </div>
+              <input type="range" class="kr-slider" min="0" max="10" step="0.1" value="{{ delayMinS }}" onInput="{{ onDelayMinInput }}" style="width:100%; margin-bottom:14px;" />
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+                <span style="font-family:var(--font-mono); font-size:11px; color:var(--fg-dim); text-transform:uppercase; letter-spacing:.06em;">{{ s.delayMax }}</span>
+                <span style="font-family:var(--font-mono); font-size:13px; color:var(--fg);">{{ delayMaxText }}</span>
+              </div>
+              <input type="range" class="kr-slider" min="0" max="10" step="0.1" value="{{ delayMaxS }}" onInput="{{ onDelayMaxInput }}" style="width:100%;" />
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="background:var(--ink-800); border:1px solid var(--border); border-radius:6px; padding:16px; margin-bottom:14px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:{{ parGap }};">
+            <span style="font-family:var(--font-cond); font-weight:600; font-size:11px; color:var(--copper-bright); text-transform:uppercase; letter-spacing:.1em;">{{ s.parTime }}</span>
+            <button onClick="{{ toggleParEnabled }}" style="{{ parToggleStyle }}">{{ parToggleText }}</button>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:8px; margin-bottom:12px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--fg-dim)" stroke-width="2" style="flex-shrink:0; margin-top:1px;"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="11" x2="12" y2="17"></line><circle cx="12" cy="7.5" r="0.9" fill="var(--fg-dim)" stroke="none"></circle></svg>
+            <span style="font-size:12.5px; color:var(--fg-dim); line-height:1.5;">{{ s.parTimeInfo }}</span>
+          </div>
+          <sc-if value="{{ parEnabled }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <button onClick="{{ parMinus }}" style="{{ parStepBtnStyle }}">&minus;</button>
+              <span style="font-family:var(--font-mono); font-size:18px; color:var(--fg); min-width:52px; text-align:center;">{{ parTimeText }}</span>
+              <button onClick="{{ parPlus }}" style="{{ parStepBtnStyle }}">+</button>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="border-top:1px solid var(--border); padding-top:14px; margin-top:6px;">
+          <div style="font-family:var(--font-mono); font-size:10px; color:var(--fg-dim); text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px;">{{ s.limitationsTitle }}</div>
+          <div style="font-size:12.5px; color:var(--fg-dim); line-height:1.5;">{{ s.limitationsBody }}</div>
+        </div>
+
+        <div style="margin-top:14px; font-size:11.5px; color:var(--fg-faint); text-align:center;">{{ s.hubHint }}</div>
+      </div>
+    </sc-if>
+
+  </main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+
+const STR = {
+  de: {
+    appTitle: 'Schuss-Timer', tabTimer:'Timer', tabSequences:'Drills', tabHistory:'Verlauf', tabSettings:'Einstellungen',
+    ready:'BEREIT', standby:'ACHTUNG', logShot:'SCHUSS', record:'Rekord', last:'Letzter', attempts:'Versuche',
+    drawFirst:'Draw-to-1st', avgSplit:'\u00d8 Split', bestSplit:'Bester Split', splitTrend:'Split-Trend', noRuns:'Noch keine L\u00e4ufe aufgezeichnet.',
+    newSequence:'Neue Sequenz', sequenceName:'Name der Sequenz', addStep:'Schritt hinzuf\u00fcgen',
+    stepShot:'SCHUSS', stepReload:'NACHLADEN', stepMove:'BEWEGUNG', stepSwap:'WECHSEL', createSequence:'Sequenz speichern',
+    stepShotInfo:'Ein Schuss wird abgegeben \u2014 der Timer erwartet hier eine Auslösung und misst den Split dazu.',
+    stepReloadInfo:'Magazin- oder Trommelwechsel \u2014 zählt als Zwischenschritt, ohne eigenen Split-Wert.',
+    stepMoveInfo:'Positionswechsel am Stand, z. B. zu einer anderen Deckung \u2014 ohne eigenen Split-Wert.',
+    stepSwapInfo:'Wechsel der Waffe oder der Hand \u2014 ohne eigenen Split-Wert.',
+    micSection:'Mikrofon', enableMic:'Mikrofon aktivieren', sensitivity:'Empfindlichkeit', startSignal:'Startsignal',
+    delayRandom:'Zufalls-Delay', delayInstant:'Sofort', parTime:'Par-Time', language:'Sprache',
+    delayMin:'Min. Verz\u00f6gerung', delayMax:'Max. Verz\u00f6gerung',
+    parTimeInfo:'Par-Time ist eine feste Zielzeit: der Timer stoppt automatisch und piept, sobald diese Zeit nach dem Start erreicht ist \u2014 unabh\u00e4ngig von erfassten Sch\u00fcssen.',
+    limitationsTitle:'Bekannte Einschr\u00e4nkung', limitationsBody:'Die Mikrofon-Erkennung ist wetterf\u00fchlig: laute St\u00e4nde, Echo und einfache Mikrofone erzeugen Fehlz\u00fcndungen oder verpasste Schuss. F\u00fcr Wettkampfansprüche bleibt Hardware wie der CED7000 die Referenz.',
+    savedTo:'Gespeichert in', shots:'Sch\u00fcsse',
+    hubHint:'Dunkler/heller Modus und Sprache werden zentral in den Hub-Einstellungen gesteuert.'
+  },
+  en: {
+    appTitle:'Shot Timer', tabTimer:'Timer', tabSequences:'Drills', tabHistory:'History', tabSettings:'Settings',
+    ready:'READY', standby:'STAND BY', logShot:'SHOT', record:'Record', last:'Last', attempts:'Attempts',
+    drawFirst:'Draw-to-1st', avgSplit:'Avg Split', bestSplit:'Best Split', splitTrend:'Split Trend', noRuns:'No runs recorded yet.',
+    newSequence:'New Sequence', sequenceName:'Sequence name', addStep:'Add step',
+    stepShot:'SHOT', stepReload:'RELOAD', stepMove:'MOVE', stepSwap:'SWAP', createSequence:'Save sequence',
+    stepShotInfo:'A shot is fired \u2014 the timer expects a trigger here and measures its split.',
+    stepReloadInfo:'Magazine or cylinder change \u2014 counts as a step with no split value of its own.',
+    stepMoveInfo:'Position change on the range, e.g. to another position \u2014 no split value of its own.',
+    stepSwapInfo:'Switching firearm or hand \u2014 no split value of its own.',
+    micSection:'Microphone', enableMic:'Enable microphone', sensitivity:'Mic Sensitivity', startSignal:'Start Signal',
+    delayRandom:'Random Delay', delayInstant:'Instant', parTime:'Par Time', language:'Language',
+    delayMin:'Min. delay', delayMax:'Max. delay',
+    parTimeInfo:'Par time is a fixed target time: the timer stops automatically and beeps once this time is reached after start \u2014 regardless of shots recorded.',
+    limitationsTitle:'Known limitation', limitationsBody:'Mic detection is moody: loud ranges, echo and cheap microphones cause false triggers or missed shots. For match-grade timing, hardware like the CED7000 remains the reference.',
+    savedTo:'Saved to', shots:'Shots',
+    hubHint:'Dark/light mode and language are controlled centrally in the hub settings.'
+  }
+};
+const STEP_META = {
+  shot:   { short:'S', color:'var(--copper-bright)' },
+  reload: { short:'R', color:'var(--steel)' },
+  move:   { short:'M', color:'var(--olive-light)' },
+  swap:   { short:'W', color:'var(--field-tan)' }
+};
+const TAB_ICONS = {
+  timer: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="2" x2="12" y2="5"></line><line x1="12" y1="19" x2="12" y2="22"></line><circle cx="12" cy="12" r="2.4"></circle></svg>',
+  sequences: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>',
+  history: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="5" y2="12"></line><line x1="12" y1="20" x2="12" y2="6"></line><line x1="19" y1="20" x2="19" y2="15"></line></svg>',
+  settings: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"></circle><path d="M19.4 13a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V19a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 8.97 17.3a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 13a1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 6.97a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 2.6a1.7 1.7 0 0 0 1.03-1.56V1a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15.03 2.6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 7a1.7 1.7 0 0 0 1.56 1.03H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 13z"></path></svg>'
+};
+
+function hubLang() {
+  try { if (window.KRHubLang) return window.KRHubLang.get(); } catch (e) {}
+  return 'de';
+}
+
+class Component extends DCLogic {
+  state = {
+    tab: 'timer', lang: hubLang(),
+    sensitivity: 55, delayMode: 'random', delayMinS: 0.9, delayMaxS: 3.9, parEnabled: false, parTime: 8,
+    phase: 'idle', splits: [], activeSeqId: 's1',
+    sequences: [
+      { id:'s1', name:'Standard Drill', steps:[{type:'shot'},{type:'reload'},{type:'shot'}], record:null, last:null, attempts:0, runs:[] },
+      { id:'s2', name:'El Presidente', steps:[{type:'move'},{type:'shot'},{type:'swap'},{type:'shot'},{type:'reload'},{type:'shot'}], record:null, last:null, attempts:0, runs:[] }
+    ],
+    newSeqName: '', newSeqSteps: [], confirmSeq: null,
+    micGranted: false, micDenied: false, toast: '', tick: 0
+  };
+
+  componentDidMount() {
+    this._onStorage = (e) => {
+      if (!e || e.key == null || e.key === 'kr-hub-lang') {
+        const l = hubLang();
+        if (l !== this.state.lang) this.setState({ lang: l });
+      }
+    };
+    window.addEventListener('storage', this._onStorage);
+  }
+
+  componentWillUnmount() {
+    this._stopTick();
+    this._stopMic();
+    if (this._countdownTimer) clearTimeout(this._countdownTimer);
+    if (this._onStorage) window.removeEventListener('storage', this._onStorage);
+  }
+
+  // ---------- helpers ----------
+  fmt(n) { return (n == null) ? '\u2014' : n.toFixed(3); }
+  fmt2(n) { return (n == null) ? '\u2014' : n.toFixed(2); }
+  activeSeq() { return this.state.sequences.find(s => s.id === this.state.activeSeqId) || this.state.sequences[0]; }
+
+  beep(freq, dur) {
+    try {
+      if (!this._actx) this._actx = new (window.AudioContext || window.webkitAudioContext)();
+      const ctx = this._actx;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'square'; osc.frequency.value = freq || 1568;
+      gain.gain.value = 0.18;
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start();
+      setTimeout(() => { osc.stop(); }, dur || 320);
+    } catch (e) {}
+  }
+
+  // ---------- nav ----------
+  setTab(t) { this.setState({ tab: t }); }
+  setLang(l) {
+    this.setState({ lang: l });
+    try { if (window.KRHubLang) window.KRHubLang.set(l); } catch (e) {}
+  }
+
+  // ---------- sequences ----------
+  selectSeq(id) {
+    if (this.state.phase === 'running' || this.state.phase === 'countdown') return;
+    this.setState({ activeSeqId: id, splits: [], phase: 'idle', toast: '' });
+  }
+  addNewStep(type) { this.setState({ newSeqSteps: [...this.state.newSeqSteps, { type }] }); }
+  removeNewStep(idx) { const arr = this.state.newSeqSteps.slice(); arr.splice(idx, 1); this.setState({ newSeqSteps: arr }); }
+  createSequence() {
+    const name = this.state.newSeqName.trim();
+    if (!name || this.state.newSeqSteps.length === 0) return;
+    const seq = { id: 's' + Date.now(), name, steps: this.state.newSeqSteps, record: null, last: null, attempts: 0, runs: [] };
+    this.setState({ sequences: [...this.state.sequences, seq], newSeqName: '', newSeqSteps: [], activeSeqId: seq.id });
+  }
+  // Zweistufige Bestätigung (wie bei der Ringauswertung): erst „Löschen?", dann löschen
+  askDeleteSeq(id) {
+    if (this.state.confirmSeq === id) {
+      clearTimeout(this._seqT);
+      this.deleteSequence(id);
+    } else {
+      this.setState({ confirmSeq: id });
+      clearTimeout(this._seqT);
+      this._seqT = setTimeout(() => this.setState({ confirmSeq: null }), 3000);
+    }
+  }
+  deleteSequence(id) {
+    const seqs = this.state.sequences.filter(s => s.id !== id);
+    if (seqs.length === 0) { this.setState({ confirmSeq: null }); return; }
+    const nextActive = this.state.activeSeqId === id ? seqs[0].id : this.state.activeSeqId;
+    this.setState({ sequences: seqs, activeSeqId: nextActive, confirmSeq: null });
+  }
+
+  // ---------- run lifecycle ----------
+  startRun() {
+    if (this.state.phase !== 'idle' && this.state.phase !== 'finished') return;
+    this.setState({ phase: 'countdown', splits: [], toast: '' });
+    const lo = Math.min(this.state.delayMinS, this.state.delayMaxS) * 1000;
+    const hi = Math.max(this.state.delayMinS, this.state.delayMaxS) * 1000;
+    const delay = this.state.delayMode === 'random' ? (lo + Math.random() * Math.max(0, hi - lo)) : 250;
+    this._countdownTimer = setTimeout(() => this._actuallyStart(), delay);
+  }
+  _actuallyStart() {
+    this.beep(1568, 320);
+    this._startTs = performance.now();
+    this._lastEventTs = this._startTs;
+    this.setState({ phase: 'running', tick: this.state.tick + 1 });
+    this._tickInterval = setInterval(() => this.setState(s => ({ tick: s.tick + 1 })), 30);
+    if (this.state.micGranted) this._armMic();
+  }
+  recordShot() {
+    if (this.state.phase !== 'running') return;
+    const now = performance.now();
+    const delta = (now - this._lastEventTs) / 1000;
+    this._lastEventTs = now;
+    const splits = [...this.state.splits, delta];
+    this.setState({ splits });
+    const shotCount = this.activeSeq().steps.filter(st => st.type === 'shot').length;
+    if (splits.length >= shotCount) this.stopRun(true);
+  }
+  stopRun(save) {
+    this._stopTick();
+    this._stopMic();
+    if (this._countdownTimer) { clearTimeout(this._countdownTimer); this._countdownTimer = null; }
+    if (this.state.phase !== 'running' || this.state.splits.length === 0) {
+      this.setState({ phase: 'idle' });
+      return;
+    }
+    const total = this.state.splits.reduce((a, b) => a + b, 0);
+    let toast = '';
+    if (save) {
+      const seqs = this.state.sequences.map(sq => {
+        if (sq.id !== this.state.activeSeqId) return sq;
+        const record = (sq.record == null || total < sq.record) ? total : sq.record;
+        const runs = [...sq.runs, { total, splits: this.state.splits.slice() }].slice(-30);
+        return { ...sq, record, last: total, attempts: sq.attempts + 1, runs };
+      });
+      this.setState({ sequences: seqs });
+      toast = (this.state.lang === 'de' ? 'Gespeichert in ' : 'Saved to ') + this.activeSeq().name;
+    }
+    this.setState({ phase: 'finished', toast });
+  }
+  resetRun() {
+    this._stopTick(); this._stopMic();
+    if (this._countdownTimer) { clearTimeout(this._countdownTimer); this._countdownTimer = null; }
+    this.setState({ phase: 'idle', splits: [], toast: '' });
+  }
+  _stopTick() { if (this._tickInterval) { clearInterval(this._tickInterval); this._tickInterval = null; } }
+
+  // ---------- mic ----------
+  requestMic() {
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      this._micStream = stream;
+      this.setState({ micGranted: true, micDenied: false });
+    }).catch(() => { this.setState({ micDenied: true, micGranted: false }); });
+  }
+  _armMic() {
+    if (!this._micStream) return;
+    try {
+      const ctx = this._actx || new (window.AudioContext || window.webkitAudioContext)();
+      this._actx = ctx;
+      const src = ctx.createMediaStreamSource(this._micStream);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 1024;
+      src.connect(analyser);
+      this._analyser = analyser;
+      this._buf = new Uint8Array(analyser.fftSize);
+      this._lastShotAudioTs = 0;
+      this._micLoop();
+    } catch (e) {}
+  }
+  _micLoop() {
+    if (this.state.phase !== 'running' || !this._analyser) return;
+    this._analyser.getByteTimeDomainData(this._buf);
+    let peak = 0;
+    for (let i = 0; i < this._buf.length; i++) { const v = Math.abs(this._buf[i] - 128) / 128; if (v > peak) peak = v; }
+    const threshold = 0.92 - (this.state.sensitivity / 100) * 0.78;
+    const now = performance.now();
+    if (peak > threshold && now - this._lastShotAudioTs > 180) {
+      this._lastShotAudioTs = now;
+      this.recordShot();
+    }
+    this._micRaf = requestAnimationFrame(() => this._micLoop());
+  }
+  _stopMic() { if (this._micRaf) { cancelAnimationFrame(this._micRaf); this._micRaf = null; } this._analyser = null; }
+
+  // ---------- settings ----------
+  setSensitivity(v) { this.setState({ sensitivity: v }); }
+  setDelayMode(m) { this.setState({ delayMode: m }); }
+  setDelayMinS(v) { this.setState({ delayMinS: Math.max(0, Math.min(10, v)) }); }
+  setDelayMaxS(v) { this.setState({ delayMaxS: Math.max(0, Math.min(10, v)) }); }
+  toggleParEnabled() { this.setState(s => ({ parEnabled: !s.parEnabled })); }
+  setParTime(v) { this.setState({ parTime: Math.max(2, Math.min(60, v)) }); }
+
+  renderVals() {
+    const st = this.state;
+    const s = STR[st.lang];
+    const seq = this.activeSeq();
+
+    const activeBtn = (active) => ({
+      display:'flex', alignItems:'center', gap:'6px', border:'none', borderRadius:'999px', padding:'7px 14px',
+      fontFamily:'var(--font-cond)', fontWeight:'700', fontSize:'12.5px', letterSpacing:'.03em', cursor:'pointer',
+      background: active ? 'var(--copper)' : 'transparent', color: active ? 'var(--primary-fg)' : 'var(--fg-dim)'
+    });
+
+    // ---- elapsed display ----
+    let elapsedDisplay = '0.000';
+    if (st.phase === 'running') {
+      elapsedDisplay = this.fmt((performance.now() - this._startTs) / 1000);
+    } else if (st.phase === 'finished') {
+      elapsedDisplay = this.fmt(st.splits.reduce((a,b)=>a+b,0));
+    } else if (st.phase === 'countdown') {
+      elapsedDisplay = '0.000';
+    }
+
+    // auto par-time stop
+    if (st.phase === 'running' && st.parEnabled && (performance.now() - this._startTs) / 1000 >= st.parTime) {
+      setTimeout(() => this.stopRun(true), 0);
+    }
+
+    let phaseLabelText = s.ready;
+    if (st.phase === 'countdown') phaseLabelText = s.standby;
+    else if (st.phase === 'running') phaseLabelText = s.shots + ' ' + st.splits.length + '/' + seq.steps.filter(x=>x.type==='shot').length;
+    else if (st.phase === 'finished') phaseLabelText = seq.name.toUpperCase();
+
+    const phaseLabelStyle = {
+      fontFamily:'var(--font-cond)', fontWeight:'600', fontSize:'11px', textTransform:'uppercase', letterSpacing:'.14em',
+      color: st.phase === 'countdown' ? 'var(--danger)' : 'var(--copper-bright)',
+      animation: st.phase === 'countdown' ? 'kr-pulse 0.6s infinite' : 'none'
+    };
+
+    // ---- splits merged view ----
+    let shotIdx = 0;
+    const splitsView = seq.steps.map((step, i) => {
+      const meta = STEP_META[step.type];
+      const label = ({shot:s.stepShot, reload:s.stepReload, move:s.stepMove, swap:s.stepSwap})[step.type];
+      let valueText = '\u2014'; let valColor = 'var(--fg-faint)';
+      if (step.type === 'shot') {
+        const v = st.splits[shotIdx];
+        valueText = v != null ? this.fmt(v) : '\u2014';
+        valColor = v != null ? 'var(--fg)' : 'var(--fg-faint)';
+        shotIdx++;
+      }
+      return {
+        key: i, label, valueText, valColor,
+        dotStyle: { width:'7px', height:'7px', borderRadius:'2px', background: meta.color, flexShrink:0 }
+      };
+    });
+
+    const maxSplit = Math.max(0.4, ...st.splits);
+    const barsView = st.splits.map((v, i) => ({
+      key: i,
+      style: {
+        width:'6px', borderRadius:'2px 2px 0 0',
+        height: Math.max(6, (v / maxSplit) * 56) + 'px',
+        background: i === st.splits.length - 1 ? 'var(--copper)' : 'var(--steel)'
+      }
+    }));
+
+    const seqChips = st.sequences.map(sq => {
+      const active = sq.id === st.activeSeqId;
+      return {
+        key: sq.id, label: sq.name, onClick: () => this.selectSeq(sq.id),
+        recordText: sq.record != null ? this.fmt(sq.record) : '\u2014',
+        style: {
+          flexShrink:0, border: active ? '1px solid var(--copper)' : '1px solid var(--border)',
+          background: active ? 'var(--ink-700)' : 'var(--ink-800)', borderRadius:'8px', padding:'8px 14px',
+          fontFamily:'var(--font-cond)', fontWeight:'700', fontSize:'12.5px', color: active ? 'var(--fg)' : 'var(--fg-dim)',
+          textTransform:'uppercase', letterSpacing:'.03em', cursor:'pointer', display:'flex', flexDirection:'column', gap:'2px', alignItems:'flex-start'
+        },
+        recordStyle: { fontFamily:'var(--font-mono)', fontSize:'11px', color:'var(--copper-bright)' }
+      };
+    });
+
+    const canToggle = st.phase === 'idle' || st.phase === 'finished';
+    const startStopHandler = (st.phase === 'running') ? () => this.stopRun(false) : (canToggle ? () => this.startRun() : () => {});
+    const startStopStyle = {
+      width:'56px', height:'56px', borderRadius:'50%', border:'none', cursor:'pointer',
+      display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0,
+      background: st.phase === 'running' ? 'var(--danger)' : 'var(--copper)',
+      color: st.phase === 'running' ? '#fff' : 'var(--primary-fg)',
+      boxShadow: st.phase === 'countdown' ? 'none' : 'var(--glow-copper)'
+    };
+    const startStopLabel = st.phase === 'running' ? s.tabTimer + ' \u25A0' : (st.phase === 'countdown' ? s.standby : 'START');
+    const startHintText = st.delayMode === 'random' ? s.delayRandom : s.delayInstant;
+
+    // ---- sequences tab list ----
+    const sequencesListView = st.sequences.map(sq => ({
+      key: sq.id, name: sq.name,
+      onSelect: () => { this.selectSeq(sq.id); this.setTab('timer'); },
+      onDelete: () => this.askDeleteSeq(sq.id),
+      delLabel: sq.id === st.confirmSeq ? 'L\u00F6schen?' : '\u00D7',
+      delBtnStyle: sq.id === st.confirmSeq
+        ? { background:'#b42318', border:'1px solid #b42318', color:'#fff', borderRadius:'6px', height:'28px', padding:'0 10px', cursor:'pointer', fontFamily:'var(--font-body)', fontSize:'12px', fontWeight:'600', whiteSpace:'nowrap' }
+        : { background:'transparent', border:'1px solid var(--border)', color:'var(--fg-dim)', borderRadius:'6px', width:'28px', height:'28px', cursor:'pointer' },
+      selectLabel: sq.id === st.activeSeqId ? '\u2713' : '\u25B8',
+      selectBtnStyle: { background: sq.id === st.activeSeqId ? 'var(--copper)' : 'transparent', color: sq.id === st.activeSeqId ? 'var(--primary-fg)' : 'var(--fg-dim)', border:'1px solid ' + (sq.id === st.activeSeqId ? 'var(--copper)' : 'var(--border)'), borderRadius:'6px', width:'28px', height:'28px', cursor:'pointer' },
+      recordText: sq.record != null ? this.fmt(sq.record) : '\u2014',
+      lastText: sq.last != null ? this.fmt(sq.last) : '\u2014',
+      attemptsText: String(sq.attempts),
+      steps: sq.steps.map((st2, i) => ({ key:i, short: STEP_META[st2.type].short, chipStyle: { width:'22px', height:'22px', borderRadius:'4px', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'var(--font-mono)', fontSize:'11px', fontWeight:'700', color:'var(--ink-900)', background: STEP_META[st2.type].color } }))
+    }));
+
+    const newSeqStepsView = st.newSeqSteps.map((step, i) => ({
+      key: i, onRemove: () => this.removeNewStep(i),
+      label: ({shot:s.stepShot, reload:s.stepReload, move:s.stepMove, swap:s.stepSwap})[step.type] + ' ' + (i+1)
+    }));
+
+    const addStepBtnStyle = {
+      position:'relative', display:'flex', flexDirection:'column', alignItems:'center', gap:'4px', background:'var(--ink-900)', border:'1px solid var(--border)',
+      borderRadius:'6px', color:'var(--fg-dim)', fontFamily:'var(--font-cond)', fontWeight:'700', fontSize:'9.5px', letterSpacing:'.04em', padding:'10px 4px', cursor:'pointer'
+    };
+    const infoIconStyle = { position:'absolute', top:'4px', right:'4px', display:'flex', color:'var(--fg-faint)' };
+
+    // ---- history tab ----
+    const historyView = st.sequences.map(sq => {
+      const runs = sq.runs.slice().reverse();
+      const draws = sq.runs.map(r => r.splits[0]).filter(v => v != null);
+      const allSplitsExceptFirst = sq.runs.flatMap(r => r.splits.slice(1));
+      const avgDraw = draws.length ? draws.reduce((a,b)=>a+b,0)/draws.length : null;
+      const avgSplit = allSplitsExceptFirst.length ? allSplitsExceptFirst.reduce((a,b)=>a+b,0)/allSplitsExceptFirst.length : null;
+      const bestSplit = allSplitsExceptFirst.length ? Math.min(...allSplitsExceptFirst) : null;
+      const trendData = sq.runs.slice(-12);
+      const maxTotal = Math.max(0.4, ...trendData.map(r => r.total));
+      return {
+        key: sq.id, name: sq.name, hasRuns: sq.runs.length > 0, noRuns: sq.runs.length === 0,
+        drawFirstText: this.fmt2(avgDraw), avgSplitText: this.fmt2(avgSplit), bestSplitText: this.fmt2(bestSplit),
+        trend: trendData.map((r,i) => ({ key:i, style:{ width:'8px', borderRadius:'2px 2px 0 0', height: Math.max(4,(r.total/maxTotal)*40)+'px', background: i === trendData.length-1 ? 'var(--copper)' : 'var(--steel)' } })),
+        runs: runs.map((r, i) => ({ key:i, label: (s.shots.slice(0,3).toUpperCase()) + ' #' + (sq.runs.length - i), totalText: this.fmt(r.total), splitsText: r.splits.map(v=>v.toFixed(2)).join(' / ') }))
+      };
+    });
+
+    // ---- top tab pills ----
+    const tabPill = (name, label) => {
+      const active = st.tab === name;
+      return {
+        key: name, label, onClick: () => this.setTab(name),
+        iconHtml: { __html: TAB_ICONS[name] },
+        iconWrapStyle: { display:'flex', color: active ? 'var(--primary-fg)' : 'var(--fg-dim)' },
+        style: {
+          display:'flex', alignItems:'center', gap:'7px', flexShrink:0, border: active ? '1px solid var(--copper)' : '1px solid var(--border)',
+          background: active ? 'var(--copper)' : 'var(--ink-800)', borderRadius:'999px', padding:'9px 16px',
+          fontFamily:'var(--font-cond)', fontWeight:'700', fontSize:'12.5px', color: active ? 'var(--primary-fg)' : 'var(--fg-dim)',
+          textTransform:'uppercase', letterSpacing:'.04em', cursor:'pointer'
+        }
+      };
+    };
+    const mainTabs = [
+      tabPill('timer', s.tabTimer),
+      tabPill('sequences', s.tabSequences),
+      tabPill('history', s.tabHistory),
+      tabPill('settings', s.tabSettings)
+    ];
+
+    return {
+      s, mainTabs,
+      isTabTimer: st.tab === 'timer', isTabSequences: st.tab === 'sequences', isTabHistory: st.tab === 'history', isTabSettings: st.tab === 'settings',
+      seqChips, phaseLabelText, phaseLabelStyle, elapsedDisplay, barsView, splitsView,
+      startStopHandler, startStopStyle, startStopLabel, startHintText,
+      showStopIcon: st.phase === 'running', showPlayIcon: st.phase !== 'running',
+      showLogShot: st.phase === 'running', recordShot: () => this.recordShot(), resetRun: () => this.resetRun(),
+      toast: st.toast,
+      sequencesListView,
+      newSeqName: st.newSeqName, onNewSeqNameInput: (e) => this.setState({ newSeqName: e.target.value }),
+      addStepShot: () => this.addNewStep('shot'), addStepReload: () => this.addNewStep('reload'), addStepMove: () => this.addNewStep('move'), addStepSwap: () => this.addNewStep('swap'),
+      addStepBtnStyle, infoIconStyle, newSeqStepsView, createSequence: () => this.createSequence(),
+      historyView,
+      micStatusText: st.micGranted ? (st.lang==='de'?'AKTIV':'ON') : (st.micDenied ? (st.lang==='de'?'VERWEIGERT':'DENIED') : (st.lang==='de'?'INAKTIV':'OFF')),
+      micStatusStyle: { fontFamily:'var(--font-mono)', fontSize:'11px', letterSpacing:'.06em', color: st.micGranted ? 'var(--success)' : (st.micDenied ? 'var(--danger)' : 'var(--fg-dim)') },
+      requestMic: () => this.requestMic(),
+      sensitivity: st.sensitivity, onSensitivityInput: (e) => this.setSensitivity(Number(e.target.value)),
+      delayModeRandomStyle: activeBtn(st.delayMode === 'random'), delayModeInstantStyle: activeBtn(st.delayMode === 'instant'),
+      setDelayRandom: () => this.setDelayMode('random'), setDelayInstant: () => this.setDelayMode('instant'),
+      isDelayRandom: st.delayMode === 'random', delayRangeGap: '14px',
+      delayMinS: st.delayMinS, delayMaxS: st.delayMaxS,
+      delayMinText: st.delayMinS.toFixed(1) + 's', delayMaxText: st.delayMaxS.toFixed(1) + 's',
+      onDelayMinInput: (e) => this.setDelayMinS(Number(e.target.value)),
+      onDelayMaxInput: (e) => this.setDelayMaxS(Number(e.target.value)),
+      parEnabled: st.parEnabled, parGap: st.parEnabled ? '12px' : '0px',
+      parToggleText: st.parEnabled ? 'ON' : 'OFF',
+      parToggleStyle: { background: st.parEnabled ? 'var(--copper)' : 'transparent', color: st.parEnabled ? 'var(--primary-fg)' : 'var(--fg-dim)', border:'1px solid ' + (st.parEnabled ? 'var(--copper)' : 'var(--border)'), borderRadius:'999px', padding:'5px 12px', fontFamily:'var(--font-cond)', fontWeight:'700', fontSize:'11px', cursor:'pointer' },
+      toggleParEnabled: () => this.toggleParEnabled(),
+      parTimeText: st.parTime.toFixed(1) + 's', parMinus: () => this.setParTime(st.parTime - 0.5), parPlus: () => this.setParTime(st.parTime + 0.5),
+      parStepBtnStyle: { width:'32px', height:'32px', borderRadius:'6px', border:'1px solid var(--border)', background:'var(--ink-900)', color:'var(--fg)', fontSize:'16px', cursor:'pointer' }
+    };
+  }
+}
+
+</script>
+</body>
+</html>

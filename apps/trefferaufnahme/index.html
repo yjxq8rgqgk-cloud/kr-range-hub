@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<link rel="stylesheet" href="../../shared/theme.css">
+<script src="../../shared/theme.js"></script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Trefferaufnahme — KR</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Barlow+Semi+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+@font-face {
+  font-family: 'Gunplay';
+  src: url('fonts/gunplay_rg.otf') format('opentype');
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+:root {
+  /* KR earth-neutral ramp */
+  --ink-900:#14110B; --ink-850:#1A160E; --ink-800:#211C13; --ink-700:#2B2418;
+  --ink-600:#38301F; --ink-500:#4A3F29; --earth-400:#6E5F44; --earth-300:#8C7B58;
+  --sand-200:#BCAB86; --sand-100:#DCD0B5; --bone-050:#EFE8D6;
+  /* metallics */
+  --copper:#B26A3E; --copper-bright:#C9824E; --copper-deep:#8C4F2C;
+  --bronze:#C39A4C; --gold:#D2B05A; --steel:#9A988F; --steel-light:#C2C0B6;
+  --olive:#6A6C43; --olive-light:#878A56;
+
+  /* fonts */
+  --font-display:'Gunplay','Arial Black',sans-serif;
+  --font-body:'Barlow',system-ui,-apple-system,sans-serif;
+  --font-cond:'Barlow Semi Condensed','Barlow',sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+
+  /* semantic surface */
+  --bg:var(--ink-900); --surface:var(--ink-800); --raised:var(--ink-700);
+  --sunken:var(--ink-850);
+  --fg:var(--bone-050); --fg-muted:var(--sand-100); --fg-dim:var(--earth-300);
+  --border:var(--ink-600); --border-strong:var(--ink-500); --border-metal:#5A4A30;
+  --primary:var(--copper); --primary-hover:var(--copper-bright);
+  --primary-press:var(--copper-deep); --primary-fg:#1B130C;
+  --radius:4px;
+
+  /* === SVG-driving tokens (referenced live by the chart JS — names kept) === */
+  --ring:#C8BB99;      /* ring strokes — warm bone on dark */
+  --grid:#473C26;      /* faint grid + crosshair */
+  --muted:#9C8B66;     /* ring numbers, dashed spread, muted result */
+  --blue:#6E93A6;      /* Treffer / Haltepunkt — steel-blue (single cool accent) */
+  --amber:#D6A24E;     /* Mittlerer Treffpunkt (Schwerpunkt) — bronze-amber */
+  --green:#9DB23E;     /* Ziel / Visierkorrektur — olive-green */
+  --green-deep:#7C8F2E;
+  --red:#C0533B;       /* Ausreißer — brick red */
+}
+
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { margin:0; height:100%; }
+body {
+  font-family:var(--font-body);
+  background:var(--bg);
+  color:var(--fg-muted);
+  display:flex; flex-direction:column; min-height:100%;
+  position:relative;
+}
+/* quiet slate texture wash over the canvas */
+
+body > * { position:relative; z-index:1; }
+
+/* ---- Header ---- */
+header.app {
+  display:flex; align-items:center; gap:16px;
+  padding:14px 28px;
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,var(--ink-850),var(--ink-900));
+  position:sticky; top:0; z-index:20;
+}
+header.app .brand-mark { height:34px; width:auto; opacity:.92; flex:none; }
+header.app .titles { display:flex; flex-direction:column; gap:2px; min-width:0; }
+header.app h1 {
+  font-family:var(--font-display);
+  font-size:23px; font-weight:700; letter-spacing:.01em;
+  text-transform:uppercase; color:var(--fg); margin:0; line-height:1;
+}
+header.app .sub {
+  font-family:var(--font-cond); font-weight:600;
+  font-size:11.5px; text-transform:uppercase; letter-spacing:.16em;
+  color:var(--copper-bright);
+}
+header.app .count-pill {
+  margin-left:auto; flex:none;
+  font-family:var(--font-mono); font-size:12px; letter-spacing:.04em;
+  color:var(--fg-dim);
+  border:1px solid var(--border); border-left:3px solid var(--copper);
+  padding:6px 12px; border-radius:var(--radius);
+  background:var(--ink-850);
+  white-space:nowrap;
+}
+
+/* ---- Layout ---- */
+main {
+  flex:1; display:grid; grid-template-columns:minmax(0,1fr) 360px;
+  gap:24px; padding:26px 28px; align-items:start;
+  max-width:1220px; width:100%; margin:0 auto;
+}
+
+/* ---- Target stage ---- */
+.stage {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:0 6px 18px rgba(0,0,0,.45);
+  padding:20px;
+  display:flex; flex-direction:column; align-items:center; gap:16px;
+}
+.target-scroll {
+  width:100%; max-width:580px; aspect-ratio:1/1; overflow:auto;
+  display:flex; align-items:safe center; justify-content:safe center;
+  background:radial-gradient(circle at 50% 45%, var(--ink-900) 0%, var(--ink-850) 70%);
+  border:1px solid var(--ink-600);
+  border-radius:var(--radius);
+  box-shadow:inset 0 2px 14px rgba(0,0,0,.55);
+}
+.target-wrap { width:100%; aspect-ratio:1/1; flex:none; }
+svg#target { width:100%; height:100%; display:block; touch-action:none; cursor:crosshair; user-select:none; }
+.scale-note {
+  font-family:var(--font-mono); font-size:11.5px; color:var(--fg-dim);
+  letter-spacing:.03em; text-align:center;
+}
+
+/* ---- Sidebar / panels ---- */
+aside { display:flex; flex-direction:column; gap:18px; }
+.panel {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:18px;
+  box-shadow:0 6px 18px rgba(0,0,0,.35);
+}
+.panel h2 {
+  font-family:var(--font-cond); font-weight:700;
+  font-size:11px; text-transform:uppercase; letter-spacing:.18em;
+  color:var(--copper-bright); margin:0 0 14px;
+  display:flex; align-items:center; gap:9px;
+}
+.panel h2::before {
+  content:""; width:14px; height:2px; background:var(--copper); flex:none;
+}
+
+/* ---- Collapsible panel ---- */
+.panel.collapsible > h2 {
+  margin:0; cursor:pointer; user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.panel.collapsible > h2 .chevron {
+  margin-left:auto; flex:none;
+  width:16px; height:16px; transition:transform .22s ease;
+  color:var(--fg-dim);
+}
+.panel.collapsible.open > h2 .chevron { transform:rotate(180deg); }
+.collapse-body {
+  display:grid; grid-template-rows:0fr;
+  transition:grid-template-rows .26s ease, margin-top .26s ease;
+  margin-top:0;
+}
+.collapse-body > div { overflow:hidden; min-height:0; }
+.panel.collapsible.open .collapse-body {
+  grid-template-rows:1fr; margin-top:14px;
+}
+
+/* ---- Ringauswertung ---- */
+.ring-empty { font-size:12px; color:var(--fg-dim); line-height:1.5; margin:0; }
+.ring-table { display:flex; flex-direction:column; gap:0; }
+.ring-row {
+  display:grid; grid-template-columns:34px 1fr auto;
+  align-items:center; gap:10px;
+  padding:6px 0; border-bottom:1px solid var(--border);
+}
+.ring-row:last-child { border-bottom:0; }
+.ring-row .rv {
+  font-family:var(--font-cond); font-weight:700; font-size:14px;
+  color:var(--copper-bright); letter-spacing:.04em;
+}
+.ring-row.miss .rv { color:var(--red); }
+.ring-bar { height:7px; border-radius:2px; background:var(--ink-700); overflow:hidden; }
+.ring-bar > span { display:block; height:100%; background:var(--copper); border-radius:2px; }
+.ring-row.miss .ring-bar > span { background:var(--red); }
+.ring-cnt {
+  font-family:var(--font-mono); font-size:12px; color:var(--fg-muted);
+  min-width:54px; text-align:right;
+}
+.ring-total {
+  display:flex; justify-content:space-between; align-items:baseline;
+  margin-top:12px; padding-top:12px; border-top:1px solid var(--border-strong);
+}
+.ring-total .lbl {
+  font-family:var(--font-cond); font-weight:700; font-size:11px;
+  text-transform:uppercase; letter-spacing:.16em; color:var(--fg-dim);
+}
+.ring-total .val { font-family:var(--font-mono); font-size:15px; color:var(--copper-bright); }
+
+/* ---- Buttons ---- */
+.btn-row { display:flex; flex-direction:column; gap:10px; }
+button {
+  font-family:var(--font-cond); font-size:14px; font-weight:600;
+  text-transform:uppercase; letter-spacing:.06em;
+  border-radius:var(--radius); padding:12px 14px;
+  border:1px solid var(--border-strong); background:transparent; color:var(--fg-muted);
+  cursor:pointer; transition:background .14s, border-color .14s, color .14s, transform .04s;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+button:hover { background:var(--ink-600); color:var(--fg); }
+button:active { transform:translateY(1px); }
+button.primary {
+  background:var(--primary); border-color:var(--copper-deep);
+  color:var(--primary-fg); font-size:18px; letter-spacing:.08em;
+}
+button.primary:hover { background:var(--primary-hover); color:var(--primary-fg); }
+button.primary:active { background:var(--primary-press); }
+button:disabled { opacity:.38; cursor:not-allowed; }
+button:focus-visible { outline:none; box-shadow:0 0 0 3px rgba(201,130,78,.35); }
+.btn-row .secondary-row { display:flex; gap:10px; }
+.btn-row .secondary-row button { flex:1; font-size:12px; padding:10px; }
+.export-btn {
+  width:100%; border-color:var(--copper); color:var(--copper-bright); background:transparent;
+}
+.export-btn:hover { background:rgba(178,106,62,.14); color:var(--copper-bright); }
+
+/* ---- Zoom row ---- */
+.zoom-row {
+  display:flex; align-items:center; gap:12px;
+  margin-top:14px; padding-top:14px; border-top:1px solid var(--border);
+}
+.zoom-row label {
+  font-family:var(--font-cond); font-weight:600; text-transform:uppercase;
+  letter-spacing:.08em; font-size:12px; color:var(--fg-dim); white-space:nowrap;
+}
+.zoom-row input[type="range"] { flex:1; min-width:0; accent-color:var(--copper); cursor:pointer; }
+.zoom-val { font-family:var(--font-mono); font-size:12px; color:var(--steel-light); width:46px; text-align:right; }
+
+/* ---- Results ---- */
+.result-grid { display:flex; flex-direction:column; gap:16px; }
+.result-item { border-left:3px solid var(--border-metal); padding-left:12px; }
+.result-item .label {
+  font-family:var(--font-cond); font-weight:600; text-transform:uppercase; letter-spacing:.07em;
+  font-size:11.5px; color:var(--fg-dim); margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.result-item .value {
+  font-family:var(--font-mono); font-size:21px; font-weight:500;
+  letter-spacing:-.01em; color:var(--fg);
+}
+.result-item .value.green { color:var(--green); }
+.result-item .value.blue { color:var(--blue); }
+.result-item .value.amber { color:var(--amber); }
+.result-item .value.muted { color:var(--fg-dim); font-size:16px; }
+.result-item .value.copper { color:var(--copper-bright); }
+.result-item .value-sub {
+  font-family:var(--font-mono); font-size:12px; color:var(--fg-dim);
+  letter-spacing:.02em; margin-top:3px;
+}
+.dot { width:10px; height:10px; border-radius:50%; display:inline-block; flex:none; }
+.dot.copper { background:var(--copper-bright); }
+.dot.blue { background:var(--blue); }
+.dot.amber { background:var(--amber); }
+.dot.green { background:var(--green); }
+.dot.red { background:var(--red); }
+.dot.dash { border-radius:50%; background:transparent; border:1.5px dashed var(--muted); width:11px; height:11px; }
+
+/* ---- Legend ---- */
+.legend { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:11px 16px; }
+.legend .row { display:flex; align-items:flex-start; gap:9px; font-size:12.5px; line-height:1.32; color:var(--fg-muted); min-width:0; }
+.legend .row .dot { flex:none; margin-top:3px; }
+
+/* ---- Settings ---- */
+.settings { display:flex; flex-direction:column; gap:13px; }
+.field { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.field label {
+  font-family:var(--font-cond); font-weight:600; text-transform:uppercase;
+  letter-spacing:.06em; font-size:12px; color:var(--fg-dim); white-space:nowrap;
+}
+.field.field-text { flex-direction:column; align-items:stretch; gap:6px; }
+.field.field-text input { width:100%; text-align:left; font-family:var(--font-body); text-transform:none; letter-spacing:0; }
+.field .input-mm { display:flex; align-items:center; gap:6px; }
+.field input {
+  width:66px; font-family:var(--font-mono); font-size:14px; text-align:right;
+  padding:7px 9px; border:1px solid var(--border-strong); border-radius:var(--radius);
+  background:var(--sunken); color:var(--fg);
+}
+.field input::placeholder { color:var(--earth-400); }
+.field input:focus { outline:none; border-color:var(--copper); box-shadow:0 0 0 3px rgba(201,130,78,.25); }
+.field .unit { font-family:var(--font-mono); font-size:12px; color:var(--fg-dim); width:34px; }
+.field-slider { display:flex; flex-direction:column; gap:7px; padding-top:4px; }
+.field-slider .slider-head { display:flex; justify-content:space-between; align-items:baseline; }
+.field-slider label { font-family:var(--font-cond); font-weight:600; text-transform:uppercase; letter-spacing:.06em; font-size:12px; color:var(--fg-dim); }
+.field-slider .slider-val { font-family:var(--font-mono); font-size:13px; color:var(--copper-bright); }
+.field-slider input[type="range"] { width:100%; accent-color:var(--copper); cursor:pointer; }
+.field-slider .slider-ends { display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:10.5px; letter-spacing:.04em; color:var(--earth-400); }
+
+/* ---- Print / PDF summary (greyscale per brief) ---- */
+.print-only { display:none; }
+#printSummary h3 {
+  font-family:var(--font-cond); font-weight:700; font-size:12px;
+  text-transform:uppercase; letter-spacing:.16em; color:#444; margin:0 0 8px;
+}
+#printSummary .psrow {
+  display:flex; justify-content:space-between; gap:16px;
+  padding:6px 0; border-bottom:1px dotted #bbb; font-size:13px; align-items:baseline;
+}
+#printSummary .psrow span:first-child { color:#555; flex:0 1 auto; white-space:nowrap; }
+#printSummary .psrow span:last-child { font-family:var(--font-mono); flex:0 0 auto; white-space:nowrap; text-align:right; color:#111; }
+
+@media (max-width:900px) {
+  main { grid-template-columns:1fr; }
+  aside { order:2; }
+}
+
+@media print {
+  /* Brief: Ausdrucke nur in Grautönen. Override the live SVG tokens. */
+  :root {
+    --ring:#1c1c1c; --grid:#c4c4c4; --muted:#555;
+    --blue:#3a3a3a; --amber:#000; --green:#6a6a6a; --green-deep:#444; --red:#8c8c8c;
+  }
+  @page { size:A4 portrait; margin:10mm; }
+  html, body { height:auto; }
+  body { background:#fff !important; color:#111; display:block; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  header.app { background:none; border:none; padding:0 0 3mm; display:block; position:static; }
+  header.app .brand-mark { display:none; }
+  header.app h1 { font-size:15pt; color:#111; }
+  header.app .sub { font-size:8.5pt; color:#555; }
+  header.app .count-pill { display:none; }
+  main { display:block; padding:0; max-width:none; margin:0; }
+  aside { display:none !important; }
+  .stage { border:none; border-radius:0; padding:0; gap:2mm; display:block; box-shadow:none; background:none; }
+  .target-scroll { overflow:visible !important; display:block !important; max-width:none !important; width:auto !important; aspect-ratio:auto !important; background:none !important; border:none !important; box-shadow:none !important; }
+  .target-wrap { width:82mm !important; max-width:82mm !important; height:82mm !important; margin:0 auto !important; }
+  .scale-note { margin-top:1.5mm; font-size:8pt; text-align:center; color:#555; }
+  .print-only { display:block; margin-top:4mm; max-width:150mm; margin-left:auto; margin-right:auto; }
+  #printSummary h3 { font-size:9pt; margin:0 0 2mm; }
+  #printSummary .ps-cols { column-count:1; }
+  #printSummary .psrow { padding:2.5px 0; font-size:9pt; break-inside:avoid; }
+  #printSummary .psrow span:last-child { white-space:nowrap; }
+}
+</style>
+</head>
+<body>
+  <template id="__bundler_thumbnail">
+    <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+      <rect width="1200" height="800" fill="#14110B"></rect>
+      <g transform="translate(600,400)" fill="none" stroke="#C8BB99" stroke-width="7">
+        <circle r="300"></circle>
+        <circle r="230"></circle>
+        <circle r="160"></circle>
+        <circle r="90"></circle>
+        <circle r="24" fill="#EFE8D6" stroke="none"></circle>
+      </g>
+      <circle cx="660" cy="350" r="16" fill="#6E93A6"></circle>
+      <circle cx="560" cy="430" r="16" fill="#6E93A6"></circle>
+      <circle cx="620" cy="300" r="14" fill="#C0533B"></circle>
+      <line x1="600" y1="400" x2="640" y2="360" stroke="#9DB23E" stroke-width="9" stroke-linecap="round"></line>
+    </svg>
+  </template>
+  <header class="app">
+    <img class="brand-mark" src="assets/kr-mark-line.png" alt="KR">
+    <div class="titles">
+      <h1>Trefferaufnahme</h1>
+      <span class="sub">Ringscheibe · Trefferlage &amp; Visierkorrektur</span>
+    </div>
+    <span class="count-pill" id="countPill">0 Treffer</span>
+  </header>
+
+  <main>
+    <section class="stage">
+      <div class="target-scroll">
+        <div class="target-wrap">
+          <svg id="target" viewBox="0 0 440 440" aria-label="Schießscheibe">
+          <defs>
+            <marker id="arrowGreen" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--green)"></path>
+            </marker>
+          </defs>
+          <g id="grid"></g>
+          <g id="rings"></g>
+          <image id="logo" href="assets/kr-mark-line.png" x="312" y="372" width="122" height="62" opacity="0.4" preserveAspectRatio="xMaxYMax meet"></image>
+          <g id="overlay"></g>
+          <g id="hits"></g>
+        </svg>
+        </div>
+      </div>
+      <div class="scale-note" id="scaleNote">Maßstab: 1 Ring = 8 mm · Scheibendurchmesser 160 mm</div>
+      <div class="print-only" id="printSummary"></div>
+    </section>
+
+    <aside>
+      <div class="panel">
+        <h2>Steuerung</h2>
+        <div class="btn-row">
+          <button class="primary" id="calcBtn" disabled="">Berechnen</button>
+          <div class="secondary-row">
+            <button id="undoBtn" disabled="">Letzten löschen</button>
+            <button id="resetBtn" disabled="">Zurücksetzen</button>
+          </div>
+          <button id="pdfBtn" class="export-btn">Als PDF exportieren</button>
+        </div>
+        <div class="zoom-row">
+          <label for="zoom">Scheibengröße</label>
+          <input type="range" id="zoom" min="60" max="350" step="1" value="100">
+          <span class="zoom-val" id="zoomVal">100 %</span>
+        </div>
+      </div>
+
+      <div class="panel collapsible" id="ringPanel">
+        <h2 id="ringToggle" role="button" tabindex="0" aria-expanded="false" aria-controls="ringBody">Ringauswertung<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></h2>
+        <div class="collapse-body" id="ringBody">
+          <div class="ring-breakdown" id="ringBreakdown"><p class="ring-empty">Noch keine Auswertung. Treffer setzen und „Berechnen“ drücken.</p></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Ergebnis</h2>
+        <div class="result-grid">
+          <div class="result-item">
+            <div class="label"><span class="dot copper"></span>Ringwertung</div>
+            <div class="value copper" id="resScore">—</div>
+            <div class="value-sub" id="resScoreSub"></div>
+          </div>
+          <div class="result-item">
+            <div class="label"><span class="dot amber"></span>Mittlerer Treffpunkt</div>
+            <div class="value amber" id="resCentroid">—</div>
+          </div>
+          <div class="result-item">
+            <div class="label"><span class="dot green"></span>Visierkorrektur</div>
+            <div class="value green" id="resClicks">—</div>
+          </div>
+          <div class="result-item">
+            <div class="label"><span class="dot blue"></span>Haltepunkt</div>
+            <div class="value blue" id="resHold">—</div>
+          </div>
+          <div class="result-item">
+            <div class="label"><span class="dot dash"></span>Streukreis (Ø)</div>
+            <div class="value muted" id="resSpread">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel collapsible" id="settingsPanel">
+        <h2 id="settingsToggle" role="button" tabindex="0" aria-expanded="false" aria-controls="settingsBody">Einstellungen<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></h2>
+        <div class="collapse-body" id="settingsBody">
+        <div class="settings">
+          <div class="field field-text">
+            <label for="waffe">Waffe</label>
+            <input type="text" id="waffe" placeholder="z. B. Anschütz 1907" autocomplete="off">
+          </div>
+          <div class="field field-text">
+            <label for="munition">Munition</label>
+            <input type="text" id="munition" placeholder="z. B. RWS R 50 / Match" autocomplete="off">
+          </div>
+          <div class="field field-text">
+            <label for="kaliber">Kaliber</label>
+            <input type="text" id="kaliber" placeholder="z. B. .22 lr" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="ringCount">Ringe</label>
+            <span class="input-mm">
+              <input type="number" id="ringCount" value="10" min="2" max="12" step="1">
+              <span class="unit">Ringe</span>
+            </span>
+          </div>
+          <div class="field">
+            <label for="d10">Innenring-Ø</label>
+            <span class="input-mm">
+              <input type="number" id="d10" value="50" min="0.5" max="200" step="0.5">
+              <span class="unit">mm</span>
+            </span>
+          </div>
+          <div class="field">
+            <label for="mmRing">Ringabstand</label>
+            <span class="input-mm">
+              <input type="number" id="mmRing" value="25" min="0.5" max="50" step="0.5">
+              <span class="unit">mm</span>
+            </span>
+          </div>
+          <div class="field">
+            <label for="scheibe">Scheiben-Ø</label>
+            <span class="input-mm">
+              <input type="number" id="scheibe" value="500" min="10" max="2000" step="1">
+              <span class="unit">mm</span>
+            </span>
+          </div>
+          <div class="field">
+            <label for="mmClick">Klickwert</label>
+            <span class="input-mm">
+              <input type="number" id="mmClick" value="20" min="0.1" max="50" step="0.1">
+              <span class="unit">mm</span>
+            </span>
+          </div>
+          <div class="field-slider">
+            <div class="slider-head">
+              <label for="outlierZ">Ausreißer-Empfindlichkeit</label>
+              <span class="slider-val" id="outlierZVal">3,5</span>
+            </div>
+            <input type="range" id="outlierZ" min="2.5" max="5" step="0.1" value="3.5">
+            <div class="slider-ends"><span>streng</span><span>tolerant</span></div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Legende</h2>
+        <div class="legend">
+          <div class="row"><span class="dot blue"></span>Treffer</div>
+          <div class="row"><span class="dot amber"></span>Mittlerer Treffpunkt (Schwerpunkt)</div>
+          <div class="row"><span class="dot green"></span>Ziel / Mitte (grüner Treffpunkt)</div>
+          <div class="row"><span class="dot blue"></span>Haltepunkt (ohne Visierkorrektur)</div>
+          <div class="row"><span class="dot red"></span>Ausreißer (nicht gewertet)</div>
+          <div class="row"><span class="dot dash"></span>Streukreis (Gruppengröße)</div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---- Geometrie ----
+  const SIZE = 440;
+  const C = SIZE / 2;          // Mittelpunkt = 220
+  const R = 200;               // Außenradius Ring 1 (px)
+  let RINGS = 10;             // Ringanzahl / höchster Ringwert (Zentrum)
+
+  const svg = document.getElementById("target");
+  const gGrid = document.getElementById("grid");
+  const gRings = document.getElementById("rings");
+  const gOverlay = document.getElementById("overlay");
+  const gHits = document.getElementById("hits");
+
+  const zoomInput = document.getElementById("zoom");
+  const zoomVal = document.getElementById("zoomVal");
+  const targetWrap = document.querySelector(".target-wrap");
+
+  const calcBtn = document.getElementById("calcBtn");
+  const undoBtn = document.getElementById("undoBtn");
+  const resetBtn = document.getElementById("resetBtn");
+  const countPill = document.getElementById("countPill");
+  const scaleNote = document.getElementById("scaleNote");
+
+  const resScore = document.getElementById("resScore");
+  const resScoreSub = document.getElementById("resScoreSub");
+  const ringBreakdown = document.getElementById("ringBreakdown");
+  const resCentroid = document.getElementById("resCentroid");
+  const resClicks = document.getElementById("resClicks");
+  const resHold = document.getElementById("resHold");
+  const resSpread = document.getElementById("resSpread");
+
+  const inWaffe = document.getElementById("waffe");
+  const inMunition = document.getElementById("munition");
+  const inKaliber = document.getElementById("kaliber");
+  const inRingCount = document.getElementById("ringCount");
+  const inD10 = document.getElementById("d10");
+  const inMmRing = document.getElementById("mmRing");
+  const inScheibe = document.getElementById("scheibe");
+  const inMmClick = document.getElementById("mmClick");
+  const inOutlierZ = document.getElementById("outlierZ");
+  const outlierZVal = document.getElementById("outlierZVal");
+  const pdfBtn = document.getElementById("pdfBtn");
+  const printSummary = document.getElementById("printSummary");
+
+  let hits = [];          // {x, y} in SVG-Koordinaten
+  let calculated = false;
+
+  const NS = "http://www.w3.org/2000/svg";
+  function el(name, attrs) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  // ---- Geometrie aus Einstellungen ----
+  function geom() {
+    const d10 = parseFloat(inD10.value || "16");
+    const s = parseFloat(inMmRing.value || "8");
+    const outerMM = d10 / 2 + (RINGS - 1) * s;   // Außenradius Ring 1 in mm
+    return { d10: d10, s: s, outerMM: outerMM };
+  }
+  function mmPerPx() { return geom().outerMM / R; }
+  // Ringwert eines Treffers (10 = Zentrum … 1 = Außenring, 0 = außerhalb).
+  // Treffer auf einer Ringlinie zählt zum höheren Wert (<=).
+  function ringValue(h) {
+    const r = Math.hypot(h.x - C, h.y - C);
+    for (let v = RINGS; v >= 1; v--) {
+      if (r <= ringOuterPx(v)) return v;
+    }
+    return 0;
+  }
+  function scoreOf(arr) {
+    let s = 0;
+    arr.forEach(function (h) { s += ringValue(h); });
+    return s;
+  }
+  // Außenradius (px) des Rings k (k=1 außen … 10 = Zentrumskreis)
+  function ringOuterPx(k) {
+    const g = geom();
+    const mm = g.d10 / 2 + (RINGS - k) * g.s;
+    return mm / mmPerPx();
+  }
+
+  // ---- cm-Raster hinter der Scheibe ----
+  function drawGrid() {
+    gGrid.innerHTML = "";
+    const k2 = mmPerPx();              // mm pro px
+    const stepPx = 10 / k2;            // 10 mm = 1 cm in px
+    if (!isFinite(stepPx) || stepPx < 4) return;   // bei extremem Maßstab kein Raster
+    // vom Zentrum nach außen in beide Richtungen, bis Rand des viewBox (0..440)
+    for (let x = C; x <= SIZE; x += stepPx) {
+      const major = Math.round((x - C) / stepPx) % 5 === 0;
+      addGridLine(x, "v", major);
+      if (x !== C) addGridLine(2 * C - x, "v", major);
+    }
+    for (let y = C; y <= SIZE; y += stepPx) {
+      const major = Math.round((y - C) / stepPx) % 5 === 0;
+      addGridLine(y, "h", major);
+      if (y !== C) addGridLine(2 * C - y, "h", major);
+    }
+  }
+  function addGridLine(pos, dir, major) {
+    const attrs = dir === "v"
+      ? { x1: pos, y1: 0, x2: pos, y2: SIZE }
+      : { x1: 0, y1: pos, x2: SIZE, y2: pos };
+    attrs.stroke = "var(--grid)";
+    attrs["stroke-width"] = major ? 0.8 : 0.4;
+    attrs.opacity = major ? 0.9 : 0.55;
+    gGrid.appendChild(el("line", attrs));
+  }
+
+  // ---- Scheibe zeichnen ----
+  function drawTarget() {
+    drawGrid();
+    gRings.innerHTML = "";
+    // Ringe von außen (1) nach innen (10)
+    for (let k = 1; k <= RINGS; k++) {
+      const rad = ringOuterPx(k);
+      const isBull = k === RINGS;
+      gRings.appendChild(el("circle", {
+        cx: C, cy: C, r: rad,
+        fill: isBull ? "#f2f5f8" : "none",
+        stroke: "var(--ring)",
+        "stroke-width": (k === 1 ? 2.2 : 1.4)
+      }));
+    }
+    // Fadenkreuz
+    gRings.appendChild(el("line", { x1: C - R, y1: C, x2: C + R, y2: C, stroke: "var(--grid)", "stroke-width": 1 }));
+    gRings.appendChild(el("line", { x1: C, y1: C - R, x2: C, y2: C + R, stroke: "var(--grid)", "stroke-width": 1 }));
+
+    // Ringnummern entlang der 4 Achsen (1..9)
+    for (let k = 1; k <= RINGS - 1; k++) {
+      const rad = (ringOuterPx(k) + ringOuterPx(k + 1)) / 2;
+      const dirs = [
+        { dx: -rad, dy: 0 }, { dx: rad, dy: 0 },
+        { dx: 0, dy: -rad }, { dx: 0, dy: rad }
+      ];
+      dirs.forEach(function (d) {
+        const t = el("text", {
+          x: C + d.dx, y: C + d.dy,
+          "text-anchor": "middle", "dominant-baseline": "central",
+          "font-family": "IBM Plex Mono, monospace",
+          "font-size": 9.5, fill: "var(--muted)"
+        });
+        t.textContent = k;
+        gRings.appendChild(t);
+      });
+    }
+  }
+
+  // ---- Maßstab-Hinweis ----
+  function updateScaleNote() {
+    const g = geom();
+    const scheibe = g.d10 + 2 * (RINGS - 1) * g.s;
+    scaleNote.textContent = RINGS + " Ringe · Innenring-Ø " + fmt(g.d10, 1) + " mm · Ringabstand " + fmt(g.s, 1) + " mm · Scheiben-Ø " + fmt(scheibe, 1) + " mm";
+  }
+  // verknüpfte Felder konsistent halten
+  function syncGeometry(source) {
+    const d10 = parseFloat(inD10.value);
+    if (source === "scheibe") {
+      const sch = parseFloat(inScheibe.value);
+      if (!isNaN(sch) && !isNaN(d10)) {
+        const s = (sch - d10) / (2 * (RINGS - 1));
+        if (s > 0) inMmRing.value = Math.round(s * 100) / 100;
+      }
+    } else {
+      const s = parseFloat(inMmRing.value);
+      if (!isNaN(d10) && !isNaN(s)) {
+        inScheibe.value = Math.round((d10 + 2 * (RINGS - 1) * s) * 10) / 10;
+      }
+    }
+  }
+
+  // ---- Eingabe ----
+  function svgPoint(evt) {
+    const pt = svg.createSVGPoint();
+    pt.x = evt.clientX; pt.y = evt.clientY;
+    const ctm = svg.getScreenCTM().inverse();
+    return pt.matrixTransform(ctm);
+  }
+
+  // Pointer-Verwaltung: 1 Finger/Maus = Treffer setzen, 2 Finger = Scheibe verschieben (kein Treffer)
+  const scroller = document.querySelector(".target-scroll");
+  const pointers = new Map();            // pointerId -> {x, y} (Bildschirmkoordinaten)
+  let panning = false;
+  let pinch = null;                      // {startDist, startZoom, fracX, fracY}
+  let tapCandidate = null;               // {x, y} SVG-Koords des einzelnen Down
+  let moved = false;
+
+  function avgScreen() {
+    let sx = 0, sy = 0;
+    pointers.forEach(function (p) { sx += p.x; sy += p.y; });
+    return { x: sx / pointers.size, y: sy / pointers.size };
+  }
+  function pointerDist() {
+    const pts = Array.from(pointers.values());
+    if (pts.length < 2) return 1;
+    return Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) || 1;
+  }
+  // Verankerung: merkt sich, welcher Punkt der Scheibe unter dem Finger-Mittelpunkt liegt
+  function startPinch() {
+    const mid = avgScreen();
+    const wr = targetWrap.getBoundingClientRect();
+    pinch = {
+      startDist: pointerDist(),
+      startZoom: parseFloat(zoomInput.value) || 100,
+      fracX: (mid.x - wr.left) / wr.width,
+      fracY: (mid.y - wr.top) / wr.height
+    };
+  }
+
+  svg.addEventListener("pointerdown", function (evt) {
+    evt.preventDefault();
+    pointers.set(evt.pointerId, { x: evt.clientX, y: evt.clientY });
+
+    if (pointers.size === 1) {
+      // möglicher Einzel-Tipp -> Treffer
+      tapCandidate = svgPoint(evt);
+      moved = false;
+    } else if (pointers.size === 2) {
+      // zwei Finger -> Zoom/Verschieben, Treffer-Kandidat verwerfen
+      tapCandidate = null;
+      panning = true;
+      startPinch();
+    }
+  });
+
+  svg.addEventListener("pointermove", function (evt) {
+    if (!pointers.has(evt.pointerId)) return;
+    pointers.set(evt.pointerId, { x: evt.clientX, y: evt.clientY });
+
+    if (panning && pointers.size >= 2 && pinch) {
+      evt.preventDefault();
+      // 1) Zoom aus dem Fingerabstand (Auseinander = größer, Zusammen = kleiner)
+      const scale = pointerDist() / pinch.startDist;
+      setZoom(pinch.startZoom * scale);
+      // 2) Verankern: gemerkter Scheibenpunkt bleibt unter dem Finger-Mittelpunkt
+      //    (gleichzeitiges Verschieben ergibt sich automatisch aus der Mittelpunkt-Bewegung)
+      const mid = avgScreen();
+      const wr = targetWrap.getBoundingClientRect();
+      scroller.scrollLeft += (wr.left + pinch.fracX * wr.width) - mid.x;
+      scroller.scrollTop += (wr.top + pinch.fracY * wr.height) - mid.y;
+      moved = true;
+    } else if (pointers.size === 1 && tapCandidate) {
+      const p = svgPoint(evt);
+      if (Math.hypot(p.x - tapCandidate.x, p.y - tapCandidate.y) > 5) moved = true;
+    }
+  });
+
+  function endPointer(evt) {
+    const wasOnly = pointers.size === 1;
+    pointers.delete(evt.pointerId);
+
+    // Einzel-Tipp ohne Geste und ohne nennenswerte Bewegung -> Treffer setzen
+    if (wasOnly && !panning && tapCandidate && !moved) {
+      const dist = Math.hypot(tapCandidate.x - C, tapCandidate.y - C);
+      if (dist <= R + 6) {
+        hits.push({ x: tapCandidate.x, y: tapCandidate.y });
+        render();
+      }
+    }
+    // Bleibt noch ein Finger übrig, Geste sauber neu verankern
+    if (pointers.size < 2) { panning = false; pinch = null; }
+    if (pointers.size === 0) { tapCandidate = null; moved = false; }
+  }
+  svg.addEventListener("pointerup", endPointer);
+  svg.addEventListener("pointercancel", endPointer);
+
+  // ---- Berechnung ----
+  function centroidOf(arr) {
+    const n = arr.length;
+    if (!n) return { x: C, y: C };
+    let sx = 0, sy = 0;
+    arr.forEach(function (h) { sx += h.x; sy += h.y; });
+    return { x: sx / n, y: sy / n };
+  }
+  function maxRadiusOf(arr, cen) {
+    let m = 0;
+    arr.forEach(function (h) {
+      const d = Math.hypot(h.x - cen.x, h.y - cen.y);
+      if (d > m) m = d;
+    });
+    return m;
+  }
+  function median(nums) {
+    if (!nums.length) return 0;
+    const s = nums.slice().sort(function (a, b) { return a - b; });
+    const mid = Math.floor(s.length / 2);
+    return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
+  }
+
+  // ---- Ausreißer-Erkennung (robust, Iglewicz-Hoaglin) ----
+  // Liefert ein bool[] (true = Ausreißer). Erst ab 5 Treffern aktiv.
+  function detectOutliers(arr) {
+    const n = arr.length;
+    const flags = new Array(n).fill(false);
+    if (n < 5) return flags;
+    // robuste Mitte = Median der Koordinaten
+    const cx = median(arr.map(function (h) { return h.x; }));
+    const cy = median(arr.map(function (h) { return h.y; }));
+    const d = arr.map(function (h) { return Math.hypot(h.x - cx, h.y - cy); });
+    const medD = median(d);
+    const mad = median(d.map(function (v) { return Math.abs(v - medD); }));
+    if (mad <= 1e-6) return flags;   // praktisch deckungsgleiche Gruppe
+    const zThresh = parseFloat(inOutlierZ.value) || 3.5;
+    let count = 0;
+    for (let i = 0; i < n; i++) {
+      const mz = 0.6745 * (d[i] - medD) / mad;   // modifizierter Z-Wert
+      if (mz > zThresh) { flags[i] = true; count++; }
+    }
+    // niemals alle verwerfen
+    if (count >= n) flags.fill(false);
+    return flags;
+  }
+
+  // Analyse: Ausreißer markieren, Statistik nur über die verbleibenden Treffer
+  function analyze() {
+    const flags = detectOutliers(hits);
+    const inliers = hits.filter(function (_, i) { return !flags[i]; });
+    const base = inliers.length ? inliers : hits;
+    const cen = centroidOf(base);
+    const rad = maxRadiusOf(base, cen);
+    const outCount = flags.filter(Boolean).length;
+    return { flags: flags, inliers: base, cen: cen, rad: rad, outCount: outCount };
+  }
+
+  function fmt(n, dec) {
+    return Number(n).toLocaleString("de-DE", {
+      minimumFractionDigits: dec, maximumFractionDigits: dec
+    });
+  }
+
+  function compute(a) {
+    const k2 = mmPerPx();
+    const cen = a.cen;
+    const offX = cen.x - C;            // px, + = rechts
+    const offY = cen.y - C;            // px, + = unten (tief)
+    const mmX = offX * k2;
+    const mmY = offY * k2;
+
+    // Mittlerer Treffpunkt (Lage relativ zur Mitte)
+    const hor = mmX >= 0 ? "rechts" : "links";
+    const ver = mmY >= 0 ? "tief" : "hoch";
+    const totalOff = Math.hypot(mmX, mmY);
+    if (totalOff < 0.05) {
+      resCentroid.textContent = "zentriert";
+    } else {
+      resCentroid.textContent = fmt(Math.abs(mmX), 1) + " mm " + hor + " · " + fmt(Math.abs(mmY), 1) + " mm " + ver;
+    }
+
+    // Visierkorrektur (Klicks) – entgegengesetzt zur Trefferlage
+    const mmClick = parseFloat(inMmClick.value || "2");
+    const clicksX = Math.round(Math.abs(mmX) / mmClick);
+    const clicksY = Math.round(Math.abs(mmY) / mmClick);
+    const corrHor = mmX >= 0 ? "Links" : "Rechts";   // Treffer rechts -> Visier links
+    const corrVer = mmY >= 0 ? "Hoch" : "Tief";       // Treffer tief  -> Visier hoch
+    const parts = [];
+    if (clicksY > 0) parts.push(corrVer + " " + clicksY + (clicksY === 1 ? " Klick" : " Klicks"));
+    if (clicksX > 0) parts.push(corrHor + " " + clicksX + (clicksX === 1 ? " Klick" : " Klicks"));
+    resClicks.textContent = parts.length ? parts.join(" · ") : "keine Korrektur";
+
+    // Haltepunkt (ohne Visierkorrektur) – entgegengesetzt zur Trefferlage, in cm
+    const holdHor = mmX >= 0 ? "links" : "rechts";   // Treffer rechts -> halte links
+    const holdVer = mmY >= 0 ? "hoch" : "tief";       // Treffer tief  -> halte hoch
+    if (totalOff < 0.05) {
+      resHold.textContent = "Mitte halten";
+    } else {
+      resHold.textContent = fmt(Math.abs(mmX) / 10, 1) + " cm " + holdHor + " · " + fmt(Math.abs(mmY) / 10, 1) + " cm " + holdVer;
+    }
+
+    // Streukreis (nur über gewertete Treffer)
+    if (a.inliers.length >= 2) {
+      resSpread.textContent = "Ø " + fmt(2 * a.rad * k2, 1) + " mm";
+    } else {
+      resSpread.textContent = "—";
+    }
+
+    // Ringwertung — alle eingetragenen Schuss (Linie = höherer Wert)
+    const possible = hits.length * RINGS;
+    const achieved = scoreOf(hits);
+    resScore.textContent = achieved + " / " + possible;
+    resScoreSub.textContent = hits.length
+      ? "Ø " + fmt(achieved / hits.length, 1) + " Ring · " + hits.length + " Schuss"
+      : "";
+    buildRingBreakdown();
+  }
+
+  // ---- Ringauswertung (Aufschlüsselung pro Ring) ----
+  function buildRingBreakdown() {
+    if (!calculated || hits.length === 0) {
+      ringBreakdown.innerHTML = '<p class="ring-empty">Noch keine Auswertung. Treffer setzen und „Berechnen“ drücken.</p>';
+      return;
+    }
+    const counts = {};
+    for (let v = 0; v <= RINGS; v++) counts[v] = 0;
+    hits.forEach(function (h) { counts[ringValue(h)]++; });
+    const maxCnt = Math.max.apply(null, Object.keys(counts).map(function (k) { return counts[k]; })) || 1;
+    let rows = "";
+    for (let v = RINGS; v >= 1; v--) {
+      const c = counts[v];
+      const pct = Math.round((c / maxCnt) * 100);
+      rows += '<div class="ring-row"><span class="rv">' + v + '</span>'
+        + '<span class="ring-bar"><span style="width:' + (c ? pct : 0) + '%"></span></span>'
+        + '<span class="ring-cnt">' + c + '× = ' + (c * v) + '</span></div>';
+    }
+    if (counts[0] > 0) {
+      const c = counts[0];
+      const pct = Math.round((c / maxCnt) * 100);
+      rows += '<div class="ring-row miss"><span class="rv">0</span>'
+        + '<span class="ring-bar"><span style="width:' + pct + '%"></span></span>'
+        + '<span class="ring-cnt">' + c + '× (außerh.)</span></div>';
+    }
+    const achieved = scoreOf(hits);
+    ringBreakdown.innerHTML = '<div class="ring-table">' + rows + '</div>'
+      + '<div class="ring-total"><span class="lbl">Gesamt</span>'
+      + '<span class="val">' + achieved + ' / ' + (hits.length * RINGS) + ' Ring</span></div>';
+  }
+
+  // ---- Overlay zeichnen ----
+  function drawOverlay(a) {
+    gOverlay.innerHTML = "";
+    if (!calculated || hits.length === 0 || !a) return;
+    const cen = a.cen;
+
+    // Streukreis (nur gewertete Treffer)
+    if (a.inliers.length >= 2) {
+      gOverlay.appendChild(el("circle", {
+        cx: cen.x, cy: cen.y, r: a.rad,
+        fill: "none", stroke: "var(--muted)",
+        "stroke-width": 1.4, "stroke-dasharray": "5 4", opacity: 0.85
+      }));
+    }
+
+    // Korrektur-Pfeil: Schwerpunkt -> Mitte
+    const d = Math.hypot(cen.x - C, cen.y - C);
+    if (d > 7) {
+      gOverlay.appendChild(el("line", {
+        x1: cen.x, y1: cen.y, x2: C, y2: C,
+        stroke: "var(--green)", "stroke-width": 2.4,
+        "marker-end": "url(#arrowGreen)", "stroke-linecap": "round"
+      }));
+    }
+
+    // Grüner Zielpunkt (Mitte)
+    gOverlay.appendChild(el("circle", { cx: C, cy: C, r: 6, fill: "var(--green)", stroke: "#fff", "stroke-width": 1.6 }));
+
+    // Blauer Haltepunkt (ohne Visierkorrektur) = Spiegelung des Schwerpunkts an der Mitte
+    const holdX = 2 * C - cen.x;
+    const holdY = 2 * C - cen.y;
+    if (Math.hypot(holdX - C, holdY - C) > 7) {
+      gOverlay.appendChild(el("circle", { cx: holdX, cy: holdY, r: 8.5, fill: "none", stroke: "var(--blue)", "stroke-width": 2.2 }));
+      gOverlay.appendChild(el("circle", { cx: holdX, cy: holdY, r: 2.4, fill: "var(--blue)" }));
+    }
+
+    // Schwerpunkt-Marker (amber Kreuz + Ring)
+    gOverlay.appendChild(el("circle", { cx: cen.x, cy: cen.y, r: 7.5, fill: "none", stroke: "var(--amber)", "stroke-width": 2 }));
+    gOverlay.appendChild(el("line", { x1: cen.x - 11, y1: cen.y, x2: cen.x + 11, y2: cen.y, stroke: "var(--amber)", "stroke-width": 1.6 }));
+    gOverlay.appendChild(el("line", { x1: cen.x, y1: cen.y - 11, x2: cen.x, y2: cen.y + 11, stroke: "var(--amber)", "stroke-width": 1.6 }));
+  }
+
+  // ---- Treffer zeichnen ----
+  function drawHits(a) {
+    gHits.innerHTML = "";
+    hits.forEach(function (h, i) {
+      const isOut = a && a.flags && a.flags[i];
+      gHits.appendChild(el("circle", {
+        cx: h.x, cy: h.y, r: 5.5,
+        fill: isOut ? "var(--red)" : "var(--blue)",
+        stroke: "#fff", "stroke-width": 1.6
+      }));
+    });
+  }
+
+  // ---- Render / State ----
+  let lastAnalysis = null;
+  function render() {
+    const a = (calculated && hits.length) ? analyze() : null;
+    lastAnalysis = a;
+    drawHits(a);
+    if (calculated) { compute(a); }
+    drawOverlay(a);
+    const n = hits.length;
+    const out = a ? a.outCount : 0;
+    countPill.textContent = out > 0
+      ? n + " Treffer · " + out + (out === 1 ? " Ausreißer" : " Ausreißer")
+      : n + " Treffer";
+    calcBtn.disabled = n === 0;
+    undoBtn.disabled = n === 0;
+    resetBtn.disabled = n === 0;
+  }
+
+  function clearResults() {
+    resScore.textContent = "—";
+    resScoreSub.textContent = "";
+    buildRingBreakdown();
+    resCentroid.textContent = "—";
+    resClicks.textContent = "—";
+    resHold.textContent = "—";
+    resSpread.textContent = "—";
+  }
+
+  // ---- Events ----
+  calcBtn.addEventListener("click", function () {
+    if (hits.length === 0) return;
+    calculated = true;
+    render();
+  });
+  undoBtn.addEventListener("click", function () {
+    hits.pop();
+    if (hits.length === 0) { calculated = false; clearResults(); }
+    render();
+  });
+  // Zurücksetzen: zweistufige Bestätigung (wie bei der Ringauswertung)
+  let resetArmed = false;
+  let resetTimer = null;
+  function disarmReset() {
+    resetArmed = false;
+    clearTimeout(resetTimer);
+    resetBtn.textContent = "Zurücksetzen";
+    resetBtn.style.background = "";
+    resetBtn.style.color = "";
+    resetBtn.style.borderColor = "";
+  }
+  resetBtn.addEventListener("click", function () {
+    if (!hits.length) return;
+    if (!resetArmed) {
+      resetArmed = true;
+      resetBtn.textContent = "Wirklich zurücksetzen?";
+      resetBtn.style.background = "#b42318";
+      resetBtn.style.color = "#fff";
+      resetBtn.style.borderColor = "#b42318";
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(disarmReset, 3000);
+      return;
+    }
+    disarmReset();
+    hits = [];
+    calculated = false;
+    clearResults();
+    render();
+  });
+  function onGeometryInput(source) {
+    syncGeometry(source);
+    updateScaleNote();
+    drawTarget();
+    render();
+  }
+  function applyRingCount() {
+    let n = parseInt(inRingCount.value, 10);
+    if (isNaN(n)) n = RINGS;
+    n = Math.max(2, Math.min(12, n));
+    RINGS = n;
+    onGeometryInput("ring");   // Scheiben-Ø neu ableiten, neu zeichnen, neu rechnen
+  }
+  inRingCount.addEventListener("input", applyRingCount);
+  inRingCount.addEventListener("change", function () { inRingCount.value = String(RINGS); });
+  inD10.addEventListener("input", function () { onGeometryInput("d10"); });
+  inMmRing.addEventListener("input", function () { onGeometryInput("ring"); });
+  inScheibe.addEventListener("input", function () { onGeometryInput("scheibe"); });
+  inMmClick.addEventListener("input", function () { if (calculated) render(); });
+  inOutlierZ.addEventListener("input", function () {
+    outlierZVal.textContent = fmt(parseFloat(inOutlierZ.value), 1);
+    if (calculated) render();
+  });
+
+  // ---- PDF / Druck-Auswertung ----
+  function buildPrintSummary() {
+    const g = geom();
+    const scheibe = g.d10 + 2 * (RINGS - 1) * g.s;
+    const now = new Date();
+    const date = now.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+    const time = now.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+    const rows = [
+      ["Datum", date + " · " + time + " Uhr"]
+    ];
+    const waffe = (inWaffe.value || "").trim();
+    const munition = (inMunition.value || "").trim();
+    const kaliber = (inKaliber.value || "").trim();
+    if (waffe) rows.push(["Waffe", waffe]);
+    if (munition) rows.push(["Munition", munition]);
+    if (kaliber) rows.push(["Kaliber", kaliber]);
+    const outCount = (calculated && lastAnalysis) ? lastAnalysis.outCount : 0;
+    rows.push(
+      ["Treffer gesamt", String(hits.length)],
+      ["davon gewertet", calculated ? String(hits.length - outCount) : "—"],
+      ["Ausreißer", calculated ? String(outCount) : "—"],
+      ["Ringwertung", calculated ? (scoreOf(hits) + " / " + (hits.length * RINGS) + " Ring") : "—"],
+      ["Mittlerer Treffpunkt", calculated ? resCentroid.textContent : "—"],
+      ["Visierkorrektur", calculated ? resClicks.textContent : "—"],
+      ["Haltepunkt (ohne Korrektur)", calculated ? resHold.textContent : "—"],
+      ["Streukreis (Ø)", calculated ? resSpread.textContent : "—"],
+      ["Ringe", String(RINGS)],
+      ["Innenring-Ø", fmt(g.d10, 1) + " mm"],
+      ["Ringabstand", fmt(g.s, 1) + " mm"],
+      ["Scheiben-Ø", fmt(scheibe, 1) + " mm"],
+      ["Klickwert", fmt(parseFloat(inMmClick.value || "2"), 1) + " mm"],
+      ["Ausreißer-Schwelle", fmt(parseFloat(inOutlierZ.value) || 3.5, 1) + " (Z)"]
+    );
+    printSummary.innerHTML = "<h3>Auswertung</h3><div class=\"ps-cols\">" + rows.map(function (r) {
+      return '<div class="psrow"><span>' + r[0] + '</span><span>' + r[1] + "</span></div>";
+    }).join("") + "</div>";
+  }
+  pdfBtn.addEventListener("click", function () { buildPrintSummary(); window.print(); });
+  window.addEventListener("beforeprint", buildPrintSummary);
+
+  // ---- Zoom / Scheibengröße ----
+  function setZoom(pct) {
+    pct = Math.max(60, Math.min(350, pct));
+    zoomInput.value = pct;
+    zoomVal.textContent = Math.round(pct) + " %";
+    // Fester quadratischer Rahmen (.target-scroll). 100 % = Rahmen ausgefüllt,
+    // >100 % vergrößert nur die Scheibe und macht sie im Rahmen scrollbar.
+    targetWrap.style.width = pct + "%";
+    return pct;
+  }
+  function applyZoom() { setZoom(parseFloat(zoomInput.value)); }
+  zoomInput.addEventListener("input", applyZoom);
+
+  // ---- Einstellungen aufklappbar (geschlossen by default) ----
+  (function () {
+    const panel = document.getElementById("settingsPanel");
+    const head = document.getElementById("settingsToggle");
+    function toggle() {
+      const open = panel.classList.toggle("open");
+      head.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+    head.addEventListener("click", toggle);
+    head.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); }
+    });
+  })();
+
+  // ---- Ringauswertung aufklappbar (geschlossen by default) ----
+  (function () {
+    const panel = document.getElementById("ringPanel");
+    const head = document.getElementById("ringToggle");
+    function toggle() {
+      const open = panel.classList.toggle("open");
+      head.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+    head.addEventListener("click", toggle);
+    head.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); }
+    });
+  })();
+
+  // ---- Init ----
+  drawTarget();
+  updateScaleNote();
+  applyZoom();
+  render();
+})();
+</script>
+
+</body></html>

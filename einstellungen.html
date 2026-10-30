@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="de" data-kr-hub-root>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Einstellungen — KR Range Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared/theme.css">
+<script src="shared/theme.js"></script>
+<style>
+:root {
+  --ink-900:#14110B; --ink-850:#1A160E; --ink-800:#211C13; --ink-700:#2B2418;
+  --ink-600:#38301F; --ink-500:#4A3F29; --earth-400:#6E5F44; --earth-300:#8C7B58;
+  --sand-200:#BCAB86; --sand-100:#DCD0B5; --bone-050:#EFE8D6;
+  --copper:#B26A3E; --copper-bright:#C9824E;
+  --font-head:'Barlow Semi Condensed',sans-serif;
+  --font-body:'Barlow',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+* { box-sizing: border-box; margin: 0; }
+body {
+  background: var(--ink-900); color: var(--sand-100);
+  font-family: var(--font-body); min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 640px; margin: 0 auto; padding: 28px 20px 64px; }
+a.back {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: var(--sand-200); text-decoration: none;
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em;
+  text-transform: uppercase; margin-bottom: 26px;
+}
+a.back:hover { color: var(--copper-bright); }
+h1 {
+  font-family: var(--font-head); font-weight: 700; font-size: 26px;
+  color: var(--bone-050); margin-bottom: 6px;
+}
+.hint { font-size: 14px; color: var(--sand-200); margin-bottom: 28px; }
+
+fieldset {
+  border: 1px solid var(--ink-500); border-radius: 10px;
+  background: var(--ink-800); padding: 18px;
+}
+legend {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--earth-300); padding: 0 8px;
+}
+label.opt {
+  display: flex; align-items: center; gap: 14px;
+  padding: 13px 12px; border-radius: 8px; cursor: pointer;
+  border: 1px solid transparent;
+}
+label.opt:hover { background: var(--ink-700); }
+label.opt input {
+  appearance: none; -webkit-appearance: none;
+  width: 18px; height: 18px; flex: none;
+  border: 2px solid var(--ink-500);
+  border-radius: 50%;
+  background: var(--ink-900);
+  display: grid; place-content: center;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+label.opt input::before {
+  content: "";
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--copper);
+  transform: scale(0);
+  transition: transform .12s ease;
+}
+label.opt input:checked {
+  border-color: var(--copper);
+}
+label.opt input:checked::before {
+  transform: scale(1);
+}
+label.opt input:focus-visible {
+  outline: 2px solid var(--copper-bright);
+  outline-offset: 2px;
+}
+label.opt .name {
+  font-family: var(--font-head); font-weight: 600; font-size: 15px;
+  color: var(--bone-050);
+}
+label.opt .desc { font-size: 13px; color: var(--sand-200); }
+label.opt .txt { display: flex; flex-direction: column; gap: 2px; }
+
+.preview {
+  margin-top: 22px; border: 1px solid var(--ink-500); border-radius: 10px;
+  overflow: hidden;
+}
+.preview .bar {
+  padding: 8px 14px; font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--earth-300);
+  border-bottom: 1px solid var(--ink-600); background: var(--ink-850);
+}
+.preview .body {
+  padding: 18px 14px; background: var(--ink-800);
+  display: flex; align-items: center; gap: 12px;
+}
+.preview .chip {
+  padding: 6px 12px; border-radius: 999px; font-size: 12px;
+  font-family: var(--font-head); font-weight: 600; letter-spacing: 0.05em;
+}
+.preview .chip.a { background: var(--copper); color: var(--ink-900); }
+.preview .chip.b { border: 1px solid var(--ink-500); color: var(--sand-100); }
+.note {
+  margin-top: 22px; font-size: 13px; line-height: 1.55; color: var(--earth-300);
+}
+.data-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 16px; border-radius: 8px; cursor: pointer;
+  font-family: var(--font-head); font-weight: 600; font-size: 14px;
+  letter-spacing: 0.03em; border: 1px solid var(--ink-500);
+  background: var(--ink-700); color: var(--sand-100);
+  transition: border-color .15s, transform .15s, background .15s;
+}
+.btn:hover { border-color: var(--copper); transform: translateY(-1px); }
+.btn.primary { background: var(--copper); color: var(--ink-900); border-color: var(--copper); }
+.btn.primary:hover { background: var(--copper-bright); }
+.data-status {
+  margin-top: 12px; min-height: 18px;
+  font-family: var(--font-mono); font-size: 12.5px; letter-spacing: 0.02em;
+}
+.data-status.ok { color: #9CB06A; }
+.data-status.err { color: var(--copper-bright); }
+.sync-status { font-family: var(--font-mono); font-size: 12.5px; letter-spacing: 0.02em; color: var(--sand-200); margin-bottom: 14px; }
+.sync-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; font-size: 13px; color: var(--sand-200); }
+.sync-field input {
+  padding: 11px 13px; border-radius: 8px; border: 1px solid var(--ink-500);
+  background: var(--ink-900); color: var(--sand-100);
+  font-family: var(--font-mono); font-size: 13px;
+}
+.sync-field input:focus-visible { outline: 2px solid var(--copper-bright); outline-offset: 1px; }
+.btn[href] { text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← Zurück zum Hub</a>
+  <h1>Einstellungen</h1>
+  <p class="hint">Gilt für die Startseite und alle Apps. Die Wahl wird auf diesem Gerät gespeichert.</p>
+
+  <fieldset>
+    <legend>Erscheinungsbild</legend>
+    <label class="opt">
+      <input type="radio" name="theme" value="dark">
+      <span class="txt"><span class="name">Dunkel</span><span class="desc">Original-Design — dunkle Erdtöne, Kupfer-Akzente.</span></span>
+    </label>
+    <label class="opt">
+      <input type="radio" name="theme" value="light">
+      <span class="txt"><span class="name">Hell</span><span class="desc">Helle Sandtöne, dunkler Text. Gut bei Tageslicht am Stand.</span></span>
+    </label>
+    <label class="opt">
+      <input type="radio" name="theme" value="system">
+      <span class="txt"><span class="name">System</span><span class="desc">Folgt automatisch der Einstellung des Geräts.</span></span>
+    </label>
+  </fieldset>
+
+  <div class="preview" aria-hidden="true">
+    <div class="bar">Vorschau</div>
+    <div class="body">
+      <span class="chip a">Primär</span>
+      <span class="chip b">Sekundär</span>
+      <span style="font-size:13px;color:var(--sand-200)">Fließtext in der gewählten Optik.</span>
+    </div>
+  </div>
+
+  <p class="note">Hinweis: Der helle Modus übersetzt das Farbsystem automatisch. Einzelne Ansichten mit fest hinterlegten Farben oder Bildern können im hellen Modus dunkler wirken als der Rest.</p>
+
+  <fieldset style="margin-top:22px">
+    <legend>Synchronisation</legend>
+    <p style="font-size:13px;color:var(--sand-200);margin:0 4px 14px;line-height:1.5">Sichert die Daten <strong>aller Apps</strong> automatisch in einen privaten GitHub-Gist (laufendes Cloud-Backup mit Versionsverlauf). <strong>Zum Schutz vor Datenverlust wird nie automatisch zurückgeladen</strong> — das Wiederherstellen auf ein Gerät löst du bewusst über den Knopf aus.</p>
+
+    <div class="sync-status" id="syncStatusRow">…</div>
+
+    <div id="syncSetup" hidden>
+      <label class="sync-field">GitHub-Token (nur „gist"-Recht)
+        <input type="password" id="syncToken" placeholder="ghp_… oder github_pat_…" autocomplete="off" autocapitalize="off" spellcheck="false">
+      </label>
+      <div class="data-row">
+        <button type="button" class="btn primary" id="syncSetupBtn">Sync einrichten</button>
+        <a class="btn" href="https://github.com/settings/tokens/new?scopes=gist&description=KR+Range+Hub+Sync" target="_blank" rel="noopener">Token erstellen ↗</a>
+      </div>
+    </div>
+
+    <div id="syncActive" hidden>
+      <div class="data-row">
+        <button type="button" class="btn primary" id="syncNowBtn">↑ Jetzt in Cloud sichern</button>
+        <button type="button" class="btn" id="syncRestoreBtn">↓ Aus Cloud wiederherstellen</button>
+        <button type="button" class="btn" id="syncDisconnectBtn">Sync trennen</button>
+      </div>
+      <p style="font-size:12px;color:var(--sand-200);margin:8px 4px 0;line-height:1.5">Die Sicherung in die Cloud läuft automatisch im Hintergrund. <strong>Wiederhergestellt wird nur, wenn du es hier bewusst auslöst</strong> — deine lokalen Daten werden nie mehr von selbst überschrieben.</p>
+    </div>
+
+    <div id="syncConflict" hidden>
+      <p class="data-status err" style="margin-top:0">⚠ Auf diesem Gerät und online gibt es unterschiedliche Änderungen. Welche sollen gelten?</p>
+      <div class="data-row">
+        <button type="button" class="btn primary" id="syncTakeRemote">Online-Version übernehmen</button>
+        <button type="button" class="btn" id="syncTakeLocal">Meine hochladen</button>
+      </div>
+    </div>
+
+    <div class="data-status" id="syncMsg" role="status" aria-live="polite"></div>
+  </fieldset>
+  <p class="note">Hinweis: Der Token liegt nur auf diesem Gerät und wird nie in den Gist geschrieben (nur „gist"-Recht — er kann nichts an deinen Repos). Richte die Sync nicht auf fremden oder öffentlichen Computern ein. Tipp: Mach zusätzlich ab und zu einen Datei-Export (unten unter „Daten") als unabhängige Sicherung.</p>
+
+  <fieldset style="margin-top:22px">
+    <legend>Daten</legend>
+    <p style="font-size:13px;color:var(--sand-200);margin:0 4px 14px;line-height:1.5">Sichert und importiert die Daten <strong>aller Apps auf einmal</strong> als eine Datei — Waffen, Munitionsbestand, Ballistik-Profile, Zähler-Verläufe und mehr.</p>
+    <div class="data-row">
+      <button type="button" class="btn primary" id="btnExport">↓ Alle Daten exportieren</button>
+      <button type="button" class="btn" id="btnImport">↑ Daten importieren …</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+    </div>
+    <div class="data-status" id="dataStatus" role="status" aria-live="polite"></div>
+  </fieldset>
+  <p class="note">Hinweis: Die Sicherung umfasst die lokal in diesem Browser gespeicherten Daten aller Hub-Apps. Zum Übertragen auf ein anderes Gerät die Datei dort über „Daten importieren" einspielen — vorhandene gleichnamige Einträge werden dabei überschrieben.</p>
+</div>
+<script>
+(function () {
+  var current = (window.KRHubTheme && KRHubTheme.get()) || 'dark';
+  var inputs = document.querySelectorAll('input[name="theme"]');
+  inputs.forEach(function (i) {
+    i.checked = (i.value === current);
+    i.addEventListener('change', function () {
+      if (window.KRHubTheme) KRHubTheme.set(i.value);
+    });
+  });
+
+  // ---------- Zentraler Daten-Export / -Import ----------
+  // Alle Hub-Apps laufen unter derselben Origin und teilen sich denselben
+  // localStorage. Der Export sichert daher alle App-Daten auf einmal.
+  var statusEl = document.getElementById('dataStatus');
+  function status(msg, cls) {
+    if (!statusEl) return;
+    statusEl.textContent = msg || '';
+    statusEl.className = 'data-status' + (cls ? ' ' + cls : '');
+  }
+
+  function snapshot() {
+    var data = {};
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      try { data[k] = localStorage.getItem(k); } catch (e) {}
+    }
+    return data;
+  }
+
+  var btnExport = document.getElementById('btnExport');
+  if (btnExport) btnExport.addEventListener('click', function () {
+    try {
+      var data = snapshot();
+      var count = Object.keys(data).length;
+      var payload = {
+        app: 'KR Range Hub', type: 'kr-hub-backup', version: 1,
+        exportedAt: new Date().toISOString(), entries: count, data: data
+      };
+      var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'kr-range-hub-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      status('✓ Export erstellt — ' + count + ' Einträge gesichert.', 'ok');
+    } catch (e) {
+      status('⚠ Export fehlgeschlagen: ' + e.message, 'err');
+    }
+  });
+
+  var fileInput = document.getElementById('importFile');
+  var btnImport = document.getElementById('btnImport');
+  if (btnImport && fileInput) {
+    btnImport.addEventListener('click', function () { fileInput.click(); });
+    fileInput.addEventListener('change', function () {
+      var file = fileInput.files && fileInput.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        try {
+          var parsed = JSON.parse(reader.result);
+          var data = (parsed && parsed.data && typeof parsed.data === 'object') ? parsed.data : parsed;
+          if (!data || typeof data !== 'object') throw new Error('Keine gültige Backup-Datei.');
+          var keys = Object.keys(data);
+          if (!keys.length) throw new Error('Die Datei enthält keine Daten.');
+          var when = parsed && parsed.exportedAt ? new Date(parsed.exportedAt).toLocaleString('de-DE') : 'unbekannt';
+          var ok = window.confirm('Backup einspielen?\n\nStand: ' + when + '\nEinträge: ' + keys.length +
+            '\n\nVorhandene gleichnamige Daten werden überschrieben. Danach wird die Seite neu geladen.');
+          if (!ok) { fileInput.value = ''; return; }
+          var written = 0, failed = [];
+          keys.forEach(function (k) {
+            try { localStorage.setItem(k, data[k]); written++; }
+            catch (e) { failed.push(k); }
+          });
+          if (failed.length) {
+            // Nichts stillschweigend verlieren: klar melden, was nicht gespeichert wurde.
+            status('⚠ ' + written + ' von ' + keys.length + ' Einträgen importiert. NICHT gespeichert (vermutlich Speicher voll): ' + failed.join(', ') + '. Bitte Fotos verkleinern oder weniger Daten importieren.', 'err');
+          } else {
+            status('✓ ' + written + ' Einträge importiert — Seite wird neu geladen …', 'ok');
+            setTimeout(function () { location.reload(); }, 1300);
+          }
+        } catch (e) {
+          status('⚠ Import fehlgeschlagen: ' + e.message, 'err');
+        } finally {
+          fileInput.value = '';
+        }
+      };
+      reader.onerror = function () { status('⚠ Datei konnte nicht gelesen werden.', 'err'); };
+      reader.readAsText(file);
+    });
+  }
+
+  // ---------- Synchronisation (hub-weit, GitHub-Gist) ----------
+  function whenSyncReady(cb) {
+    if (window.KRHubSync) return cb(window.KRHubSync);
+    var n = 0;
+    var t = setInterval(function () {
+      if (window.KRHubSync) { clearInterval(t); cb(window.KRHubSync); }
+      else if (++n > 60) { clearInterval(t); }
+    }, 100);
+  }
+  whenSyncReady(function (S) {
+    var elStatus = document.getElementById('syncStatusRow');
+    var elSetup = document.getElementById('syncSetup');
+    var elActive = document.getElementById('syncActive');
+    var elConflict = document.getElementById('syncConflict');
+    var elMsg = document.getElementById('syncMsg');
+    var tokenInput = document.getElementById('syncToken');
+
+    function fmt(d) { try { return d ? new Date(d).toLocaleTimeString('de-DE') : ''; } catch (e) { return ''; } }
+    function render(st) {
+      elSetup.hidden = st.configured;
+      elActive.hidden = !st.configured || st.status === 'conflict';
+      elConflict.hidden = st.status !== 'conflict';
+      var line;
+      if (!st.configured) line = 'Nicht eingerichtet.';
+      else if (st.status === 'conflict') line = '⚠ Konflikt – bitte unten wählen.';
+      else line = '✓ Eingerichtet' + (st.lastSync ? ' · zuletzt ' + fmt(st.lastSync) : '');
+      elStatus.textContent = line;
+      elMsg.textContent = st.message || '';
+      elMsg.className = 'data-status' + (st.status === 'error' ? ' err' : (st.status === 'ok' ? ' ok' : ''));
+    }
+    S.onChange(render);
+
+    document.getElementById('syncSetupBtn').addEventListener('click', function () {
+      var val = tokenInput.value;
+      S.setup(val).then(function () { tokenInput.value = ''; }).catch(function () {});
+    });
+    document.getElementById('syncNowBtn').addEventListener('click', function () {
+      S.backupNow().then(function () {}, function (e) {});
+    });
+    document.getElementById('syncRestoreBtn').addEventListener('click', function () {
+      if (!S.peekCloud) { S.restoreFromCloud(); return; }
+      S.peekCloud().then(function (remote) {
+        var d = (remote && remote.data) || {};
+        function cnt(k) { try { var v = JSON.parse(d[k] || '[]'); return Array.isArray(v) ? v.length : (v && typeof v === 'object' ? Object.keys(v).length : 0); } catch (e) { return 0; } }
+        var when = remote && remote.updatedAt ? new Date(remote.updatedAt).toLocaleString('de-DE') : 'unbekannt';
+        var ok = window.confirm('Aus der Cloud wiederherstellen?\n\nStand: ' + when +
+          '\nWaffen: ' + cnt('waffen:liste') + ' · Zubehör: ' + cnt('zubehoer:liste') +
+          ' · Munitionssorten: ' + cnt('munition:liste') +
+          '\n\nACHTUNG: Die Daten auf DIESEM Gerät werden durch den Cloud-Stand ERSETZT. Danach wird die Seite neu geladen.');
+        if (ok) S.restoreFromCloud();
+      }, function (e) { alert('Cloud konnte nicht gelesen werden: ' + (e && e.message || e)); });
+    });
+    document.getElementById('syncDisconnectBtn').addEventListener('click', function () {
+      if (window.confirm('Sync auf diesem Gerät trennen?\n\nDer Online-Gist und deine lokalen Daten bleiben erhalten — nur die automatische Synchronisation wird hier beendet.')) S.disconnect();
+    });
+    document.getElementById('syncTakeRemote').addEventListener('click', function () { S.resolveRemote(); });
+    document.getElementById('syncTakeLocal').addEventListener('click', function () { S.resolveLocal(); });
+  });
+})();
+</script>
+</body>
+</html>

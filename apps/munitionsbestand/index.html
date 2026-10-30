@@ -1,0 +1,1640 @@
+<!doctype html>
+<html lang="de">
+<head>
+<link rel="stylesheet" href="../../shared/kr-reskin.css">
+<link rel="stylesheet" href="../../shared/theme.css">
+<script src="../../shared/theme.js"></script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e1113">
+<title>Munitionsbestand</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>[hidden]{display:none!important}img{max-width:100%}html,body{margin:0}:root{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+<style>
+  /* Layout: dunkles Gunmetal-"Wolf"-Panel, kompakte Bestandstabelle zuerst, Logbuch darunter; auf Papier eine helle A4-Seite. */
+  :root {
+    --bg: #0e1113;
+    --surface: #15191c;
+    --surface-2: #1b2024;
+    --surface-3: #22282d;
+    --line: #2c3338;
+    --line-soft: #242a2f;
+    --fg: #e8eaec;
+    --fg-dim: #b3b9be;
+    --muted: #8b949b;
+    --brass: #c9a24b;
+    --brass-dim: #9a7c35;
+    --brass-ink: #1a1507;
+    --ok: #5fae7e;
+    --ok-bg: #16281e;
+    --warn: #e0a93c;
+    --warn-bg: #2d2410;
+    --crit: #e06a63;
+    --crit-bg: #2e1715;
+    --radius: 10px;
+    --f-head: "Oswald", "Arial Narrow", system-ui, sans-serif;
+    --f-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --f-num: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    color-scheme: dark;
+  }
+
+  /* ---------- Helles Theme ---------- */
+  :root[data-theme="light"] {
+    --bg: #f3f1ec;
+    --surface: #ffffff;
+    --surface-2: #f1eee8;
+    --surface-3: #e9e5dd;
+    --line: #dcd7cd;
+    --line-soft: #e8e4db;
+    --fg: #1b1e21;
+    --fg-dim: #434a53;
+    --muted: #6c727a;
+    --brass: #8a6d24;
+    --brass-dim: #b79440;
+    --brass-ink: #ffffff;
+    --ok: #2f7d52;
+    --ok-bg: #e4f1e9;
+    --warn: #8a6210;
+    --warn-bg: #f6eccf;
+    --crit: #b23b36;
+    --crit-bg: #f7e1df;
+    color-scheme: light;
+  }
+
+  /* ---------- App-Leiste / Tabs / Theme ---------- */
+  .appbar { display: flex; align-items: center; gap: 10px; padding-block: 12px; flex-wrap: wrap; }
+  .tabs { display: flex; gap: 6px; }
+  .tab { background: transparent; border: 1px solid transparent; color: var(--muted); }
+  .tab:hover { color: var(--fg); border-color: var(--line); }
+  .tab.active { color: var(--brass); border-color: var(--line); background: var(--surface); }
+  #themeBtn { margin-left: auto; }
+
+  /* ---------- Auswertung ---------- */
+  .rank-row { display: grid; grid-template-columns: 150px 1fr auto; gap: 12px; align-items: center; padding: 7px 0; }
+  .rank-name { font-family: var(--f-head); font-weight: 600; letter-spacing: .03em; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rank-track { background: var(--surface-2); border: 1px solid var(--line-soft); border-radius: 6px; height: 16px; overflow: hidden; }
+  .rank-fill { height: 100%; background: var(--brass); }
+  .rank-val { font-family: var(--f-num); font-variant-numeric: tabular-nums; font-weight: 700; min-width: 92px; text-align: right; white-space: nowrap; }
+  @media (max-width: 520px) {
+    .rank-row { grid-template-columns: 1fr auto; }
+    .rank-track { grid-column: 1 / -1; order: 3; }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--f-body);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* feiner Rand-Glow am oberen Rand hinter der Statusleiste */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0 0 auto;
+    height: env(safe-area-inset-top, 0px);
+    background: var(--surface);
+    z-index: 30;
+  }
+
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 0 48px;
+  }
+
+  /* ---------- Kopf ---------- */
+  header.top {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 20;
+    background: linear-gradient(180deg, var(--surface) 0%, rgba(21,25,28,0.96) 100%);
+    border-bottom: 1px solid var(--line);
+    margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+    margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 14px;
+  }
+  .top-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .mark {
+    width: 40px; height: 40px; flex: none;
+    border: 1.5px solid var(--brass-dim);
+    border-radius: 9px;
+    display: grid; place-items: center;
+    background: radial-gradient(120% 120% at 30% 20%, #20262b, #11151800);
+  }
+  .mark svg { width: 24px; height: 24px; }
+  h1 {
+    font-family: var(--f-head);
+    font-weight: 600;
+    font-size: 21px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 1.1;
+  }
+  .sub {
+    font-family: var(--f-head);
+    font-weight: 400;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--brass);
+    margin-top: 1px;
+  }
+  .top-actions { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+
+  /* ---------- Buttons ---------- */
+  button {
+    font-family: var(--f-head);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--fg);
+    background: var(--surface-3);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px 13px;
+    cursor: pointer;
+    transition: border-color .12s, background .12s, color .12s;
+    white-space: nowrap;
+  }
+  button:hover { border-color: var(--brass-dim); }
+  button:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+  button.primary {
+    background: var(--brass);
+    border-color: var(--brass);
+    color: var(--brass-ink);
+    font-weight: 600;
+  }
+  button.primary:hover { background: #d8b159; }
+  button.ghost { background: transparent; }
+  button.sm { padding: 5px 9px; font-size: 12px; }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+
+  /* ---------- Übersichtskennzahlen ---------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    padding: 13px 15px;
+  }
+  .stat .k {
+    font-family: var(--f-head);
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .stat .v {
+    font-family: var(--f-num);
+    font-size: 26px; font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    margin-top: 2px;
+  }
+  .stat.alert .v { color: var(--warn); }
+  .stat.alert.none .v { color: var(--ok); }
+
+  /* ---------- Abschnittskopf ---------- */
+  .sec-head {
+    display: flex; align-items: center; gap: 12px;
+    margin: 28px 0 10px;
+  }
+  .sec-head h2 {
+    font-family: var(--f-head);
+    font-size: 14px; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    margin: 0; color: var(--fg-dim);
+  }
+  .sec-head .rule { flex: 1; height: 1px; background: var(--line); }
+
+  /* ---------- Tabelle ---------- */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); }
+  table { width: 100%; border-collapse: collapse; min-width: 560px; }
+  thead th {
+    font-family: var(--f-head);
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); font-weight: 500; text-align: left;
+    padding: 10px 14px; background: var(--surface-2);
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  th.num, td.num { text-align: right; }
+  tbody tr { border-bottom: 1px solid var(--line-soft); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface); }
+  tbody tr.low { background: var(--warn-bg); }
+  tbody tr.empty-stock { background: var(--crit-bg); }
+  td { padding: 11px 14px; vertical-align: middle; }
+  .cal {
+    font-family: var(--f-head);
+    font-size: 16px; font-weight: 600; letter-spacing: 0.04em;
+  }
+  .qty {
+    font-family: var(--f-num);
+    font-size: 20px; font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .mins {
+    font-family: var(--f-num);
+    font-variant-numeric: tabular-nums;
+    color: var(--muted); font-size: 14px;
+  }
+  .avail {
+    font-family: var(--f-num);
+    font-variant-numeric: tabular-nums;
+    font-size: 18px; font-weight: 700;
+  }
+  .avail.ok { color: var(--ok); }
+  .avail.warn { color: var(--warn); }
+  .avail.crit { color: var(--crit); }
+  .pill {
+    display: inline-block;
+    font-family: var(--f-head);
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    font-weight: 600;
+    padding: 3px 9px; border-radius: 999px;
+    border: 1px solid transparent;
+  }
+  .pill.ok { color: var(--ok); background: var(--ok-bg); border-color: #2a4535; }
+  .pill.warn { color: var(--warn); background: var(--warn-bg); border-color: #4a3c16; }
+  .pill.crit { color: var(--crit); background: var(--crit-bg); border-color: #4a2320; }
+  .row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+
+  .empty-note {
+    padding: 30px 18px; text-align: center; color: var(--muted);
+  }
+  .empty-note strong { color: var(--fg-dim); font-weight: 600; display: block; margin-bottom: 4px; }
+
+  /* ---------- Logbuch ---------- */
+  .log { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .log-row {
+    display: grid;
+    grid-template-columns: 92px 1fr auto auto;
+    gap: 12px; align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .log-row:last-child { border-bottom: none; }
+  .log-row:hover { background: var(--surface); }
+  .log-date { font-family: var(--f-num); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .log-main { min-width: 0; }
+  .log-cal { font-family: var(--f-head); font-weight: 600; font-size: 14px; letter-spacing: .03em; }
+  .log-meta { font-size: 12.5px; color: var(--muted); }
+  .log-meta .note { color: var(--fg-dim); }
+  .delta { font-family: var(--f-num); font-weight: 700; font-variant-numeric: tabular-nums; font-size: 15px; white-space: nowrap; }
+  .delta.plus { color: var(--ok); }
+  .delta.minus { color: var(--crit); }
+  .log-del { color: var(--muted); }
+  .log-del[data-armed="1"] { color: var(--crit); border-color: var(--crit); }
+  .log-foot { padding: 9px 14px; font-size: 12px; color: var(--muted); background: var(--surface-2); font-family: var(--f-head); letter-spacing: .08em; text-transform: uppercase; }
+
+  /* ---------- Dialog ---------- */
+  .scrim {
+    position: fixed; inset: 0; z-index: 40;
+    background: rgba(5,7,8,0.72);
+    display: grid; place-items: center;
+    padding: max(16px, env(safe-area-inset-left,0px)) max(16px, env(safe-area-inset-right,0px));
+    padding-top: max(24px, env(safe-area-inset-top,0px));
+    padding-bottom: max(24px, env(safe-area-inset-bottom,0px));
+  }
+  .dialog {
+    width: 100%; max-width: 440px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    max-height: 100%;
+    overflow-y: auto;
+    box-shadow: 0 18px 50px rgba(0,0,0,.55);
+  }
+  .dialog-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 18px; border-bottom: 1px solid var(--line);
+  }
+  .dialog-head h3 {
+    margin: 0; font-family: var(--f-head); font-size: 16px;
+    letter-spacing: .1em; text-transform: uppercase; font-weight: 600;
+  }
+  .dialog-body { padding: 18px; display: flex; flex-direction: column; gap: 15px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-family: var(--f-head); font-size: 11px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  input, select {
+    font-family: var(--f-body); font-size: 15px;
+    color: var(--fg); background: var(--surface-2);
+    border: 1px solid var(--line); border-radius: 8px;
+    padding: 10px 12px; width: 100%;
+  }
+  input:focus, select:focus { outline: none; border-color: var(--brass-dim); }
+  input[type=number] { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
+  .seg { display: flex; gap: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .seg button {
+    flex: 1; border: none; border-radius: 0; background: var(--surface-2);
+    color: var(--fg-dim); padding: 11px;
+  }
+  .seg button[aria-pressed=true].zu { background: var(--ok-bg); color: var(--ok); }
+  .seg button[aria-pressed=true].ab { background: var(--crit-bg); color: var(--crit); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* ---------- Mengen-Rad ---------- */
+  .wheel { position: relative; height: 132px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); overflow: hidden; }
+  .wheel-sel { position: absolute; left: 10px; right: 10px; top: 48px; height: 36px; border-top: 1px solid var(--brass-dim); border-bottom: 1px solid var(--brass-dim); background: rgba(201,162,75,.08); border-radius: 6px; pointer-events: none; z-index: 1; }
+  .wheel-scroll {
+    height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; padding: 48px 0;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 32%, #000 68%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 32%, #000 68%, transparent);
+  }
+  .wheel-scroll::-webkit-scrollbar { display: none; }
+  .wheel-item { height: 36px; scroll-snap-align: center; display: flex; align-items: center; justify-content: center; font-family: var(--f-num); font-variant-numeric: tabular-nums; font-size: 19px; color: var(--muted); cursor: pointer; user-select: none; }
+  .wheel-item.sel { color: var(--brass); font-weight: 700; font-size: 23px; }
+  .wheel-hint { font-size: 11px; color: var(--muted); margin-top: 5px; text-align: center; letter-spacing: .02em; }
+  .dialog-foot {
+    display: flex; gap: 10px; justify-content: space-between; align-items: center;
+    padding: 14px 18px; border-top: 1px solid var(--line);
+    position: sticky; bottom: 0; background: var(--surface); z-index: 2;
+  }
+  .dialog-foot .right { display: flex; gap: 10px; margin-left: auto; }
+  .danger { color: var(--crit); border-color: #4a2320; background: var(--crit-bg); }
+  .danger[data-armed="1"] { background: var(--crit); color: #fff; border-color: var(--crit); }
+  .hint { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+
+  .notice {
+    margin-top: 16px; padding: 11px 14px;
+    border: 1px solid var(--line); border-left: 3px solid var(--warn);
+    border-radius: 8px; background: var(--surface);
+    font-size: 13.5px; color: var(--fg-dim);
+  }
+  .foot-note {
+    margin-top: 22px; font-size: 12px; color: var(--muted); line-height: 1.6;
+  }
+  .foot-note code { font-family: var(--f-num); color: var(--fg-dim); background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+
+  /* ---------- Daten-Werkzeuge ---------- */
+  .datatools { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .datatools .sep { flex: 1; }
+
+  /* ---------- Verbindungsstatus ---------- */
+  .conn { margin-top: 14px; padding: 9px 13px; border-radius: 8px; font-size: 13px; font-weight: 500; border: 1px solid var(--line); line-height: 1.4; }
+  .conn.connecting { color: var(--fg-dim); background: var(--surface); border-left: 3px solid var(--muted); }
+  .conn.synced { color: var(--ok); background: var(--ok-bg); border-left: 3px solid var(--ok); }
+  .conn.offline { color: var(--warn); background: var(--warn-bg); border-left: 3px solid var(--warn); }
+
+  /* ---------- Toasts ---------- */
+  #toasts {
+    position: fixed; left: 50%; transform: translateX(-50%);
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    z-index: 60; display: flex; flex-direction: column; gap: 8px; align-items: center;
+    width: max-content; max-width: 92vw; pointer-events: none;
+  }
+  .toast {
+    font-size: 13.5px; font-weight: 500;
+    padding: 10px 15px; border-radius: 9px;
+    background: var(--surface-3); color: var(--fg);
+    border: 1px solid var(--line); border-left: 3px solid var(--muted);
+    box-shadow: 0 8px 26px rgba(0,0,0,.5);
+    animation: toastin .18s ease-out;
+  }
+  .toast.ok { border-left-color: var(--ok); }
+  .toast.err { border-left-color: var(--crit); }
+  @keyframes toastin { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* ---------- Druck-Zurück (schwebend, nur in Druckansicht sichtbar) ---------- */
+  .print-exit {
+    position: fixed; z-index: 50; display: none;
+    top: calc(14px + env(safe-area-inset-top, 0px));
+    right: calc(14px + env(safe-area-inset-right, 0px));
+    box-shadow: 0 6px 20px rgba(0,0,0,.3);
+  }
+  body.print-preview .print-exit { display: inline-flex; }
+
+  /* ---------- Druck / A4 ---------- */
+  .print-head { display: none; }
+
+  body.print-preview { background: #fff; color: #111; }
+  body.print-preview .no-print { display: none !important; }
+  body.print-preview .print-head {
+    display: block; border-bottom: 2px solid #111; padding-bottom: 10px; margin-bottom: 14px;
+  }
+  body.print-preview .wrap { max-width: 760px; padding-block-start: 20px; }
+  body.print-preview .table-wrap { border-color: #999; }
+  body.print-preview table { min-width: 0; }
+  body.print-preview thead th { background: #eee; color: #111; border-color: #999; }
+  body.print-preview tbody tr, body.print-preview tbody tr.low, body.print-preview tbody tr.empty-stock { background: #fff; }
+  body.print-preview td { border-color: #ccc; color: #111; }
+  body.print-preview .qty, body.print-preview .cal, body.print-preview .avail { color: #111; }
+  body.print-preview .mins { color: #555; }
+  body.print-preview .pill { border: 1px solid #999 !important; color: #111 !important; background: #fff !important; }
+  body.print-preview .sec-head h2 { color: #111; }
+
+  @media print {
+    @page { size: A4 portrait; margin: 14mm; }
+    body { background: #fff; color: #111; font-size: 11pt; }
+    body::before { display: none; }
+    .no-print { display: none !important; }
+    .print-head { display: block; border-bottom: 2px solid #111; padding-bottom: 8px; margin-bottom: 12px; }
+    .wrap { max-width: none; padding: 0; }
+    header.top { display: none; }
+    .table-wrap { border: 1px solid #999; overflow: visible; }
+    table { min-width: 0; }
+    thead th { background: #eee !important; color: #111; border-color: #999; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    tbody tr, tbody tr.low, tbody tr.empty-stock { background: #fff !important; }
+    td { border-color: #ccc; color: #111; }
+    .qty, .cal, .avail { color: #111; }
+    .mins { color: #555; }
+    .pill { border: 1px solid #777 !important; color: #111 !important; background: #fff !important; font-weight: 600; }
+    .sec-head h2 { color: #111; }
+    tr { break-inside: avoid; }
+    .print-exit { display: none !important; }
+    .appbar { display: none !important; }
+    #overview { display: block !important; }
+    #analytics { display: none !important; }
+  }
+  body.print-preview .appbar { display: none !important; }
+  body.print-preview #overview { display: block !important; }
+  body.print-preview #analytics { display: none !important; }
+  .print-head h2 { font-family: var(--f-head); margin: 0 0 2px; font-size: 20px; letter-spacing: .08em; text-transform: uppercase; }
+  .print-head .pmeta { font-size: 12px; color: #333; }
+
+  @media (max-width: 520px) {
+    .stats { grid-template-columns: 1fr 1fr 1fr; gap: 7px; }
+    .stat { padding: 10px 11px; }
+    .stat .v { font-size: 21px; }
+    h1 { font-size: 18px; }
+    .log-row { grid-template-columns: 1fr auto; row-gap: 3px; }
+    .log-date { grid-column: 1 / -1; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+
+  <div class="print-head">
+    <h2>Munitionsbestand</h2>
+    <div class="pmeta" id="printMeta">Stand: —</div>
+  </div>
+
+  <main>
+    <div class="appbar no-print">
+      <nav class="tabs">
+        <button class="tab active" data-action="tab" data-tab="bestand">Bestand</button>
+        <button class="tab" data-action="tab" data-tab="auswertung">Auswertung</button>
+      </nav>
+      <button class="sm ghost" id="themeBtn" data-action="theme-toggle" title="Hell/Dunkel umschalten">☀ Hell</button>
+    </div>
+
+    <section id="overview">
+      <div class="sec-head no-print">
+        <h2>Bestand</h2>
+        <span class="rule"></span>
+        <button class="sm ghost" data-action="print-toggle" id="printBtn">Druckansicht</button>
+      </div>
+
+      <div id="connStatus" class="conn no-print" hidden></div>
+
+      <div class="stats no-print" id="stats" hidden>
+        <div class="stat"><div class="k">Patronen gesamt</div><div class="v" id="statTotal">—</div></div>
+        <div class="stat"><div class="k">Sorten</div><div class="v" id="statKinds">—</div></div>
+        <div class="stat" id="statAlertBox"><div class="k">Warnungen</div><div class="v" id="statAlerts">—</div></div>
+      </div>
+
+      <div class="table-wrap" id="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Sorte</th>
+              <th class="num">Bestand</th>
+              <th class="num">Sperre</th>
+              <th class="num">Frei</th>
+              <th class="num">Mindest</th>
+              <th>Status</th>
+              <th class="no-print num">Buchen</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr><td colspan="7" class="empty-note" id="loadingRow">Bestand wird geladen …</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="no-print" style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="primary" data-action="open-book" id="bookBtn" disabled>+ / − Buchen</button>
+        <button data-action="add-type" id="addBtn" disabled>+ Neue Sorte</button>
+      </div>
+
+      <div class="datatools no-print" id="dataTools" hidden>
+        <button class="ghost sm" data-action="pdf">↓ Druckblatt (PDF)</button>
+        <button class="ghost sm" data-action="export-csv">↓ Export CSV</button>
+      </div>
+    </section>
+
+    <section id="logSection" class="no-print">
+      <div class="sec-head">
+        <h2>Logbuch</h2>
+        <span class="rule"></span>
+      </div>
+      <div class="log" id="log">
+        <div class="empty-note">Noch keine Buchungen.</div>
+      </div>
+    </section>
+
+    <section id="analytics" class="no-print" hidden>
+      <div class="sec-head">
+        <h2>Auswertung</h2>
+        <span class="rule"></span>
+        <label class="hint" for="periodSel" style="margin-right:4px">Zeitraum</label>
+        <select id="periodSel" style="width:auto; min-width:120px"></select>
+      </div>
+
+      <div class="stats" id="aStats">
+        <div class="stat"><div class="k">Verschossen gesamt</div><div class="v" id="aShot">—</div></div>
+        <div class="stat"><div class="k">Trainings-Buchungen</div><div class="v" id="aOut">—</div></div>
+        <div class="stat"><div class="k">Meistgenutzt</div><div class="v" id="aTop" style="font-size:17px">—</div></div>
+      </div>
+
+      <div class="sec-head"><h2 style="font-size:12px">Verschossen je Sorte</h2><span class="rule"></span></div>
+      <div id="aRank"></div>
+
+      <p class="hint" style="margin-top:14px">Gezählt werden nur Buchungen mit dem Grund „Training". Verkäufe, Verluste und Korrekturen fließen hier nicht ein – sie wirken nur im Bestand.</p>
+    </section>
+
+    <div class="notice no-print" id="roNotice" hidden>
+      Nur-Lese-Ansicht: In dieser Ansicht bist du nicht als Eigentümer angemeldet, Änderungen werden nicht gespeichert.
+    </div>
+
+    <p class="foot-note no-print" id="footNote">
+      Diese Seite speichert lokal auf diesem Gerät. Für den Abgleich zwischen Handy und PC richte die zentrale Synchronisation in den <strong>Hub-Einstellungen</strong> ein – dann liegen deine Daten in einem privaten GitHub-Gist und sind überall abrufbar.<br>
+      Drucken: <strong>↓ Druckblatt (PDF)</strong> für eine fertige A4-Datei, oder <strong>Druckansicht</strong> + <code>Cmd/Strg&nbsp;+&nbsp;P</code>.<br>
+      Tipp: Seite als Lesezeichen bzw. zum Home-Bildschirm hinzufügen – dann ist der Bestand wie eine App griffbereit.
+    </p>
+  </main>
+</div>
+
+<button class="print-exit" data-action="print-toggle">✕ Druckansicht schließen</button>
+<div id="toasts" class="no-print" aria-live="polite"></div>
+
+<!-- Buchungs-Dialog -->
+<div class="scrim no-print" id="bookScrim" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="bkTitle">
+    <div class="dialog-head">
+      <h3 id="bkTitle">Buchung</h3>
+      <button class="sm ghost" data-action="close-book">Schließen</button>
+    </div>
+    <div class="dialog-body">
+      <div class="field">
+        <label for="bkType">Sorte</label>
+        <select id="bkType"></select>
+      </div>
+      <div class="field">
+        <label>Richtung</label>
+        <div class="seg">
+          <button type="button" class="zu" id="bkZu" data-dir="in" aria-pressed="true">Zugang +</button>
+          <button type="button" class="ab" id="bkAb" data-dir="out" aria-pressed="false">Abgang −</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Menge</label>
+        <div class="wheel" id="bkWheel">
+          <div class="wheel-sel"></div>
+          <div class="wheel-scroll" id="bkWheelScroll" tabindex="0" role="listbox" aria-label="Menge wählen"></div>
+        </div>
+        <div class="wheel-hint">Zum Wählen drehen / wischen – oder Wert antippen</div>
+      </div>
+      <div class="field">
+        <label for="bkDate">Datum</label>
+        <input type="date" id="bkDate">
+      </div>
+      <div class="field">
+        <label for="bkReason">Grund</label>
+        <select id="bkReason"></select>
+      </div>
+      <div class="field">
+        <label for="bkNote">Notiz (optional)</label>
+        <input type="text" id="bkNote" maxlength="80" placeholder="z. B. Charge, Hersteller, Stand">
+      </div>
+    </div>
+    <div class="dialog-foot">
+      <div class="right">
+        <button class="ghost" data-action="close-book">Abbrechen</button>
+        <button class="primary" id="bkSave" data-action="save-book">Buchen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sorten-Dialog (neu / bearbeiten) -->
+<div class="scrim no-print" id="typeScrim" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="tyTitle">
+    <div class="dialog-head">
+      <h3 id="tyTitle">Neue Sorte</h3>
+      <button class="sm ghost" data-action="close-type">Schließen</button>
+    </div>
+    <div class="dialog-body">
+      <div class="field">
+        <label for="tyName">Bezeichnung</label>
+        <input type="text" id="tyName" maxlength="40" placeholder="z. B. 9mm Luger">
+      </div>
+      <div class="field" id="tyStartWrap">
+        <label for="tyStart">Anfangsbestand</label>
+        <input type="number" id="tyStart" min="0" step="1" value="0" inputmode="numeric">
+      </div>
+      <div class="two">
+        <div class="field">
+          <label for="tyMin">Mindestbestand</label>
+          <input type="number" id="tyMin" min="0" step="1" value="0" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="tyReserve">Sperrbestand</label>
+          <input type="number" id="tyReserve" min="0" step="1" value="0" inputmode="numeric">
+        </div>
+      </div>
+      <p class="hint" id="tyHint">Der Anfangsbestand wird als erste Buchung „Anfangsbestand“ im Logbuch erfasst.</p>
+      <p class="hint">Sperrbestand = zurückgelegte Menge, die nicht als „frei verfügbar“ zählt. Jederzeit änderbar; der Gesamtbestand bleibt unverändert.</p>
+    </div>
+    <div class="dialog-foot">
+      <button class="danger" id="tyDelete" data-action="del-type" hidden>Sorte löschen</button>
+      <div class="right">
+        <button class="ghost" data-action="close-type">Abbrechen</button>
+        <button class="primary" id="tySave" data-action="save-type">Speichern</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bestätigungs-Dialog (Wiederherstellen) -->
+<div class="scrim no-print" id="confirmScrim" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="cfTitle" style="max-width:400px">
+    <div class="dialog-head">
+      <h3 id="cfTitle">Bestätigen</h3>
+      <button class="sm ghost" data-action="close-confirm">Schließen</button>
+    </div>
+    <div class="dialog-body">
+      <p class="hint" id="cfMsg" style="font-size:14px"></p>
+    </div>
+    <div class="dialog-foot">
+      <div class="right">
+        <button class="ghost" data-action="close-confirm">Abbrechen</button>
+        <button class="danger" id="cfOk" data-action="confirm-ok">Wiederherstellen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var REASONS = ["Kauf", "Training", "Verkauf", "Verlust", "Korrektur", "Anfangsbestand"];
+  var state = { types: [], txns: [], ready: false, canWrite: null, readonly: false };
+  var db = null, userCap = null, downloadsCap = null;
+  var editingTypeId = null;      // null = neue Sorte
+  var bookDir = "in";
+  var armedDel = null;           // Logbuch-Eintrag mit "wirklich löschen?"
+  var delTypeArmed = false;
+  var armedTimer = null;
+  var pendingImport = null;      // eingelesenes Backup, wartet auf Bestätigung
+
+  // ---------- Helfer ----------
+  function $(id) { return document.getElementById(id); }
+  function nf(n) { return (n || 0).toLocaleString("de-DE"); }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function todayISO() {
+    var d = new Date(), tz = d.getTimezoneOffset() * 60000;
+    return new Date(d - tz).toISOString().slice(0, 10);
+  }
+  function fmtDate(iso) {
+    if (!iso) return "—";
+    var p = String(iso).slice(0, 10).split("-");
+    return p.length === 3 ? p[2] + "." + p[1] + "." + p[0] : iso;
+  }
+  function nameOf(typeId) {
+    for (var i = 0; i < state.types.length; i++) if (state.types[i].id === typeId) return state.types[i].name;
+    return "?";
+  }
+  function toast(msg, kind) {
+    var box = $("toasts");
+    if (!box) return;
+    var el = document.createElement("div");
+    el.className = "toast" + (kind ? " " + kind : "");
+    el.textContent = msg;
+    box.appendChild(el);
+    setTimeout(function () {
+      el.style.transition = "opacity .25s";
+      el.style.opacity = "0";
+      setTimeout(function () { el.remove(); }, 260);
+    }, kind === "err" ? 4200 : 2600);
+  }
+  function stockOf(typeId) {
+    var s = 0;
+    for (var i = 0; i < state.txns.length; i++) {
+      if (state.txns[i].typeId === typeId) s += Number(state.txns[i].delta) || 0;
+    }
+    return s;
+  }
+  function statusOf(qty, min) {
+    if (qty <= 0) return { cls: "crit", label: "Leer", row: "empty-stock" };
+    if (min > 0 && qty < min) return { cls: "warn", label: "Niedrig", row: "low" };
+    return { cls: "ok", label: "OK", row: "" };
+  }
+  function sortedTypes() {
+    return state.types.slice().sort(function (a, b) {
+      var ao = a.order == null ? 1e9 : a.order, bo = b.order == null ? 1e9 : b.order;
+      if (ao !== bo) return ao - bo;
+      return (a.createdAt || 0) - (b.createdAt || 0);
+    });
+  }
+
+  // ---------- Rendern ----------
+  function render() {
+    var types = sortedTypes();
+    var total = 0, alerts = 0;
+
+    // Tabelle
+    var tb = $("tbody");
+    if (!state.ready) {
+      tb.innerHTML = '<tr><td colspan="7" class="empty-note" id="loadingRow">Bestand wird geladen …</td></tr>';
+    } else if (types.length === 0) {
+      tb.innerHTML = '<tr><td colspan="7" class="empty-note"><strong>Noch keine Sorten angelegt.</strong>' +
+        (state.readonly ? "" : 'Lege mit „+ Neue Sorte“ die erste Munitionssorte an.') + "</td></tr>";
+    } else {
+      var rows = "";
+      types.forEach(function (t) {
+        var qty = stockOf(t.id), min = Number(t.minStock) || 0, res = Number(t.reserved) || 0;
+        var avail = qty - res;
+        var st = statusOf(avail, min);
+        total += qty;
+        if (st.cls !== "ok") alerts++;
+        rows += '<tr class="' + st.row + '">' +
+          '<td><button class="cal ghost" style="all:unset;cursor:pointer;" data-action="edit-type" data-id="' + esc(t.id) + '" title="Sorte bearbeiten">' + esc(t.name) + '</button></td>' +
+          '<td class="num"><span class="qty">' + nf(qty) + '</span></td>' +
+          '<td class="num"><span class="mins">' + (res > 0 ? nf(res) : "–") + '</span></td>' +
+          '<td class="num"><span class="avail ' + st.cls + '">' + nf(avail) + '</span></td>' +
+          '<td class="num"><span class="mins">' + (min > 0 ? nf(min) : "–") + '</span></td>' +
+          '<td><span class="pill ' + st.cls + '">' + st.label + '</span></td>' +
+          '<td class="no-print num"><div class="row-actions">' +
+            '<button class="sm" data-action="book" data-id="' + esc(t.id) + '" data-dir="in" title="Zugang">+</button>' +
+            '<button class="sm" data-action="book" data-id="' + esc(t.id) + '" data-dir="out" title="Abgang">−</button>' +
+          '</div></td>' +
+        '</tr>';
+      });
+      tb.innerHTML = rows;
+    }
+
+    // Kennzahlen
+    $("stats").hidden = !state.ready;
+    $("statTotal").textContent = nf(total);
+    $("statKinds").textContent = nf(types.length);
+    $("statAlerts").textContent = nf(alerts);
+    var box = $("statAlertBox");
+    box.className = "stat alert" + (alerts === 0 ? " none" : "");
+
+    // Logbuch
+    renderLog();
+
+    // Druck-Metazeile
+    $("printMeta").textContent = "Stand: " + new Date().toLocaleString("de-DE", {
+      day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit"
+    }) + " · " + nf(total) + " Patronen · " + nf(types.length) + " Sorten";
+
+    // Auswertung mitführen
+    renderAnalytics();
+  }
+
+  function renderLog() {
+    var log = $("log");
+    if (!state.ready) { log.innerHTML = '<div class="empty-note">…</div>'; return; }
+    if (state.txns.length === 0) { log.innerHTML = '<div class="empty-note">Noch keine Buchungen.</div>'; return; }
+    var nameById = {};
+    state.types.forEach(function (t) { nameById[t.id] = t.name; });
+    var list = state.txns.slice().sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
+    var shown = list.slice(0, 60);
+    var html = "";
+    shown.forEach(function (x) {
+      var d = Number(x.delta) || 0, plus = d >= 0;
+      var nm = nameById[x.typeId] || "(gelöschte Sorte)";
+      var armed = armedDel === x.id;
+      html += '<div class="log-row">' +
+        '<div class="log-date">' + fmtDate(x.dateISO) + '</div>' +
+        '<div class="log-main">' +
+          '<div class="log-cal">' + esc(nm) + '</div>' +
+          '<div class="log-meta">' + esc(x.reason || "—") +
+            (x.note ? ' · <span class="note">' + esc(x.note) + '</span>' : '') + '</div>' +
+        '</div>' +
+        '<div class="delta ' + (plus ? "plus" : "minus") + '">' + (plus ? "+" : "−") + nf(Math.abs(d)) + '</div>' +
+        (state.readonly ? '' :
+          '<button class="sm ghost log-del" data-action="del-txn" data-id="' + esc(x.id) + '" data-armed="' + (armed ? 1 : 0) + '" title="Buchung entfernen">' +
+          (armed ? "Löschen?" : "✕") + '</button>') +
+      '</div>';
+    });
+    if (list.length > shown.length) {
+      html += '<div class="log-foot">Älteste ' + nf(list.length - shown.length) + ' Buchungen ausgeblendet · gesamt ' + nf(list.length) + '</div>';
+    }
+    log.innerHTML = html;
+  }
+
+  function disarm() {
+    if (armedDel || delTypeArmed) { armedDel = null; delTypeArmed = false; setDelTypeBtn(); renderLog(); }
+    if (armedTimer) { clearTimeout(armedTimer); armedTimer = null; }
+  }
+
+  // ---------- Dialoge ----------
+  function fillReasons(sel, chosen) {
+    sel.innerHTML = REASONS.map(function (r) {
+      return '<option value="' + esc(r) + '"' + (r === chosen ? " selected" : "") + ">" + esc(r) + "</option>";
+    }).join("");
+  }
+  function setDir(dir) {
+    bookDir = dir;
+    $("bkZu").setAttribute("aria-pressed", dir === "in");
+    $("bkAb").setAttribute("aria-pressed", dir === "out");
+    var rs = $("bkReason");
+    if (!rs.value || rs.value === "Kauf" || rs.value === "Training") rs.value = dir === "in" ? "Kauf" : "Training";
+  }
+  function openBook(typeId, dir) {
+    if (!db) { toast("Speicher verbindet noch – einen Moment …", "err"); return; }
+    if (state.readonly) { toast("Nur Lese-Zugriff.", "err"); return; }
+    if (!state.types.length) { toast("Noch keine Sorten – lege zuerst eine an.", "err"); return; }
+    var sel = $("bkType");
+    sel.innerHTML = sortedTypes().map(function (t) {
+      return '<option value="' + esc(t.id) + '">' + esc(t.name) + "</option>";
+    }).join("");
+    if (typeId) sel.value = typeId;
+    fillReasons($("bkReason"), dir === "out" ? "Training" : "Kauf");
+    setDir(dir || "in");
+    $("bkDate").value = todayISO();
+    $("bkNote").value = "";
+    $("bookScrim").hidden = false;
+    setWheelValue(50);
+    requestAnimationFrame(function () { setWheelValue(50); });
+  }
+  function closeBook() { $("bookScrim").hidden = true; }
+
+  // ---------- Mengen-Rad ----------
+  var WHEEL_VALUES = (function () { var a = [], i; for (i = 1; i <= 200; i++) a.push(i); for (i = 210; i <= 1000; i += 10) a.push(i); return a; })();
+  var WHEEL_ITEMH = 36, bkAmountVal = 50, wheelScrollEl = null, wheelSnapTimer = null;
+  function buildWheel() {
+    wheelScrollEl = $("bkWheelScroll"); if (!wheelScrollEl) return;
+    wheelScrollEl.innerHTML = WHEEL_VALUES.map(function (v) { return '<div class="wheel-item">' + nf(v) + '</div>'; }).join("");
+    wheelScrollEl.addEventListener("scroll", function () {
+      markWheel();
+      if (wheelSnapTimer) clearTimeout(wheelSnapTimer);
+      wheelSnapTimer = setTimeout(markWheel, 90);
+    }, { passive: true });
+    wheelScrollEl.addEventListener("click", function (e) {
+      var it = e.target.closest(".wheel-item"); if (!it) return;
+      scrollWheelTo(Array.prototype.indexOf.call(wheelScrollEl.children, it));
+    });
+  }
+  function wheelIndex() {
+    if (!wheelScrollEl) return 0;
+    return Math.max(0, Math.min(WHEEL_VALUES.length - 1, Math.round(wheelScrollEl.scrollTop / WHEEL_ITEMH)));
+  }
+  function markWheel() {
+    if (!wheelScrollEl) return;
+    var idx = wheelIndex();
+    bkAmountVal = WHEEL_VALUES[idx];
+    var items = wheelScrollEl.children;
+    for (var i = 0; i < items.length; i++) items[i].classList.toggle("sel", i === idx);
+  }
+  function scrollWheelTo(idx) {
+    if (!wheelScrollEl) return;
+    wheelScrollEl.scrollTop = idx * WHEEL_ITEMH;
+    markWheel();
+  }
+  function setWheelValue(v) {
+    var best = 0, bd = Infinity;
+    for (var i = 0; i < WHEEL_VALUES.length; i++) { var d = Math.abs(WHEEL_VALUES[i] - v); if (d < bd) { bd = d; best = i; } }
+    bkAmountVal = WHEEL_VALUES[best];
+    scrollWheelTo(best);
+  }
+
+  function openType(typeId) {
+    if (!db) { toast("Speicher verbindet noch – einen Moment …", "err"); return; }
+    if (state.readonly) { toast("Nur Lese-Zugriff – Bearbeiten nicht möglich.", "err"); return; }
+    editingTypeId = typeId || null;
+    delTypeArmed = false;
+    var t = typeId ? state.types.filter(function (x) { return x.id === typeId; })[0] : null;
+    $("tyTitle").textContent = t ? "Sorte bearbeiten" : "Neue Sorte";
+    $("tyName").value = t ? t.name : "";
+    $("tyMin").value = t ? (Number(t.minStock) || 0) : 0;
+    $("tyReserve").value = t ? (Number(t.reserved) || 0) : 0;
+    $("tyStartWrap").hidden = !!t;         // Anfangsbestand nur bei neuer Sorte
+    $("tyHint").hidden = !!t;
+    $("tyDelete").hidden = !t;
+    setDelTypeBtn();
+    $("typeScrim").hidden = false;
+    setTimeout(function () { $("tyName").focus(); }, 30);
+  }
+  function closeType() { $("typeScrim").hidden = true; editingTypeId = null; delTypeArmed = false; }
+  function setDelTypeBtn() {
+    var b = $("tyDelete");
+    b.setAttribute("data-armed", delTypeArmed ? "1" : "0");
+    b.textContent = delTypeArmed ? "Wirklich löschen?" : "Sorte löschen";
+  }
+
+  // ---------- Schreibvorgänge ----------
+  function markReadonly() {
+    if (state.readonly) return;
+    state.readonly = true;
+    $("roNotice").hidden = false;
+    $("bookBtn").disabled = true; $("addBtn").disabled = true;
+    closeBook(); closeType();
+    render();
+  }
+  var MIGRATE_CODES = { invalid_argument: 1, transform_error: 1, revoked: 1, not_granted: 1, capability_disabled: 1, capability_removed: 1 };
+  function writeGuard(err) {
+    console.warn("db-Fehler:", err);
+    var code = err && err.code;
+    if (code && MIGRATE_CODES[code] && db && !db.__local) {
+      migrateToLocal();   // Sync-Speicher schreibt nicht → auf lokalen Speicher wechseln
+      return;
+    }
+    toast("Speichern fehlgeschlagen" + (code ? " (" + code + ")" : "") + " – bitte erneut versuchen.", "err");
+  }
+
+  function saveBooking() {
+    if (state.readonly) { toast("Nur Lese-Zugriff – Buchen nicht möglich.", "err"); return; }
+    if (!db) { toast("Speicher noch nicht verbunden – kurz warten und erneut versuchen.", "err"); return; }
+    var typeId = $("bkType").value;
+    var amt = Math.abs(parseInt(bkAmountVal, 10) || 0);
+    if (!typeId) { toast("Bitte eine Sorte wählen.", "err"); return; }
+    if (amt <= 0) { toast("Bitte eine Menge wählen.", "err"); return; }
+    var delta = bookDir === "out" ? -amt : amt;
+    var rec = {
+      typeId: typeId,
+      delta: delta,
+      reason: $("bkReason").value || "Korrektur",
+      note: ($("bkNote").value || "").trim(),
+      dateISO: $("bkDate").value || todayISO(),
+      createdAt: Date.now()
+    };
+    var btn = $("bkSave"); btn.disabled = true;
+    db.collection("transactions").add(rec).then(function () {
+      closeBook();
+      toast((delta > 0 ? "Zugang +" : "Abgang −") + nf(Math.abs(delta)) + " · " + nameOf(typeId), "ok");
+    }).catch(writeGuard).then(function () { btn.disabled = false; });
+  }
+
+  function saveType() {
+    if (state.readonly) { toast("Nur Lese-Zugriff – Speichern nicht möglich.", "err"); return; }
+    if (!db) { toast("Speicher noch nicht verbunden – kurz warten und erneut versuchen.", "err"); return; }
+    var name = ($("tyName").value || "").trim();
+    if (!name) { toast("Bitte eine Bezeichnung eingeben.", "err"); $("tyName").focus(); return; }
+    var min = Math.max(0, parseInt($("tyMin").value, 10) || 0);
+    var res = Math.max(0, parseInt($("tyReserve").value, 10) || 0);
+    var btn = $("tySave"); btn.disabled = true;
+
+    if (editingTypeId) {
+      db.doc("types/" + editingTypeId).update({ name: name, minStock: min, reserved: res })
+        .then(function () { closeType(); toast("Sorte aktualisiert: " + name, "ok"); })
+        .catch(writeGuard).then(function () { btn.disabled = false; });
+    } else {
+      var start = Math.max(0, parseInt($("tyStart").value, 10) || 0);
+      var maxOrder = 0;
+      state.types.forEach(function (t) { if ((t.order || 0) > maxOrder) maxOrder = t.order; });
+      var ref = db.collection("types").doc();
+      ref.set({ name: name, minStock: min, reserved: res, order: maxOrder + 1, createdAt: Date.now() })
+        .then(function () {
+          if (start > 0) {
+            return db.collection("transactions").add({
+              typeId: ref.id, delta: start, reason: "Anfangsbestand",
+              note: "", dateISO: todayISO(), createdAt: Date.now()
+            });
+          }
+        }).then(function () { closeType(); toast("Sorte angelegt: " + name, "ok"); })
+        .catch(writeGuard).then(function () { btn.disabled = false; });
+    }
+  }
+
+  function deleteType() {
+    if (!db || !editingTypeId || state.readonly) return;
+    if (!delTypeArmed) { delTypeArmed = true; setDelTypeBtn(); return; }
+    var id = editingTypeId;
+    var btn = $("tyDelete"); btn.disabled = true;
+    // zugehörige Buchungen zuerst entfernen
+    var own = state.txns.filter(function (x) { return x.typeId === id; });
+    var chain = Promise.resolve();
+    own.forEach(function (x) { chain = chain.then(function () { return db.doc("transactions/" + x.id).delete(); }); });
+    chain.then(function () { return db.doc("types/" + id).delete(); })
+      .then(function () { closeType(); }).catch(writeGuard)
+      .then(function () { btn.disabled = false; });
+  }
+
+  function deleteTxn(id) {
+    if (!db || state.readonly) return;
+    if (armedDel !== id) {
+      armedDel = id; renderLog();
+      if (armedTimer) clearTimeout(armedTimer);
+      armedTimer = setTimeout(function () { armedDel = null; renderLog(); }, 4000);
+      return;
+    }
+    armedDel = null;
+    db.doc("transactions/" + id).delete().catch(writeGuard);
+  }
+
+  // ---------- Backup / Export / Import ----------
+  function buildBackup() {
+    return {
+      app: "Munitionsbestand", schema: 1, exportedAt: new Date().toISOString(),
+      types: sortedTypes().map(function (t) {
+        return { id: t.id, name: t.name, minStock: Number(t.minStock) || 0, reserved: Number(t.reserved) || 0, order: Number(t.order) || 0 };
+      }),
+      transactions: state.txns.map(function (x) {
+        return { typeId: x.typeId, delta: Number(x.delta) || 0, reason: x.reason || "", note: x.note || "", dateISO: x.dateISO || "", createdAt: Number(x.createdAt) || 0 };
+      })
+    };
+  }
+  function saveFile(filename, data, okMsg) {
+    if (!downloadsCap) { toast("Download in dieser Ansicht nicht verfügbar.", "err"); return; }
+    downloadsCap.save({ filename: filename, data: data }).then(function () {
+      toast(okMsg, "ok");
+    }).catch(function (e) {
+      if (e && e.code === "declined") return;
+      toast("Export abgebrochen" + (e && e.code ? " (" + e.code + ")" : "") + ".", "err");
+    });
+  }
+  function doBackup() {
+    saveFile("munitionsbestand-backup-" + todayISO() + ".json", JSON.stringify(buildBackup(), null, 2), "Backup gespeichert.");
+  }
+  function csvCell(v) {
+    v = String(v == null ? "" : v);
+    return /[";\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+  }
+  function doCsv() {
+    var rows = [["Sorte", "Bestand", "Sperrbestand", "Frei", "Mindestbestand", "Status"]];
+    sortedTypes().forEach(function (t) {
+      var q = stockOf(t.id), m = Number(t.minStock) || 0, r = Number(t.reserved) || 0, a = q - r;
+      rows.push([t.name, q, r, a, m > 0 ? m : "", statusOf(a, m).label]);
+    });
+    var csv = "﻿" + rows.map(function (r) { return r.map(csvCell).join(";"); }).join("\r\n");
+    saveFile("munitionsbestand-" + todayISO() + ".csv", csv, "CSV gespeichert.");
+  }
+  function doPdf() {
+    if (!downloadsCap) { toast("PDF-Download in dieser Ansicht nicht verfügbar – nutze „Druckansicht“.", "err"); return; }
+    var JS = window.jspdf && window.jspdf.jsPDF;
+    if (!JS) { toast("PDF-Bibliothek noch nicht geladen – kurz warten und erneut versuchen.", "err"); return; }
+    var types = sortedTypes();
+    if (!types.length) { toast("Noch keine Sorten – nichts zu drucken.", "err"); return; }
+    var total = 0, alerts = 0, clsByRow = [];
+    var body = types.map(function (t) {
+      var q = stockOf(t.id), m = Number(t.minStock) || 0, r = Number(t.reserved) || 0, a = q - r;
+      var st = statusOf(a, m);
+      total += q; if (st.cls !== "ok") alerts++;
+      clsByRow.push(st.cls);
+      return [t.name, nf(q), r > 0 ? nf(r) : "–", nf(a), m > 0 ? nf(m) : "–", st.label];
+    });
+    var doc = new JS({ orientation: "portrait", unit: "mm", format: "a4" });
+    doc.setFont("helvetica", "bold"); doc.setFontSize(17); doc.setTextColor(20);
+    doc.text("Munitionsbestand", 14, 18);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(90);
+    var stand = new Date().toLocaleString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    doc.text("Stand: " + stand + "   ·   " + nf(total) + " Patronen gesamt   ·   " + nf(types.length) + " Sorten   ·   " + nf(alerts) + " Warnung(en)", 14, 25);
+    doc.autoTable({
+      startY: 30,
+      head: [["Sorte", "Bestand", "Sperre", "Frei", "Mindest", "Status"]],
+      body: body,
+      styles: { font: "helvetica", fontSize: 10, cellPadding: 2.3, lineColor: [205, 205, 205], lineWidth: 0.1, textColor: 25 },
+      headStyles: { fillColor: [201, 162, 75], textColor: 25, fontStyle: "bold" },
+      alternateRowStyles: { fillColor: [247, 246, 243] },
+      columnStyles: { 0: { halign: "left" }, 1: { halign: "right" }, 2: { halign: "right" }, 3: { halign: "right", fontStyle: "bold" }, 4: { halign: "right" }, 5: { halign: "center" } },
+      didParseCell: function (data) {
+        if (data.section === "body" && data.column.index === 5) {
+          var cls = clsByRow[data.row.index];
+          data.cell.styles.fontStyle = "bold";
+          data.cell.styles.textColor = cls === "ok" ? [60, 140, 90] : cls === "warn" ? [170, 120, 20] : [190, 50, 45];
+        }
+      },
+      margin: { left: 14, right: 14 }
+    });
+    var y = (doc.lastAutoTable ? doc.lastAutoTable.finalY : 40) + 8;
+    doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(120);
+    doc.text("Frei = Bestand − Sperre. Warnung „Niedrig/Leer“ bezieht sich auf den frei verfügbaren Bestand.", 14, y);
+    var blob = doc.output("blob");
+    downloadsCap.save({ filename: "munitionsbestand-" + todayISO() + ".pdf", data: blob })
+      .then(function () { toast("Druckblatt (PDF) gespeichert.", "ok"); })
+      .catch(function (e) { if (e && e.code === "declined") return; toast("PDF-Export abgebrochen" + (e && e.code ? " (" + e.code + ")" : "") + ".", "err"); });
+  }
+  function pickImport() {
+    if (state.readonly) { toast("Nur Lese-Zugriff – Wiederherstellen nicht möglich.", "err"); return; }
+    $("importFile").click();
+  }
+  function onImportFile(ev) {
+    var f = ev.target.files && ev.target.files[0];
+    ev.target.value = "";
+    if (!f) return;
+    var r = new FileReader();
+    r.onload = function () {
+      try {
+        var o = JSON.parse(r.result);
+        if (!o || !Array.isArray(o.types)) throw new Error("kein Backup");
+        pendingImport = o;
+        $("cfTitle").textContent = "Backup wiederherstellen";
+        $("cfMsg").textContent = "Ersetzt den aktuellen Bestand durch " + o.types.length + " Sorte(n) und " +
+          ((o.transactions || []).length) + " Buchung(en). Der jetzige Bestand wird vorher gelöscht.";
+        $("cfOk").textContent = "Wiederherstellen";
+        $("confirmScrim").hidden = false;
+      } catch (e) { toast("Datei ist kein gültiges Backup.", "err"); }
+    };
+    r.onerror = function () { toast("Datei konnte nicht gelesen werden.", "err"); };
+    r.readAsText(f);
+  }
+  function cleanId(v, fallback) {
+    var s = String(v == null ? "" : v).replace(/[^A-Za-z0-9_\-.~:@+]/g, "_").slice(0, 40);
+    return s || fallback;
+  }
+  function runImport() {
+    if (!db || !pendingImport || state.readonly) { $("confirmScrim").hidden = true; return; }
+    var o = pendingImport; pendingImport = null;
+    $("confirmScrim").hidden = true;
+    var btnBusy = true;
+    var chain = Promise.resolve();
+    state.txns.forEach(function (x) { chain = chain.then(function () { return db.doc("transactions/" + x.id).delete(); }); });
+    state.types.forEach(function (t) { chain = chain.then(function () { return db.doc("types/" + t.id).delete(); }); });
+    (o.types || []).forEach(function (t, i) {
+      var id = cleanId(t.id, "imp" + i);
+      chain = chain.then(function () {
+        return db.collection("types").doc(id).set({
+          name: String(t.name || "?").slice(0, 40),
+          minStock: Number(t.minStock) || 0,
+          reserved: Number(t.reserved) || 0,
+          order: Number(t.order) || (i + 1),
+          createdAt: Number(t.createdAt) || (Date.now() + i)
+        });
+      });
+    });
+    (o.transactions || []).forEach(function (x) {
+      chain = chain.then(function () {
+        return db.collection("transactions").add({
+          typeId: String(x.typeId || ""),
+          delta: Number(x.delta) || 0,
+          reason: String(x.reason || "Import"),
+          note: String(x.note || ""),
+          dateISO: String(x.dateISO || todayISO()),
+          createdAt: Number(x.createdAt) || Date.now()
+        });
+      });
+    });
+    chain.then(function () {
+      toast("Backup wiederhergestellt.", "ok");
+    }).catch(function (e) {
+      toast("Wiederherstellen fehlgeschlagen" + (e && e.code ? " (" + e.code + ")" : "") + ".", "err");
+    });
+  }
+
+  // ---------- Druckansicht ----------
+  function togglePrint() {
+    var on = document.body.classList.toggle("print-preview");
+    $("printBtn").textContent = on ? "Ansicht schließen" : "Druckansicht";
+    if (on) render();
+  }
+
+  // ---------- Theme (hell / dunkel) ----------
+  function applyTheme(t) {
+    t = (t === "light") ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", t);
+    var b = $("themeBtn"); if (b) b.textContent = t === "light" ? "☾ Dunkel" : "☀ Hell";
+    try { localStorage.setItem("munbestand_theme", t); } catch (e) {}
+  }
+  function toggleTheme() {
+    var cur = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+    var next = cur === "light" ? "dark" : "light";
+    applyTheme(next);
+    try { if (window.KRHubTheme && window.KRHubTheme.set) window.KRHubTheme.set(next); } catch (e) {}
+  }
+
+  // ---------- Tabs ----------
+  var currentTab = "bestand";
+  function showTab(name) {
+    currentTab = (name === "auswertung") ? "auswertung" : "bestand";
+    var bestand = currentTab === "bestand";
+    $("overview").hidden = !bestand;
+    $("logSection").hidden = !bestand;
+    $("analytics").hidden = bestand;
+    var tabs = document.querySelectorAll(".tab");
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].classList.toggle("active", tabs[i].getAttribute("data-tab") === currentTab);
+    }
+    if (!bestand) renderAnalytics();
+  }
+
+  // ---------- Auswertung ----------
+  var period = "all", OUT_REASONS = ["Training", "Verkauf", "Verlust", "Korrektur"], lastPeriods = "";
+  function buildYears() {
+    var ys = {};
+    state.txns.forEach(function (x) { var y = String(x.dateISO || "").slice(0, 4); if (/^\d{4}$/.test(y)) ys[y] = 1; });
+    return Object.keys(ys).sort().reverse();
+  }
+  function fillPeriods() {
+    var sel = $("periodSel"); if (!sel) return;
+    var years = buildYears(), key = years.join(",");
+    if (key !== lastPeriods) {
+      lastPeriods = key;
+      sel.innerHTML = '<option value="all">Gesamt</option>' + years.map(function (y) { return '<option value="' + y + '">' + y + '</option>'; }).join("");
+    }
+    if (period !== "all" && years.indexOf(period) < 0) period = "all";
+    sel.value = period;
+  }
+  function txnsInPeriod() {
+    if (period === "all") return state.txns;
+    return state.txns.filter(function (x) { return String(x.dateISO || "").slice(0, 4) === period; });
+  }
+  function renderAnalytics() {
+    if (!$("aRank")) return;
+    fillPeriods();
+    var txns = txnsInPeriod(), types = sortedTypes();
+    // Nur Training zählt – Verkauf/Verlust/Korrektur werden ignoriert
+    var byType = {}, totalShot = 0, shootCount = 0;
+    types.forEach(function (t) { byType[t.id] = 0; });
+    txns.forEach(function (x) {
+      if (x.reason !== "Training") return;
+      var d = Number(x.delta) || 0; if (d >= 0) return;
+      var q = -d;
+      if (byType[x.typeId] == null) byType[x.typeId] = 0;
+      byType[x.typeId] += q;
+      totalShot += q; shootCount++;
+    });
+    $("aShot").textContent = nf(totalShot);
+    $("aOut").textContent = nf(shootCount);
+
+    var rankList = types.slice().sort(function (a, b) { return (byType[b.id] || 0) - (byType[a.id] || 0); });
+    var max = rankList.length ? (byType[rankList[0].id] || 0) : 0;
+    $("aTop").textContent = (max > 0) ? rankList[0].name : "—";
+
+    var rank = $("aRank");
+    if (max <= 0) {
+      rank.innerHTML = '<div class="empty-note" style="padding:18px">Noch keine Trainings-Buchungen im Zeitraum. Buche Abgänge mit dem Grund „Training“, dann erscheint hier, welche Munition am meisten verschossen wurde.</div>';
+    } else {
+      rank.innerHTML = rankList.map(function (t) {
+        var v = byType[t.id] || 0;
+        var pct = Math.max(v > 0 ? 3 : 0, Math.round(v / max * 100));
+        var share = totalShot > 0 ? Math.round(v / totalShot * 100) : 0;
+        return '<div class="rank-row"><div class="rank-name">' + esc(t.name) + '</div>' +
+          '<div class="rank-track"><div class="rank-fill" style="width:' + pct + '%"></div></div>' +
+          '<div class="rank-val">' + nf(v) + (v > 0 ? ' · ' + share + '%' : '') + '</div></div>';
+      }).join("");
+    }
+  }
+
+  // ---------- Ereignisse ----------
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest("[data-action]");
+    if (t) {
+      var a = t.getAttribute("data-action");
+      if (a === "del-txn") { deleteTxn(t.getAttribute("data-id")); return; }
+      if (a !== "del-type") disarm();
+      switch (a) {
+        case "open-book": openBook(null, "in"); break;
+        case "book": openBook(t.getAttribute("data-id"), t.getAttribute("data-dir")); break;
+        case "close-book": closeBook(); break;
+        case "save-book": saveBooking(); break;
+        case "add-type": openType(null); break;
+        case "edit-type": openType(t.getAttribute("data-id")); break;
+        case "close-type": closeType(); break;
+        case "save-type": saveType(); break;
+        case "del-type": deleteType(); break;
+        case "print-toggle": togglePrint(); break;
+        case "pdf": doPdf(); break;
+        case "backup": doBackup(); break;
+        case "export-csv": doCsv(); break;
+        case "import": pickImport(); break;
+        case "close-confirm": pendingImport = null; $("confirmScrim").hidden = true; break;
+        case "confirm-ok": runImport(); break;
+        case "sync-open": openSync(); break;
+        case "sync-connect": connectSync(); break;
+        case "sync-disconnect": disconnectSync(); break;
+        case "sync-close": closeSync(); break;
+        case "tab": showTab(t.getAttribute("data-tab")); break;
+        case "theme-toggle": toggleTheme(); break;
+      }
+      return;
+    }
+    // Klick auf Richtungs-Segment
+    var seg = e.target.closest(".seg button[data-dir]");
+    if (seg) { setDir(seg.getAttribute("data-dir")); return; }
+    // Klick auf Scrim schließt Dialog
+    if (e.target.id === "bookScrim") closeBook();
+    if (e.target.id === "typeScrim") closeType();
+    if (e.target.id === "confirmScrim") { pendingImport = null; $("confirmScrim").hidden = true; }
+    if (e.target.id === "syncScrim") closeSync();
+    disarm();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { closeBook(); closeType(); closeSync(); pendingImport = null; $("confirmScrim").hidden = true; disarm(); }
+    if (e.key === "Enter" && !$("bookScrim").hidden && e.target.tagName !== "SELECT") { e.preventDefault(); saveBooking(); }
+    if (e.key === "Enter" && !$("typeScrim").hidden && e.target.id === "tyName") { e.preventDefault(); saveType(); }
+  });
+
+  // ---------- Speicher verbinden (db mit localStorage-Fallback) ----------
+  var DEFAULTS = ["9mm", "9mm Hohlspitz", ".45", ".45 Hohlspitz", ".223", ".308", ".357", ".38", ".22", "12/70"];
+  var backendChosen = false, subscribed = false, unsubs = [];
+  var MODE_KEY = "munitionsbestand_mode";
+  function readMode() { try { return localStorage.getItem(MODE_KEY) || ""; } catch (e) { return ""; } }
+  function writeMode(m) { try { localStorage.setItem(MODE_KEY, m); } catch (e) {} }
+
+  function enableUI() {
+    $("bookBtn").disabled = false;
+    $("addBtn").disabled = false;
+    $("dataTools").hidden = false;
+  }
+  function setConn(s) {
+    var el = $("connStatus"); if (!el) return;
+    el.hidden = false;
+    el.className = "conn no-print " + s;
+    if (s === "connecting") el.textContent = "⏳ Verbindet mit dem Speicher …";
+    else if (s === "synced") { el.textContent = "✓ Geräteübergreifend synchronisiert"; setTimeout(function () { if (el.classList.contains("synced")) el.hidden = true; }, 2800); }
+    else if (s === "offline") el.textContent = "⚠ Offline-Modus: Der Sync-Speicher ist in dieser Ansicht nicht verfügbar – deine Daten werden nur auf diesem Gerät gespeichert.";
+  }
+  function stopSubs() {
+    unsubs.forEach(function (u) { try { u(); } catch (e) {} });
+    unsubs = []; subscribed = false;
+  }
+  function subscribe() {
+    if (subscribed || !db) return;
+    subscribed = true;
+    unsubs.push(db.collection("types").onSnapshot(function (snap) {
+      state.types = snap.docs.map(function (d) { var o = d.data() || {}; o.id = d.id; return o; });
+      state.ready = true; render();
+    }, function (err) { state.ready = true; render(); writeGuard(err); }));
+    unsubs.push(db.collection("transactions").onSnapshot(function (snap) {
+      state.txns = snap.docs.map(function (d) { var o = d.data() || {}; o.id = d.id; return o; });
+      render();
+    }, function (err) { writeGuard(err); }));
+  }
+  function useDb(d) {
+    if (backendChosen) return;
+    backendChosen = true; db = d;
+    enableUI(); setConn("synced"); subscribe();
+    // Wächter: liefert der Sync-Speicher binnen 5 s keine Daten, auf lokal wechseln
+    setTimeout(function () { if (!state.ready && db && !db.__local) migrateToLocal(); }, 5000);
+  }
+  function useLocal() {
+    if (backendChosen) return;
+    backendChosen = true; db = makeLocalDb(DEFAULTS, true);
+    enableUI(); subscribe();
+    SYNC.setStatusCb(setSyncStatus); SYNC.start();
+  }
+  function migrateToLocal() {
+    if (db && db.__local) return;
+    stopSubs();
+    var sType = state.types.slice(), sTxn = state.txns.slice();
+    var local = makeLocalDb(DEFAULTS, sType.length === 0);
+    sType.forEach(function (t) { local.doc("types/" + t.id).set({ name: t.name, minStock: Number(t.minStock) || 0, reserved: Number(t.reserved) || 0, order: Number(t.order) || 0, createdAt: Number(t.createdAt) || Date.now() }); });
+    sTxn.forEach(function (x) { local.doc("transactions/" + x.id).set({ typeId: x.typeId, delta: Number(x.delta) || 0, reason: x.reason || "", note: x.note || "", dateISO: x.dateISO || todayISO(), createdAt: Number(x.createdAt) || Date.now() }); });
+    db = local; backendChosen = true; writeMode("local");
+    enableUI(); setConn("offline"); subscribe();
+    toast("Sync-Speicher nicht beschreibbar – auf lokalen Speicher umgeschaltet. Bitte die letzte Aktion einmal wiederholen.", "err");
+  }
+
+  // localStorage-Backend mit derselben Schnittstelle wie db
+  function makeLocalDb(defaults, seedDefaults) {
+    var KEY = "munitionsbestand_v1", mem;
+    try { mem = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) { mem = null; }
+    if (!mem || typeof mem !== "object") mem = { types: {}, transactions: {} };
+    if (!mem.types) mem.types = {};
+    if (!mem.transactions) mem.transactions = {};
+    if (seedDefaults && Object.keys(mem.types).length === 0) {
+      defaults.forEach(function (name, i) { mem.types["t" + (i + 1)] = { name: name, minStock: 0, order: i + 1, createdAt: 1000000 + i }; });
+    }
+    var onChangeCb = null, applying = false;
+    function persist() { try { localStorage.setItem(KEY, JSON.stringify(mem)); } catch (e) {} if (onChangeCb && !applying) onChangeCb(); }
+    persist();
+    var listeners = { types: [], transactions: [] };
+    function gid() { return "l" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+    function snapOf(c) {
+      var docs = Object.keys(mem[c]).map(function (id) { var d = mem[c][id]; return { id: id, exists: true, data: function () { return d; }, metadata: {} }; });
+      return { docs: docs, size: docs.length, empty: docs.length === 0, docChanges: function () { return []; }, metadata: {} };
+    }
+    function fire(c) { listeners[c].slice().forEach(function (cb) { try { cb(snapOf(c)); } catch (e) {} }); }
+    function dref(c, id) {
+      return {
+        id: id, path: c + "/" + id,
+        get: function () { return Promise.resolve({ id: id, exists: !!mem[c][id], data: function () { return mem[c][id]; }, metadata: {} }); },
+        set: function (d) { mem[c][id] = d; persist(); fire(c); return Promise.resolve(); },
+        update: function (d) { if (!mem[c][id]) return Promise.reject({ code: "invalid_argument", message: "missing" }); var o = mem[c][id]; for (var k in d) o[k] = d[k]; persist(); fire(c); return Promise.resolve(); },
+        delete: function () { delete mem[c][id]; persist(); fire(c); return Promise.resolve(); }
+      };
+    }
+    function cref(c) {
+      if (!mem[c]) mem[c] = {};
+      return {
+        path: c,
+        onSnapshot: function (next) { listeners[c].push(next); setTimeout(function () { try { next(snapOf(c)); } catch (e) {} }, 0); return function () { var i = listeners[c].indexOf(next); if (i >= 0) listeners[c].splice(i, 1); }; },
+        add: function (d) { var id = gid(); mem[c][id] = d; persist(); fire(c); return Promise.resolve(dref(c, id)); },
+        doc: function (id) { if (!id) id = gid(); return dref(c, id); }
+      };
+    }
+    return {
+      __local: true, collection: cref,
+      doc: function (p) { var s = p.split("/"); return dref(s[0], s.slice(1).join("/")); },
+      exportMem: function () { return { types: JSON.parse(JSON.stringify(mem.types)), transactions: JSON.parse(JSON.stringify(mem.transactions)) }; },
+      applyRemote: function (m) { applying = true; mem.types = (m && m.types) || {}; mem.transactions = (m && m.transactions) || {}; persist(); applying = false; fire("types"); fire("transactions"); },
+      setOnChange: function (cb) { onChangeCb = cb; }
+    };
+  }
+
+  // ---------- Datei-Download (Standalone) ----------
+  function mimeOf(fn) {
+    fn = (fn || "").toLowerCase();
+    if (fn.indexOf(".pdf") >= 0) return "application/pdf";
+    if (fn.indexOf(".csv") >= 0) return "text/csv;charset=utf-8";
+    if (fn.indexOf(".json") >= 0) return "application/json";
+    return "application/octet-stream";
+  }
+  function makeFileDownloader() {
+    return { save: function (req) {
+      try {
+        var data = req.data, blob = (data instanceof Blob) ? data : new Blob([data], { type: mimeOf(req.filename) });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url; a.download = req.filename || "download";
+        document.body.appendChild(a); a.click();
+        setTimeout(function () { try { URL.revokeObjectURL(url); a.remove(); } catch (e) {} }, 1500);
+        return Promise.resolve({ status: "saved" });
+      } catch (e) { return Promise.reject({ code: "unavailable", message: String(e) }); }
+    } };
+  }
+
+  // ---------- GitHub-Gist-Sync (Standalone) ----------
+  function syncErrText(code) {
+    return code === 401 ? "Token ungültig oder abgelaufen"
+      : code === 403 ? "Zugriff verweigert (Rechte/Limit)"
+      : code === 404 ? "Gist nicht gefunden"
+      : code === "empty" ? "kein Token eingegeben"
+      : code ? "Fehler " + code : "Netzwerkfehler";
+  }
+  function setSyncStatus(s, info) {
+    var el = $("connStatus"); if (el) { el.hidden = true; el.innerHTML = ""; }
+  }
+
+  var SYNC = (function () {
+    var TKEY = "munbestand_gh_token", GKEY = "munbestand_gh_gist", UKEY = "munbestand_updated";
+    var FILE = "munitionsbestand.json", API = "https://api.github.com";
+    var token = "", gistId = "", pushTimer = null, busy = false, pollTimer = null, statusCb = function () {};
+    try { localStorage.removeItem(TKEY); localStorage.removeItem(GKEY); } catch (e) {} token = ""; gistId = "";
+    function setLS(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+    function delLS(k) { try { localStorage.removeItem(k); } catch (e) {} }
+    function localU() { try { return Number(localStorage.getItem(UKEY)) || 0; } catch (e) { return 0; } }
+    function setLocalU(v) { setLS(UKEY, String(v)); }
+    function hdr() { return { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }; }
+    function emit(s, info) { try { statusCb(s, info); } catch (e) {} }
+    function payload() {
+      var m = db.exportMem();
+      return { app: "munitionsbestand", schema: 1, updatedAt: localU() || Date.now(), types: m.types, transactions: m.transactions };
+    }
+    function ensureGist() {
+      if (gistId) return Promise.resolve(gistId);
+      return fetch(API + "/gists?per_page=100", { headers: hdr() }).then(function (r) {
+        if (!r.ok) throw { code: r.status }; return r.json();
+      }).then(function (list) {
+        for (var i = 0; i < list.length; i++) { if (list[i].files && list[i].files[FILE]) { gistId = list[i].id; break; } }
+        if (gistId) { setLS(GKEY, gistId); return gistId; }
+        var body = { description: "Munitionsbestand – Sync (privat)", public: false, files: {} };
+        body.files[FILE] = { content: JSON.stringify(payload(), null, 2) };
+        return fetch(API + "/gists", { method: "POST", headers: hdr(), body: JSON.stringify(body) }).then(function (r) {
+          if (!r.ok) throw { code: r.status }; return r.json();
+        }).then(function (g) { gistId = g.id; setLS(GKEY, gistId); setLocalU(Date.now()); return gistId; });
+      });
+    }
+    function pull() {
+      if (!token || busy) return Promise.resolve();
+      busy = true; emit("sync");
+      return ensureGist().then(function (id) {
+        return fetch(API + "/gists/" + id, { headers: hdr() });
+      }).then(function (r) { if (!r.ok) throw { code: r.status }; return r.json(); })
+      .then(function (g) {
+        var f = g.files && g.files[FILE]; if (!f) return;
+        var getc = (f.truncated && f.raw_url) ? fetch(f.raw_url).then(function (r) { return r.text(); }) : Promise.resolve(f.content);
+        return getc.then(function (txt) {
+          var remote = JSON.parse(txt);
+          var rU = Number(remote.updatedAt) || 0, lU = localU();
+          if (rU > lU) { db.applyRemote({ types: remote.types || {}, transactions: remote.transactions || {} }); setLocalU(rU); }
+          else if (lU > rU) { schedulePush(true); }
+        });
+      }).then(function () { emit("ok"); }).catch(function (e) { emit("err", e && e.code); })
+      .then(function () { busy = false; });
+    }
+    function doPush() {
+      if (!token) return;
+      emit("sync");
+      ensureGist().then(function (id) {
+        var body = { files: {} }; body.files[FILE] = { content: JSON.stringify(payload(), null, 2) };
+        return fetch(API + "/gists/" + id, { method: "PATCH", headers: hdr(), body: JSON.stringify(body) });
+      }).then(function (r) { if (!r.ok) throw { code: r.status }; emit("ok"); })
+      .catch(function (e) { emit("err", e && e.code); });
+    }
+    function schedulePush(now) {
+      if (!token) return;
+      if (pushTimer) clearTimeout(pushTimer);
+      pushTimer = setTimeout(doPush, now ? 60 : 1400);
+    }
+    function onLocalChange() { setLocalU(Date.now()); schedulePush(false); }
+    function verify() {
+      return fetch(API + "/gists?per_page=1", { headers: hdr() }).then(function (r) { if (!r.ok) throw { code: r.status }; return true; });
+    }
+    return {
+      setStatusCb: function (cb) { statusCb = cb; },
+      hasToken: function () { return !!token; },
+      start: function () {
+        db.setOnChange(onLocalChange);
+        if (!token) { emit("off"); return; }
+        pull();
+        if (pollTimer) clearInterval(pollTimer);
+        pollTimer = setInterval(pull, 25000);
+        window.addEventListener("focus", function () { pull(); });
+      },
+      connect: function (t) {
+        token = (t || "").trim(); setLS(TKEY, token); gistId = ""; delLS(GKEY);
+        if (!token) return Promise.reject({ code: "empty" });
+        emit("sync");
+        return verify().then(function () { return pull(); }).then(function () { return true; })
+          .catch(function (e) { emit("err", e && e.code); throw e; });
+      },
+      disconnect: function () { token = ""; gistId = ""; delLS(TKEY); delLS(GKEY); emit("off"); }
+    };
+  })();
+
+  function openSync() {
+    $("syncToken").value = "";
+    $("syncState").textContent = SYNC.hasToken() ? "Verbunden – auf diesem Gerät ist ein Token hinterlegt." : "Nicht verbunden.";
+    $("syncDisc").hidden = !SYNC.hasToken();
+    $("syncScrim").hidden = false;
+    setTimeout(function () { $("syncToken").focus(); }, 30);
+  }
+  function closeSync() { $("syncScrim").hidden = true; }
+  function connectSync() {
+    var t = ($("syncToken").value || "").trim();
+    if (!t) { toast("Bitte Token einfügen.", "err"); return; }
+    var b = $("syncConnect"); b.disabled = true;
+    SYNC.connect(t).then(function () { closeSync(); toast("Mit GitHub verbunden – Sync aktiv.", "ok"); })
+      .catch(function (e) { toast("Verbindung fehlgeschlagen: " + syncErrText(e && e.code) + ".", "err"); })
+      .then(function () { b.disabled = false; });
+  }
+  function disconnectSync() { SYNC.disconnect(); closeSync(); toast("Sync getrennt – deine Daten bleiben lokal erhalten.", "ok"); }
+
+  $("bkDate") && ($("bkDate").value = todayISO());
+  $("importFile") && $("importFile").addEventListener("change", onImportFile);
+  buildWheel();
+
+  // Theme & Tabs initialisieren
+  (function () {
+    var saved = "dark";
+    var ht = document.documentElement.getAttribute("data-theme");
+    if (ht === "light" || ht === "dark") { saved = ht; }
+    else { try { var s = localStorage.getItem("munbestand_theme"); if (s === "light" || s === "dark") saved = s; } catch (e) {} }
+    applyTheme(saved);
+    showTab("bestand");
+    var ps = $("periodSel");
+    if (ps) ps.addEventListener("change", function () { period = this.value; renderAnalytics(); });
+  })();
+
+  if (window.claude && window.claude.use) {
+    window.claude.use("user").then(function (u) { userCap = u; }, function () {});
+    window.claude.use("downloads").then(function (d) { downloadsCap = d; }, function () {});
+    if (readMode() === "local") {
+      // Dieses Gerät hat zuvor auf lokalen Speicher umgeschaltet – direkt lokal starten
+      useLocal();
+    } else {
+      setConn("connecting");
+      window.claude.use("db").then(function (d) { if (d) useDb(d); else useLocal(); }, function () { useLocal(); });
+      setTimeout(function () { if (!backendChosen) useLocal(); }, 6000);
+    }
+  } else {
+    downloadsCap = makeFileDownloader();
+    useLocal();
+  }
+})();
+</script>
+
+</body>
+</html>

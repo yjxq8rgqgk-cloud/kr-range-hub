@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="../../shared/kr-reskin.css">
+<link rel="stylesheet" href="../../shared/theme.css">
+<script src="../../shared/theme.js"></script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Ringzahl &amp; Schusszahl</title>
+<link rel="stylesheet" href="_ds/halo-design-system-f23c852e-6dc8-4d92-b7e0-45e81efc1e85/_ds_bundle.css">
+<link rel="stylesheet" href="_ds/halo-design-system-f23c852e-6dc8-4d92-b7e0-45e81efc1e85/styles.css">
+<style>html,body{margin:0;background:#14110B;color:#DCD0B5;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}button{touch-action:manipulation;-webkit-user-select:none;user-select:none}input::placeholder{color:rgba(255,255,255,.35)}a{color:#C9824E}a:hover{color:#fff}
+/* Skalierung an den Bildschirm anpassen: größer auf Tablet/Desktop, kompakter auf niedrigen Screens */
+@media (min-width:600px){#rz-col{max-width:640px}.rz-key{height:76px!important}.rz-act{height:60px!important}}
+@media (min-width:900px){#rz-col{max-width:720px}.rz-key{height:84px!important}}
+@media (max-height:740px){.rz-key{height:52px!important}.rz-act{height:46px!important}}</style>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#000"/><circle cx="50" cy="50" r="28" fill="none" stroke="#C9824E" stroke-width="4"/><circle cx="50" cy="50" r="14" fill="none" stroke="#fff" stroke-width="4"/><circle cx="50" cy="50" r="4" fill="#fff"/></svg></template>
+</helmet>
+<div class="halo-root" style="min-height:100dvh;background:var(--halo-bg);display:flex;justify-content:center;font-family:var(--halo-font-body)">
+<div id="rz-col" style="width:100%;max-width:480px;min-height:100dvh;display:flex;flex-direction:column;gap:var(--halo-space-3);padding:max(var(--halo-space-4),env(safe-area-inset-top)) var(--halo-space-4) max(var(--halo-space-4),env(safe-area-inset-bottom));box-sizing:border-box">
+
+<div style="background:var(--halo-surface-2);border-radius:var(--halo-radius-xl);box-shadow:var(--halo-ring-strong);overflow:hidden">
+<div style="padding:var(--halo-space-3) var(--halo-space-4) 0;text-align:center;font-size:15px;font-weight:600;color:var(--halo-accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ activeName }}</div>
+<div style="display:grid;grid-template-columns:1fr 1fr">
+<div style="display:flex;flex-direction:column;align-items:center;gap:var(--halo-space-2);padding:var(--halo-space-3) var(--halo-space-3) var(--halo-space-4)">
+<div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--halo-fg-muted)">Gesamtringe</div>
+<div style="font-family:var(--halo-font-display);font-weight:500;font-size:clamp(52px,16vw,76px);line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums">{{ ringe }}</div>
+</div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:var(--halo-space-2);padding:var(--halo-space-3) var(--halo-space-3) var(--halo-space-4);border-left:1px solid var(--halo-hairline-strong)">
+<div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--halo-fg-muted)">Gesamttreffer</div>
+<div style="font-family:var(--halo-font-display);font-weight:500;font-size:clamp(52px,16vw,76px);line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums">{{ treffer }}</div>
+</div>
+</div>
+</div>
+
+<div style="display:flex;padding:0 var(--halo-space-2);font-size:13px;color:var(--halo-fg-dim)">
+<span style="flex:1;min-width:0;display:flex;align-items:center;gap:6px">Letzte: <span style="flex:1;min-width:0;display:flex;justify-content:flex-end;align-items:center;gap:6px;overflow:hidden;white-space:nowrap"><span style="flex:none;color:var(--halo-fg-muted)">{{ letzte }}</span><span style="flex:none;color:#fff;font-weight:800;font-size:15px">{{ zuletzt }}</span></span></span>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--halo-space-3)">
+<sc-for list="{{ keys }}" as="k" hint-placeholder-count="12">
+<button onClick="{{ k.press }}" class="rz-key" style="position:relative;height:62px;border:0;border-radius:var(--halo-radius-pill);background:var(--halo-surface-3);box-shadow:{{ k.shadow }};color:var(--halo-fg);font-family:var(--halo-font-display);font-size:{{ k.size }};font-weight:500;letter-spacing:-.02em;cursor:pointer;transition:background .15s,transform .08s" style-active="background:var(--halo-surface-hover);transform:scale(.96)">
+{{ k.label }}
+<span style="position:absolute;right:10px;bottom:7px;min-width:22px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:var(--halo-radius-pill);background:{{ k.badgeBg }};color:{{ k.badgeFg }};font-family:var(--halo-font-body);font-size:12px;font-weight:600;line-height:22px;text-align:center;font-variant-numeric:tabular-nums">{{ k.count }}</span>
+</button>
+</sc-for>
+</div>
+
+<div style="flex:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--halo-space-3);align-content:start">
+<sc-for list="{{ teams }}" as="team" hint-placeholder-count="2">
+<div style="display:flex;flex-direction:column;gap:6px">
+<sc-for list="{{ team.people }}" as="p" hint-placeholder-count="3">
+<div onClick="{{ p.select }}" style="display:flex;align-items:center;gap:6px;height:40px;padding:0 12px 0 14px;border-radius:var(--halo-radius-pill);background:{{ p.bg }};box-shadow:{{ p.ring }};cursor:pointer;transition:background .15s,box-shadow .15s">
+<input value="{{ p.name }}" placeholder="{{ p.placeholder }}" onChange="{{ p.rename }}" onFocus="{{ p.select }}" style="flex:1;min-width:0;height:100%;border:0;outline:0;background:transparent;color:var(--halo-fg);font-family:var(--halo-font-body);font-size:16px;font-weight:{{ p.weight }}">
+<span style="font-size:14px;font-weight:600;color:{{ p.numColor }};font-variant-numeric:tabular-nums">{{ p.ringe }}</span>
+</div>
+</sc-for>
+<div style="display:flex;justify-content:space-between;align-items:baseline;padding:4px 14px 0;border-top:1px solid var(--halo-hairline-strong);margin-top:2px">
+<span style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--halo-fg-muted)">Summe</span>
+<span style="font-family:var(--halo-font-display);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums">{{ team.sum }}</span>
+</div>
+</div>
+</sc-for>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--halo-space-3)">
+<button onClick="{{ clear }}" class="rz-act" style="height:56px;border:0;border-radius:var(--halo-radius-pill);background:{{ clearBg }};color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);font-family:var(--halo-font-body);font-size:16px;font-weight:500;cursor:pointer;transition:background .15s">{{ clearLabel }}</button>
+<button onClick="{{ undo }}" class="rz-act" style="height:56px;border:0;border-radius:var(--halo-radius-pill);background:#C9824E;color:#14110B;font-family:var(--halo-font-body);font-size:16px;font-weight:500;cursor:pointer;opacity:{{ undoOpacity }}" style-active="background:#B26A3E">zurück</button>
+</div>
+
+<button onClick="{{ clearAll }}" class="rz-act" style="height:48px;border:0;border-radius:var(--halo-radius-pill);background:{{ clearAllBg }};color:var(--halo-fg);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);font-family:var(--halo-font-body);font-size:15px;font-weight:500;cursor:pointer;transition:background .15s">{{ clearAllLabel }}</button>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { hists: [[], [], [], [], [], []], names: ['', '', '', '', '', ''], active: 0, confirm: false, confirmAll: false };
+  setHist(h) {
+    const hists = this.state.hists.slice();
+    hists[this.state.active] = h;
+    this.setState({ hists, confirm: false });
+  }
+  renderVals() {
+    const { hists, names, active, confirm, confirmAll } = this.state;
+    const hist = hists[active];
+    const sumOf = h => h.reduce((s, v) => s + (v === 'F' ? 0 : v), 0);
+    const counts = {};
+    hist.forEach(v => counts[v] = (counts[v] || 0) + 1);
+    const ringe = sumOf(hist);
+    const keys = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 'F'].map(v => {
+      const c = counts[v] || 0;
+      return {
+        label: v === 'F' ? 'Fehler' : String(v),
+        size: v === 'F' ? '18px' : '26px',
+        count: c,
+        badgeBg: c ? 'var(--halo-accent)' : 'rgba(255,255,255,.06)',
+        badgeFg: c ? '#fff' : 'var(--halo-fg-dim)',
+        shadow: c ? 'inset 0 0 0 1px rgba(201,130,78,.35)' : 'inset 0 0 0 1px rgba(255,255,255,.14)',
+        press: () => { this.setHist([...hist, v]); if (navigator.vibrate) navigator.vibrate(10); }
+      };
+    });
+    const lbl = v => v === 'F' ? 'F' : String(v);
+    const prev = hist.slice(-40, -1).map(lbl);
+    const label = i => names[i].trim() || 'Schütze ' + (i + 1);
+    const teams = [0, 1].map(t => {
+      const idx = [0, 1, 2].map(j => t * 3 + j);
+      return {
+        sum: idx.reduce((s, i) => s + sumOf(hists[i]), 0),
+        people: idx.map(i => {
+          const on = i === active;
+          return {
+            name: names[i],
+            placeholder: 'Schütze ' + (i + 1),
+            ringe: sumOf(hists[i]),
+            bg: on ? 'rgba(201,130,78,.14)' : 'var(--halo-surface-3)',
+            ring: on ? 'inset 0 0 0 1.5px var(--halo-accent)' : 'inset 0 0 0 1px rgba(255,255,255,.14)',
+            weight: on ? 600 : 400,
+            numColor: on ? '#fff' : 'var(--halo-fg-muted)',
+            select: () => { if (this.state.active !== i) this.setState({ active: i, confirm: false }); },
+            rename: e => { const n = this.state.names.slice(); n[i] = e.target.value; this.setState({ names: n }); }
+          };
+        })
+      };
+    });
+    return {
+      activeName: label(active),
+      ringe, treffer: hist.length, keys, teams,
+      letzte: hist.length ? (prev.length ? prev.join(' · ') + ' ·' : '') : '–',
+      zuletzt: hist.length ? lbl(hist[hist.length - 1]) : '',
+      undo: () => { if (hist.length) this.setHist(hist.slice(0, -1)); },
+      undoOpacity: hist.length ? 1 : 0.4,
+      clear: () => {
+        if (!hist.length) return;
+        if (!confirm) { this.setState({ confirm: true }); clearTimeout(this.t); this.t = setTimeout(() => this.setState({ confirm: false }), 3000); return; }
+        this.setHist([]);
+      },
+      clearLabel: confirm ? 'Wirklich löschen?' : 'löschen',
+      clearBg: confirm ? '#b42318' : 'var(--halo-surface-3)',
+      clearAll: () => {
+        const any = hists.some(h => h.length) || names.some(n => n.trim());
+        if (!any) return;
+        if (!this.state.confirmAll) { this.setState({ confirmAll: true }); clearTimeout(this.ta); this.ta = setTimeout(() => this.setState({ confirmAll: false }), 3000); return; }
+        clearTimeout(this.ta);
+        this.setState({ hists: [[], [], [], [], [], []], names: ['', '', '', '', '', ''], active: 0, confirm: false, confirmAll: false });
+      },
+      clearAllLabel: confirmAll ? 'Alles wirklich löschen?' : 'Alles löschen',
+      clearAllBg: confirmAll ? '#b42318' : 'var(--halo-surface-2)'
+    };
+  }
+}
+</script>
+</body>
+</html>
